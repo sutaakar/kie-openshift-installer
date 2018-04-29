@@ -15,15 +15,9 @@
  */
 package org.kie.cloud.openshift.settings.builder;
 
-import java.util.List;
-
-import org.kie.cloud.openshift.OpenShiftImageConstants;
-import org.kie.cloud.openshift.deployment.Deployment;
-
-import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
-import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.Template;
+import org.kie.cloud.openshift.OpenShiftImageConstants;
 
 /**
  * Cloud settings builder for Kie Server.
@@ -31,22 +25,13 @@ import io.fabric8.openshift.api.model.Template;
  * If any environment variable isn't configured by SettingsBuilder, then default
  * value from application template is used.
  */
-public class MySqlDeploymentBuilder implements DeploymentBuilder {
-
-    private Deployment mySqlDeployment;
+public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
 
     public MySqlDeploymentBuilder(Template mySqlTemplate) {
-        mySqlDeployment = new Deployment(mySqlTemplate);
+        super(mySqlTemplate);
     }
 
-    /**
-     * Return configured builder with Kie Server user.
-     *
-     * @param kieServerUser Kie Server username.
-     * @param kieServerPwd Kie Server password.
-     * @return Builder
-     */
-    public MySqlDeploymentBuilder withUser(String mySqlUser, String mySqlPwd) {
+    public MySqlDeploymentBuilder withDatabaseUser(String mySqlUser, String mySqlPwd) {
         EnvVar mySqlUserVar = new EnvVar(OpenShiftImageConstants.MYSQL_USER, mySqlUser, null);
         EnvVar mySqlPwdVar = new EnvVar(OpenShiftImageConstants.MYSQL_PASSWORD, mySqlPwd, null);
         addOrReplaceEnvVar(mySqlUserVar);
@@ -58,23 +43,5 @@ public class MySqlDeploymentBuilder implements DeploymentBuilder {
         EnvVar mySqlDbNameVar = new EnvVar(OpenShiftImageConstants.MYSQL_DATABASE, dbName, null);
         addOrReplaceEnvVar(mySqlDbNameVar);
         return this;
-    }
-
-    @Override
-    public Deployment build() {
-        return mySqlDeployment;
-    }
-
-    private void addOrReplaceEnvVar(EnvVar envVar) {
-        for (DeploymentConfig deploymentConfig : mySqlDeployment.getDeploymentConfigs()) {
-            List<Container> containers = deploymentConfig.getSpec()
-                                                         .getTemplate()
-                                                         .getSpec()
-                                                         .getContainers();
-            for (Container container : containers) {
-                container.getEnv().removeIf(n -> n.getName().equals(envVar.getName()));
-                container.getEnv().add(envVar);
-            }
-        }
     }
 }

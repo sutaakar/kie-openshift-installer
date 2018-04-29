@@ -15,15 +15,9 @@
  */
 package org.kie.cloud.openshift.settings.builder;
 
-import java.util.List;
-
-import org.kie.cloud.openshift.OpenShiftImageConstants;
-import org.kie.cloud.openshift.deployment.Deployment;
-
-import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
-import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.Template;
+import org.kie.cloud.openshift.OpenShiftImageConstants;
 
 /**
  * Cloud settings builder for Kie Server.
@@ -31,12 +25,10 @@ import io.fabric8.openshift.api.model.Template;
  * If any environment variable isn't configured by SettingsBuilder, then default
  * value from application template is used.
  */
-public class KieServerDeploymentBuilder implements DeploymentBuilder {
-
-    private Deployment kieServerDeployment;
+public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
 
     public KieServerDeploymentBuilder(Template kieServerTemplate) {
-        kieServerDeployment = new Deployment(kieServerTemplate);
+        super(kieServerTemplate);
     }
 
     /**
@@ -52,23 +44,5 @@ public class KieServerDeploymentBuilder implements DeploymentBuilder {
         addOrReplaceEnvVar(kieServerUserVar);
         addOrReplaceEnvVar(kieServerPwdVar);
         return this;
-    }
-
-    @Override
-    public Deployment build() {
-        return kieServerDeployment;
-    }
-
-    private void addOrReplaceEnvVar(EnvVar envVar) {
-        for (DeploymentConfig deploymentConfig : kieServerDeployment.getDeploymentConfigs()) {
-            List<Container> containers = deploymentConfig.getSpec()
-                                                         .getTemplate()
-                                                         .getSpec()
-                                                         .getContainers();
-            for (Container container : containers) {
-                container.getEnv().removeIf(n -> n.getName().equals(envVar.getName()));
-                container.getEnv().add(envVar);
-            }
-        }
     }
 }

@@ -198,20 +198,6 @@ objects:
       application: "${APPLICATION_NAME}"
     annotations:
       description: The execution server web server's http port.
-- kind: Service
-  apiVersion: v1
-  spec:
-    ports:
-    - port: 8443
-      targetPort: 8443
-    selector:
-      deploymentConfig: "${APPLICATION_NAME}-kieserver"
-  metadata:
-    name: secure-${APPLICATION_NAME}-kieserver
-    labels:
-      application: "${APPLICATION_NAME}"
-    annotations:
-      description: The execution server web server's https port.
 - kind: Route
   apiVersion: v1
   id: "${APPLICATION_NAME}-kieserver-http"
@@ -225,21 +211,6 @@ objects:
     host: "${EXECUTION_SERVER_HOSTNAME_HTTP}"
     to:
       name: "${APPLICATION_NAME}-kieserver"
-- kind: Route
-  apiVersion: v1
-  id: "${APPLICATION_NAME}-kieserver-https"
-  metadata:
-    name: secure-${APPLICATION_NAME}-kieserver
-    labels:
-      application: "${APPLICATION_NAME}"
-    annotations:
-      description: Route for execution server's https service.
-  spec:
-    host: "${EXECUTION_SERVER_HOSTNAME_HTTPS}"
-    to:
-      name: secure-${APPLICATION_NAME}-kieserver
-    tls:
-      termination: passthrough
 - kind: DeploymentConfig
   apiVersion: v1
   metadata:
@@ -279,10 +250,6 @@ objects:
           resources:
             limits:
               memory: "${EXCECUTION_SERVER_MEMORY_LIMIT}"
-          volumeMounts:
-          - name: kieserver-keystore-volume
-            mountPath: "/etc/kieserver-secret-volume"
-            readOnly: true
           livenessProbe:
             exec:
               command:
@@ -301,9 +268,6 @@ objects:
             protocol: TCP
           - name: http
             containerPort: 8080
-            protocol: TCP
-          - name: https
-            containerPort: 8443
             protocol: TCP
           env:
           - name: DROOLS_SERVER_FILTER_CLASSES
@@ -358,7 +322,3 @@ objects:
             value: "${HTTPS_NAME}"
           - name: HTTPS_PASSWORD
             value: "${HTTPS_PASSWORD}"
-        volumes:
-        - name: kieserver-keystore-volume
-          secret:
-            secretName: "${HTTPS_SECRET}"

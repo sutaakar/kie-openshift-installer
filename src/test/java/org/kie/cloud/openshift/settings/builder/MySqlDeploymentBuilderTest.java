@@ -27,7 +27,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
         Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
 
         MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
-        Deployment builtMySqlDeployment = settingsBuilder.withUser("mySqlName", "mySqlPassword")
+        Deployment builtMySqlDeployment = settingsBuilder.withDatabaseUser("mySqlName", "mySqlPassword")
                                                          .build();
 
         assertThat(builtMySqlDeployment).isNotNull();

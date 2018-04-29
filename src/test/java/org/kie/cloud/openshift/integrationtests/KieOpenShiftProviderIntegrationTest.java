@@ -33,14 +33,12 @@ public class KieOpenShiftProviderIntegrationTest extends AbstractCloudTest{
             assertThat(project).isNotNull();
 
             RouteList routes = openShiftClient.routes().inNamespace(projectName).list();
-            assertThat(routes.getItems()).hasSize(2)
-                                         .anySatisfy(n -> assertThat(n.getMetadata().getName()).isEqualTo("myapp-kieserver"))
-                                         .anySatisfy(n -> assertThat(n.getMetadata().getName()).isEqualTo("secure-myapp-kieserver"));
+            assertThat(routes.getItems()).hasSize(1)
+                                         .anySatisfy(n -> assertThat(n.getMetadata().getName()).isEqualTo("myapp-kieserver"));
 
             ServiceList services = openShiftClient.services().inNamespace(projectName).list();
-            assertThat(services.getItems()).hasSize(2)
-                                           .anySatisfy(n -> assertThat(n.getMetadata().getName()).isEqualTo("myapp-kieserver"))
-                                           .anySatisfy(n -> assertThat(n.getMetadata().getName()).isEqualTo("secure-myapp-kieserver"));
+            assertThat(services.getItems()).hasSize(1)
+                                           .anySatisfy(n -> assertThat(n.getMetadata().getName()).isEqualTo("myapp-kieserver"));
 
             DeploymentConfigList deploymentConfigs = openShiftClient.deploymentConfigs().inNamespace(projectName).list();
             assertThat(deploymentConfigs.getItems()).hasSize(1);
