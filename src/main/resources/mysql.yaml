@@ -289,9 +289,6 @@ objects:
           ports:
           - containerPort: 3306
             protocol: TCP
-          volumeMounts:
-          - mountPath: "/var/lib/mysql/data"
-            name: "${APPLICATION_NAME}-mysql-pvol"
           env:
           - name: MYSQL_USER
             value: "${KIE_SERVER_MYSQL_USER}"
@@ -299,19 +296,3 @@ objects:
             value: "${KIE_SERVER_MYSQL_PWD}"
           - name: MYSQL_DATABASE
             value: "${KIE_SERVER_MYSQL_DB}"
-        volumes:
-        - name: "${APPLICATION_NAME}-mysql-pvol"
-          persistentVolumeClaim:
-            claimName: "${APPLICATION_NAME}-mysql-claim"
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    name: "${APPLICATION_NAME}-mysql-claim"
-    labels:
-      application: "${APPLICATION_NAME}"
-  spec:
-    accessModes:
-    - ReadWriteOnce
-    resources:
-      requests:
-        storage: "${DB_VOLUME_CAPACITY}"
