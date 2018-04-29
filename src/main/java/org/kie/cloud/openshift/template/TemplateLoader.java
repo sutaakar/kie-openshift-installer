@@ -8,7 +8,7 @@ import org.kie.cloud.openshift.KieOpenShiftProvider;
 
 public class TemplateLoader {
 
-    private static final String KIE_SERVER_TEMPLATE_RESOURCE_PATH = "/rhpam70-kieserver.yaml";
+    private static final String KIE_SERVER_TEMPLATE_RESOURCE_PATH = "/kieserver.yaml";
 
     private OpenShiftClient openShiftClient;
 
