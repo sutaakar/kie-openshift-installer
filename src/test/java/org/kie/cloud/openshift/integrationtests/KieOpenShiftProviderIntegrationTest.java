@@ -23,29 +23,28 @@ public class KieOpenShiftProviderIntegrationTest extends AbstractCloudTest{
     public void testCreateAndDeployKieServer() {
         final String projectName = "test-project-" + UUID.randomUUID().toString().substring(0, 4);
 
-        OpenShiftClient client = getOfflineOpenShiftClient();
-        try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(client)) {
+        try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
             Deployment kieServerDeployment = kieOpenShiftProvider.createKieServerDeploymentBuilder()
                                                                       .withKieServerUser("john", "john123")
                                                                       .build();
-            Scenario kieServerScenario = kieOpenShiftProvider.createScenario(projectName);
+            Scenario kieServerScenario = kieOpenShiftProvider.createScenario();
             kieServerScenario.addDeployment(kieServerDeployment);
-            kieServerScenario.deploy();
+            kieOpenShiftProvider.deployScenario(kieServerScenario, projectName);
 
-            Project project = client.projects().withName(projectName).get();
+            Project project = openShiftClient.projects().withName(projectName).get();
             assertThat(project).isNotNull();
 
-            RouteList routes = client.routes().inNamespace(projectName).list();
+            RouteList routes = openShiftClient.routes().inNamespace(projectName).list();
             assertThat(routes.getItems()).hasSize(2)
                                          .anySatisfy(n -> assertThat(n.getMetadata().getName()).isEqualTo("myapp-kieserver"))
                                          .anySatisfy(n -> assertThat(n.getMetadata().getName()).isEqualTo("secure-myapp-kieserver"));
 
-            ServiceList services = client.services().inNamespace(projectName).list();
+            ServiceList services = openShiftClient.services().inNamespace(projectName).list();
             assertThat(services.getItems()).hasSize(2)
                                            .anySatisfy(n -> assertThat(n.getMetadata().getName()).isEqualTo("myapp-kieserver"))
                                            .anySatisfy(n -> assertThat(n.getMetadata().getName()).isEqualTo("secure-myapp-kieserver"));
 
-            DeploymentConfigList deploymentConfigs = client.deploymentConfigs().inNamespace(projectName).list();
+            DeploymentConfigList deploymentConfigs = openShiftClient.deploymentConfigs().inNamespace(projectName).list();
             assertThat(deploymentConfigs.getItems()).hasSize(1);
             assertThat(deploymentConfigs.getItems().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                                                                                            .anySatisfy(e -> {
@@ -58,7 +57,7 @@ public class KieOpenShiftProviderIntegrationTest extends AbstractCloudTest{
                                                                                                 assertThat(e.getValue()).isEqualTo("john123");
                                                                                             });
         } finally {
-            client.projects().withName(projectName).delete();
+            openShiftClient.projects().withName(projectName).delete();
         }
     }
 }

@@ -34,8 +34,8 @@ public class Deployment {
 
     public List<Service> getSecureServices() {
         List<String> secureServiceNames = getSecureRoutes().stream()
-                                                            .map(r -> r.getSpec().getTo().getName())
-                                                            .collect(Collectors.toList());
+                                                           .map(r -> r.getSpec().getTo().getName())
+                                                           .collect(Collectors.toList());
         return template.getObjects()
                        .stream()
                        .filter(o -> o instanceof Service)
@@ -64,9 +64,9 @@ public class Deployment {
 
     public List<DeploymentConfig> getDeploymentConfigs() {
         return template.getObjects()
-                .stream()
-                .filter(o -> o instanceof DeploymentConfig)
-                .map(o -> (DeploymentConfig) o)
-                .collect(Collectors.toList());
+                       .stream()
+                       .filter(o -> o instanceof DeploymentConfig)
+                       .map(o -> (DeploymentConfig) o)
+                       .collect(Collectors.toList());
     }
 }
