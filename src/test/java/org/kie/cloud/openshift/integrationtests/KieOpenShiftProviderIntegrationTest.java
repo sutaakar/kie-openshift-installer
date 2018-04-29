@@ -4,18 +4,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.UUID;
 
+import io.fabric8.kubernetes.api.model.ServiceList;
+import io.fabric8.openshift.api.model.DeploymentConfigList;
+import io.fabric8.openshift.api.model.Project;
+import io.fabric8.openshift.api.model.RouteList;
 import org.junit.Test;
 import org.kie.cloud.openshift.AbstractCloudTest;
 import org.kie.cloud.openshift.KieOpenShiftProvider;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.deployment.Deployment;
 import org.kie.cloud.openshift.scenario.Scenario;
-
-import io.fabric8.kubernetes.api.model.ServiceList;
-import io.fabric8.openshift.api.model.DeploymentConfigList;
-import io.fabric8.openshift.api.model.Project;
-import io.fabric8.openshift.api.model.RouteList;
-import io.fabric8.openshift.client.OpenShiftClient;
 
 public class KieOpenShiftProviderIntegrationTest extends AbstractCloudTest{
 

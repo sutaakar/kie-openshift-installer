@@ -16,4 +16,13 @@ public class TemplateLoaderTest extends AbstractCloudTest{
         assertThat(kieServerTemplate).isNotNull();
         assertThat(kieServerTemplate.getMetadata().getName()).contains("-kieserver");
     }
+
+    @Test
+    public void testGetMySqlTemplate() {
+        TemplateLoader templateLoader = new TemplateLoader(openShiftClient);
+        Template kieServerTemplate = templateLoader.loadMySqlTemplate();
+
+        assertThat(kieServerTemplate).isNotNull();
+        assertThat(kieServerTemplate.getMetadata().getName()).contains("-mysql");
+    }
 }

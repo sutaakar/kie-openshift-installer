@@ -9,6 +9,7 @@ import org.kie.cloud.openshift.KieOpenShiftProvider;
 public class TemplateLoader {
 
     private static final String KIE_SERVER_TEMPLATE_RESOURCE_PATH = "/kieserver.yaml";
+    private static final String MYSQL_TEMPLATE_RESOURCE_PATH = "/mysql.yaml";
 
     private OpenShiftClient openShiftClient;
 
@@ -19,5 +20,10 @@ public class TemplateLoader {
     public Template loadKieServerTemplate() {
         URL kieServerTemplateUrl = KieOpenShiftProvider.class.getResource(KIE_SERVER_TEMPLATE_RESOURCE_PATH);
         return openShiftClient.templates().load(kieServerTemplateUrl).get();
+    }
+
+    public Template loadMySqlTemplate() {
+        URL mySqlTemplateUrl = KieOpenShiftProvider.class.getResource(MYSQL_TEMPLATE_RESOURCE_PATH);
+        return openShiftClient.templates().load(mySqlTemplateUrl).get();
     }
 }

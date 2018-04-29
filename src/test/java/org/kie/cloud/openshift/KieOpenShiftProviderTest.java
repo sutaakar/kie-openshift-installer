@@ -18,7 +18,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.cloud.openshift.deployment.Deployment;
 import org.kie.cloud.openshift.scenario.Scenario;
-import org.kie.cloud.openshift.settings.builder.DeploymentBuilder;
+import org.kie.cloud.openshift.settings.builder.KieServerDeploymentBuilder;
+import org.kie.cloud.openshift.settings.builder.MySqlDeploymentBuilder;
 import org.kie.cloud.openshift.template.TemplateLoader;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -30,8 +31,16 @@ public class KieOpenShiftProviderTest extends AbstractCloudTest{
     @Test
     public void testCreateKieServerDeploymentBuilder() {
         try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
-            DeploymentBuilder kieServerSettingsBuilder = kieOpenShiftProvider.createKieServerDeploymentBuilder();
+            KieServerDeploymentBuilder kieServerSettingsBuilder = kieOpenShiftProvider.createKieServerDeploymentBuilder();
             assertThat(kieServerSettingsBuilder).isNotNull();
+        }
+    }
+
+    @Test
+    public void testCreateMySqlDeploymentBuilder() {
+        try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
+            MySqlDeploymentBuilder mySqlSettingsBuilder = kieOpenShiftProvider.createMySqlDeploymentBuilder();
+            assertThat(mySqlSettingsBuilder).isNotNull();
         }
     }
 

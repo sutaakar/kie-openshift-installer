@@ -2,18 +2,15 @@ package org.kie.cloud.openshift.deployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Collection;
 import java.util.List;
 
-import org.junit.Test;
-import org.kie.cloud.openshift.AbstractCloudTest;
-import org.kie.cloud.openshift.KieOpenShiftProvider;
-import org.kie.cloud.openshift.template.TemplateLoader;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.api.model.Template;
-import io.fabric8.openshift.client.OpenShiftClient;
+import org.junit.Test;
+import org.kie.cloud.openshift.AbstractCloudTest;
+import org.kie.cloud.openshift.template.TemplateLoader;
 
 public class DeploymentTest extends AbstractCloudTest{
 

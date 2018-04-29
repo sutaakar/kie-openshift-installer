@@ -80,4 +80,8 @@ public class OpenShiftImageConstants {
     public static final String ARTIFACT_DIR = "ARTIFACT_DIR";
 
     public static final String SECRET_NAME = "SECRET_NAME";
+
+    public static final String MYSQL_USER = "MYSQL_USER";
+    public static final String MYSQL_PASSWORD = "MYSQL_PASSWORD";
+    public static final String MYSQL_DATABASE = "MYSQL_DATABASE";
 }
