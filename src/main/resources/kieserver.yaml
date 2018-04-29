@@ -21,124 +21,6 @@ parameters:
   name: APPLICATION_NAME
   value: myapp
   required: true
-- displayName: EAP Admin User
-  description: EAP administrator username
-  name: ADMIN_USERNAME
-  value: eapadmin
-  required: false
-- displayName: EAP Admin Password
-  description: EAP administrator password
-  name: ADMIN_PASSWORD
-  from: "[a-zA-Z]{6}[0-9]{1}!"
-  generate: expression
-  required: false
-- displayName: KIE Admin User
-  description: KIE administrator username
-  name: KIE_ADMIN_USER
-  value: adminUser
-  required: false
-- displayName: KIE Admin Password
-  description: KIE administrator password
-  name: KIE_ADMIN_PWD
-  from: "[a-zA-Z]{6}[0-9]{1}!"
-  generate: expression
-  required: false
-- displayName: KIE Server User
-  description: KIE execution server username (Sets the org.kie.server.user system
-    property)
-  name: KIE_SERVER_USER
-  value: executionUser
-  required: false
-- displayName: KIE Server Password
-  description: KIE execution server password (Sets the org.kie.server.pwd system property)
-  name: KIE_SERVER_PWD
-  from: "[a-zA-Z]{6}[0-9]{1}!"
-  generate: expression
-  required: false
-- displayName: KIE Server ID
-  description: Business server identifier. Determines the template ID in Business Central or controller. If this parameter is left blank, it is set using the $HOSTNAME environment variable or a random value. (Sets the org.kie.server.id system property).
-  name: KIE_SERVER_ID
-  value: ''
-  required: false
-- displayName: KIE Server Bypass Auth User
-  description: KIE execution server bypass auth user (Sets the org.kie.server.bypass.auth.user
-    system property)
-  name: KIE_SERVER_BYPASS_AUTH_USER
-  value: 'false'
-  required: false
-- displayName: KIE Server Controller User
-  description: KIE server controller username (Sets the org.kie.server.controller.user system property)
-  name: KIE_SERVER_CONTROLLER_USER
-  value: controllerUser
-  required: false
-- displayName: KIE Server Controller Password
-  description: KIE server controller password (Sets the org.kie.server.controller.pwd system property)
-  name: KIE_SERVER_CONTROLLER_PWD
-  from: "[a-zA-Z]{6}[0-9]{1}!"
-  generate: expression
-  required: false
-- displayName: KIE server controller protocol
-  description: KIE server controller protocol (Used to set the org.kie.server.controller system property)
-  name: KIE_SERVER_CONTROLLER_PROTOCOL
-  value: http
-  required: false
-- displayName: KIE server controller service
-  description: KIE server controller service (Used to set the org.kie.server.controller system property if host and port aren't set)
-  name: KIE_SERVER_CONTROLLER_SERVICE
-  value: ''
-  required: false
-- displayName: KIE server controller host
-  description: KIE server controller host (Used to set the org.kie.server.controller system property)
-  name: KIE_SERVER_CONTROLLER_HOST
-  example: my-app-controller-ocpuser.os.example.com
-  required: false
-- displayName: KIE server controller port
-  description: KIE server controller port (Used to set the org.kie.server.controller system property)
-  name: KIE_SERVER_CONTROLLER_PORT
-  example: '8080'
-  required: false
-- displayName: KIE MBeans
-  description: KIE execution server mbeans enabled/disabled (Sets the kie.mbeans and kie.scanner.mbeans system properties)
-  name: KIE_MBEANS
-  value: enabled
-  required: false
-- displayName: Drools Server Filter Classes
-  description: KIE execution server class filtering (Sets the org.drools.server.filter.classes system property)
-  name: DROOLS_SERVER_FILTER_CLASSES
-  value: 'true'
-  required: false
-- displayName: Execution Server Custom http Route Hostname
-  description: 'Custom hostname for http service route.  Leave blank for default hostname,
-    e.g.: <application-name>-kieserver-<project>.<default-domain-suffix>'
-  name: EXECUTION_SERVER_HOSTNAME_HTTP
-  value: ''
-  required: false
-- displayName: Execution Server Custom https Route Hostname
-  description: 'Custom hostname for https service route.  Leave blank for default
-    hostname, e.g.: secure-<application-name>-kieserver-<project>.<default-domain-suffix>'
-  name: EXECUTION_SERVER_HOSTNAME_HTTPS
-  value: ''
-  required: false
-- displayName: Server Keystore Secret Name
-  description: The name of the secret containing the keystore file
-  name: HTTPS_SECRET
-  value: kieserver-app-secret
-  required: false
-- displayName: Server Keystore Filename
-  description: The name of the keystore file within the secret
-  name: HTTPS_KEYSTORE
-  value: keystore.jks
-  required: false
-- displayName: Server Certificate Name
-  description: The name associated with the server certificate
-  name: HTTPS_NAME
-  value: jboss
-  required: false
-- displayName: Server Keystore Password
-  description: The password for the keystore and certificate
-  name: HTTPS_PASSWORD
-  value: mykeystorepass
-  required: false
 - displayName: ImageStream Namespace
   description: Namespace in which the ImageStreams for Red Hat Middleware images are
     installed. These ImageStreams are normally installed in the openshift namespace.
@@ -152,38 +34,12 @@ parameters:
   name: IMAGE_STREAM_TAG
   value: "1.0"
   required: false
-- displayName: KIE Server Container Deployment
-  description: 'KIE Server Container deployment configuration in format: containerId=groupId:artifactId:version|c2=g2:a2:v2'
-  name: KIE_SERVER_CONTAINER_DEPLOYMENT
-  value: ''
-  required: false
-- displayName: Maven repository URL
-  description: Fully qualified URL to a Maven repository.
-  name: MAVEN_REPO_URL
-  value: ''
-  required: false
-- displayName: Maven repository username
-  description: Username to access the Maven repository.
-  name: MAVEN_REPO_USERNAME
-  value: ''
-  required: false
-- displayName: Maven repository password
-  description: Password to access the Maven repository.
-  name: MAVEN_REPO_PASSWORD
-  value: ''
-  required: false
 - displayName: Execution Server Container Memory Limit
   description: Execution Server Container memory limit
   name: EXCECUTION_SERVER_MEMORY_LIMIT
   value: 1Gi
   required: false
 objects:
-- kind: ServiceAccount
-  apiVersion: v1
-  metadata:
-    name: "${APPLICATION_NAME}-kieserver"
-    labels:
-      application: "${APPLICATION_NAME}"
 - kind: Service
   apiVersion: v1
   spec:
@@ -208,7 +64,6 @@ objects:
     annotations:
       description: Route for execution server's http service.
   spec:
-    host: "${EXECUTION_SERVER_HOSTNAME_HTTP}"
     to:
       name: "${APPLICATION_NAME}-kieserver"
 - kind: DeploymentConfig
@@ -270,55 +125,7 @@ objects:
             containerPort: 8080
             protocol: TCP
           env:
-          - name: DROOLS_SERVER_FILTER_CLASSES
-            value: "${DROOLS_SERVER_FILTER_CLASSES}"
-          - name: KIE_ADMIN_PWD
-            value: "${KIE_ADMIN_PWD}"
-          - name: KIE_ADMIN_USER
-            value: "${KIE_ADMIN_USER}"
-          - name: KIE_MBEANS
-            value: "${KIE_MBEANS}"
-          - name: KIE_SERVER_BYPASS_AUTH_USER
-            value: "${KIE_SERVER_BYPASS_AUTH_USER}"
-          - name: KIE_SERVER_CONTROLLER_USER
-            value: "${KIE_SERVER_CONTROLLER_USER}"
-          - name: KIE_SERVER_CONTROLLER_PWD
-            value: "${KIE_SERVER_CONTROLLER_PWD}"
-          - name: KIE_SERVER_CONTROLLER_SERVICE
-            value: "${KIE_SERVER_CONTROLLER_SERVICE}"
-          - name: KIE_SERVER_CONTROLLER_PROTOCOL
-            value: "${KIE_SERVER_CONTROLLER_PROTOCOL}"
-          - name: KIE_SERVER_CONTROLLER_HOST
-            value: "${KIE_SERVER_CONTROLLER_HOST}"
-          - name: KIE_SERVER_CONTROLLER_PORT
-            value: "${KIE_SERVER_CONTROLLER_PORT}"
-          - name: KIE_SERVER_ID
-            value: "${KIE_SERVER_ID}"
           - name: KIE_SERVER_HOST
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
-          - name: KIE_SERVER_PWD
-            value: "${KIE_SERVER_PWD}"
-          - name: KIE_SERVER_USER
-            value: "${KIE_SERVER_USER}"
-          - name: KIE_SERVER_CONTAINER_DEPLOYMENT
-            value: "${KIE_SERVER_CONTAINER_DEPLOYMENT}"
-          - name: MAVEN_REPO_URL
-            value: "${MAVEN_REPO_URL}"
-          - name: MAVEN_REPO_SERVICE
-            value: "${APPLICATION_NAME}-rhpamcentr"
-          - name: MAVEN_REPO_PATH
-            value: "/maven2/"
-          - name: MAVEN_REPO_USERNAME
-            value: "${MAVEN_REPO_USERNAME}"
-          - name: MAVEN_REPO_PASSWORD
-            value: "${MAVEN_REPO_PASSWORD}"
-          - name: HTTPS_KEYSTORE_DIR
-            value: "/etc/kieserver-secret-volume"
-          - name: HTTPS_KEYSTORE
-            value: "${HTTPS_KEYSTORE}"
-          - name: HTTPS_NAME
-            value: "${HTTPS_NAME}"
-          - name: HTTPS_PASSWORD
-            value: "${HTTPS_PASSWORD}"
