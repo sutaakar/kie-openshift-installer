@@ -16,7 +16,6 @@
 package org.kie.cloud.openshift.settings.builder;
 
 import io.fabric8.kubernetes.api.model.EnvVar;
-import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 
@@ -33,10 +32,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
     }
 
     public KieServerDeploymentBuilder withApplicationName(String applicationName) {
-        for (HasMetadata object : getDeployment().geTemplate().getObjects()) {
-            String newObjectName = object.getMetadata().getName().replace("${APPLICATION_NAME}", applicationName);
-            object.getMetadata().setName(newObjectName);
-        }
+        setApplicationName(applicationName);
         return this;
     }
 

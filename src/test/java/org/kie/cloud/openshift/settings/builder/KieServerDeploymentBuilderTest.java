@@ -20,6 +20,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
         assertThat(builtKieServerDeployment).isNotNull();
         assertThat(builtKieServerDeployment.geTemplate().getMetadata().getName()).contains("-kieserver");
+        assertThat(builtKieServerDeployment.geTemplate().getParameters()).extracting(n -> n.getName()).contains("APPLICATION_NAME");
     }
 
     @Test
@@ -32,6 +33,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
         assertThat(builtKieServerDeployment).isNotNull();
         assertThat(builtKieServerDeployment.geTemplate().getObjects()).extracting(n -> n.getMetadata().getName()).allMatch(s -> s.startsWith("myappname-"));
+        assertThat(builtKieServerDeployment.geTemplate().getParameters()).extracting(n -> n.getName()).doesNotContain("APPLICATION_NAME");
     }
 
     @Test
