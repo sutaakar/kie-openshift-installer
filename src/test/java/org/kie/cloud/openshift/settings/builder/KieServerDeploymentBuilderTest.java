@@ -23,6 +23,18 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildKieServerDeploymentApplicationName() {
+        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
+
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        Deployment builtKieServerDeployment = settingsBuilder.withApplicationName("myappname")
+                                                             .build();
+
+        assertThat(builtKieServerDeployment).isNotNull();
+        assertThat(builtKieServerDeployment.geTemplate().getObjects()).extracting(n -> n.getMetadata().getName()).allMatch(s -> s.startsWith("myappname-"));
+    }
+
+    @Test
     public void testBuildKieServerDeploymentKieServerUser() {
         Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
 

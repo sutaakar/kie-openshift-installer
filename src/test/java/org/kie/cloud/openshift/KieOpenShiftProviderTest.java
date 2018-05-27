@@ -14,6 +14,7 @@ import io.fabric8.openshift.api.model.Template;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.fabric8.openshift.client.dsl.ProjectRequestOperation;
 import io.fabric8.openshift.client.dsl.TemplateOperation;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.cloud.openshift.deployment.Deployment;
@@ -54,6 +55,7 @@ public class KieOpenShiftProviderTest extends AbstractCloudTest{
 
     // Make it IT
     @Test
+    @Ignore("Unignore when converted to IT test")
     public void testDeployEmptyScenario() {
         OpenShiftClient client = Mockito.mock(OpenShiftClient.class);
         ProjectRequestOperation projectRequest = Mockito.mock(ProjectRequestOperation.class);

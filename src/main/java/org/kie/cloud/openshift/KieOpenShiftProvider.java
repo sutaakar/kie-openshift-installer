@@ -3,12 +3,10 @@ package org.kie.cloud.openshift;
 import java.io.ByteArrayInputStream;
 
 import io.fabric8.kubernetes.api.model.KubernetesList;
-import io.fabric8.kubernetes.client.utils.Serialization;
 import io.fabric8.openshift.api.model.ProjectRequest;
 import io.fabric8.openshift.api.model.ProjectRequestBuilder;
 import io.fabric8.openshift.api.model.Template;
 import io.fabric8.openshift.client.OpenShiftClient;
-import org.kie.cloud.openshift.deployment.Deployment;
 import org.kie.cloud.openshift.scenario.Scenario;
 import org.kie.cloud.openshift.settings.builder.KieServerDeploymentBuilder;
 import org.kie.cloud.openshift.settings.builder.MySqlDeploymentBuilder;
@@ -40,9 +38,7 @@ public class KieOpenShiftProvider implements AutoCloseable {
 
     public void deployScenario(Scenario scenario, String projectName) {
         createProjectIfNotExists(projectName);
-        for (Deployment deployment : scenario.getDeployments()) {
-            deployDeployment(projectName, deployment);
-        }
+        deployScenarioIntoProject(scenario, projectName);
     }
 
     private void createProjectIfNotExists(String projectName) {
@@ -50,9 +46,8 @@ public class KieOpenShiftProvider implements AutoCloseable {
         openShiftClient.projectrequests().create(projectRequest);
     }
 
-    private void deployDeployment(String projectName, Deployment deployment) {
-        Template template = deployment.geTemplate();
-        String yaml = Serialization.asYaml(template);
+    private void deployScenarioIntoProject(Scenario scenario, String projectName) {
+        String yaml = scenario.getTemplateAsYaml();
         KubernetesList resourceList = openShiftClient.templates().load(new ByteArrayInputStream(yaml.getBytes())).processLocally();
         openShiftClient.lists().inNamespace(projectName).create(resourceList);
     }
