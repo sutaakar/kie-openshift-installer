@@ -36,7 +36,7 @@ public class ScenarioTest extends AbstractCloudTest{
         assertThat(yamlTemplate).isNotNull();
 
         Template template = openShiftClient.templates().load(new ByteArrayInputStream(yamlTemplate.getBytes())).get();
-        assertThat(template.getMetadata().getName()).contains("custom template");
+        assertThat(template.getMetadata().getName()).contains("custom-template");
 
         List<DeploymentConfig> deploymentConfigs = template.getObjects()
                                                            .stream()

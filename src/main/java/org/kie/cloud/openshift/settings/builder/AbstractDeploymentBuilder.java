@@ -41,15 +41,23 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
         }
     }
 
+    //TODO make it util class
+    protected String getEnvVarValue(Deployment deployment, String envVarName) {
+        return deployment.getDeploymentConfigs().stream()
+                                                .flatMap(n -> n.getSpec().getTemplate().getSpec().getContainers().stream())
+                                                .flatMap(c -> c.getEnv().stream())
+                                                .filter(e -> e.getName().equals(envVarName))
+                                                .map(e -> e.getValue())
+                                                .findFirst()
+                                                .orElseThrow(() -> new RuntimeException("Environment variable with name " + envVarName + " not found."));
+    }
+
     protected void setApplicationName(String applicationName) {
         for (HasMetadata object : getDeployment().geTemplate().getObjects()) {
             String newObjectName = object.getMetadata().getName().replace("${APPLICATION_NAME}", applicationName);
             object.getMetadata().setName(newObjectName);
         }
         // Delete application name property
-        List<Parameter> parametersWithoutApplicationName = getDeployment().geTemplate().getParameters().stream()
-                                                                                       .filter(p -> !p.getName().equals("APPLICATION_NAME"))
-                                                                                       .collect(Collectors.toList());
-        getDeployment().geTemplate().setParameters(parametersWithoutApplicationName);
+        getDeployment().geTemplate().getParameters().removeIf(p -> p.getName().equals("APPLICATION_NAME"));
     }
 }

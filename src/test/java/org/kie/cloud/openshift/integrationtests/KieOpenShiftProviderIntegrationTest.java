@@ -18,6 +18,21 @@ import org.kie.cloud.openshift.scenario.Scenario;
 public class KieOpenShiftProviderIntegrationTest extends AbstractCloudTest{
 
     @Test
+    public void testDeployEmptyScenario() {
+        final String projectName = "test-project-" + UUID.randomUUID().toString().substring(0, 4);
+
+        try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
+            Scenario scenario = kieOpenShiftProvider.createScenario();
+            kieOpenShiftProvider.deployScenario(scenario, projectName);
+
+            Project project = openShiftClient.projects().withName(projectName).get();
+            assertThat(project).isNotNull();
+        } finally {
+            openShiftClient.projects().withName(projectName).delete();
+        }
+    }
+
+    @Test
     public void testCreateAndDeployKieServer() {
         final String projectName = "test-project-" + UUID.randomUUID().toString().substring(0, 4);
 

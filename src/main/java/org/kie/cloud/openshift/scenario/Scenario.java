@@ -41,7 +41,7 @@ public class Scenario {
             }
         }
 
-        ObjectMeta metadata = new ObjectMetaBuilder().withName("custom template").build();
+        ObjectMeta metadata = new ObjectMetaBuilder().withName("custom-template").build();
         return new TemplateBuilder().withApiVersion("v1")
                                     .withKind("Template")
                                     .withMetadata(metadata)
