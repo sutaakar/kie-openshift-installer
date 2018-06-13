@@ -1,6 +1,7 @@
 package org.kie.cloud.openshift;
 
 import java.io.ByteArrayInputStream;
+import java.util.Map;
 import java.util.Optional;
 
 import io.fabric8.kubernetes.api.model.KubernetesList;
@@ -38,9 +39,9 @@ public class KieOpenShiftProvider implements AutoCloseable {
         return new Scenario();
     }
 
-    public void deployScenario(Scenario scenario, String projectName) {
+    public void deployScenario(Scenario scenario, String projectName, Map<String, String> parameters) {
         createProjectIfNotExists(projectName);
-        deployScenarioIntoProject(scenario, projectName);
+        deployScenarioIntoProject(scenario, projectName, parameters);
     }
 
     private void createProjectIfNotExists(String projectName) {
@@ -53,9 +54,9 @@ public class KieOpenShiftProvider implements AutoCloseable {
         }
     }
 
-    private void deployScenarioIntoProject(Scenario scenario, String projectName) {
+    private void deployScenarioIntoProject(Scenario scenario, String projectName, Map<String, String> parameters) {
         String yaml = scenario.getTemplateAsYaml();
-        KubernetesList resourceList = openShiftClient.templates().load(new ByteArrayInputStream(yaml.getBytes())).processLocally();
+        KubernetesList resourceList = openShiftClient.templates().load(new ByteArrayInputStream(yaml.getBytes())).processLocally(parameters);
         openShiftClient.lists().inNamespace(projectName).create(resourceList);
     }
 

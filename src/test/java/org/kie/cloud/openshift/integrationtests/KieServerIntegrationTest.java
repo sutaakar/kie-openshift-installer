@@ -27,7 +27,7 @@ public class KieServerIntegrationTest extends AbstractCloudTest{
                                                                       .build();
             Scenario kieServerScenario = kieOpenShiftProvider.createScenario();
             kieServerScenario.addDeployment(kieServerDeployment);
-            kieOpenShiftProvider.deployScenario(kieServerScenario, projectName);
+            kieOpenShiftProvider.deployScenario(kieServerScenario, projectName, Collections.emptyMap());
 
             Project project = openShiftClient.projects().withName(projectName).get();
             assertThat(project).isNotNull();

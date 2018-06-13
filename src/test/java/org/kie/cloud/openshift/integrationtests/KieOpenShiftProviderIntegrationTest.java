@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +23,7 @@ public class KieOpenShiftProviderIntegrationTest extends AbstractCloudTest{
 
         try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
             Scenario scenario = kieOpenShiftProvider.createScenario();
-            kieOpenShiftProvider.deployScenario(scenario, projectName);
+            kieOpenShiftProvider.deployScenario(scenario, projectName, Collections.emptyMap());
 
             Project project = openShiftClient.projects().withName(projectName).get();
             assertThat(project).isNotNull();
@@ -37,11 +38,11 @@ public class KieOpenShiftProviderIntegrationTest extends AbstractCloudTest{
 
         try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
             Scenario scenario = kieOpenShiftProvider.createScenario();
-            kieOpenShiftProvider.deployScenario(scenario, projectName);
+            kieOpenShiftProvider.deployScenario(scenario, projectName, Collections.emptyMap());
 
             waitUntilProjectExists(projectName);
 
-            kieOpenShiftProvider.deployScenario(scenario, projectName);
+            kieOpenShiftProvider.deployScenario(scenario, projectName, Collections.emptyMap());
 
             Project project = openShiftClient.projects().withName(projectName).get();
             assertThat(project).isNotNull();
