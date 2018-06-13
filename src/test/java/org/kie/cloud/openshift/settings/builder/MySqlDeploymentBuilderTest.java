@@ -23,7 +23,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
-    public void testBuildMySqlDeploymentMySqlUser() {
+    public void testBuildMySqlDeploymentWithMySqlUser() {
         Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
 
         MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
@@ -41,7 +41,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
-    public void testBuildMySqlDeploymentDbName() {
+    public void testBuildMySqlDeploymentWithDbName() {
         Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
 
         MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);

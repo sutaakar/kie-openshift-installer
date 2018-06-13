@@ -24,7 +24,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
-    public void testBuildKieServerDeploymentApplicationName() {
+    public void testBuildKieServerDeploymentWithApplicationName() {
         Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
 
         KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
@@ -37,7 +37,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
-    public void testBuildKieServerDeploymentKieServerUser() {
+    public void testBuildKieServerDeploymentWithKieServerUser() {
         Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
 
         KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
