@@ -84,4 +84,18 @@ public class OpenShiftImageConstants {
     public static final String MYSQL_USER = "MYSQL_USER";
     public static final String MYSQL_PASSWORD = "MYSQL_PASSWORD";
     public static final String MYSQL_DATABASE = "MYSQL_DATABASE";
+
+    public static final String DATASOURCES = "DATASOURCES";
+    public static final String DATASOURCES_KIE = "KIE";
+    public static final String KIE_DATABASE = "KIE_DATABASE";
+    public static final String KIE_JNDI = "KIE_JNDI";
+    public static final String KIE_DRIVER = "KIE_DRIVER";
+    public static final String KIE_JTA = "KIE_JTA";
+    public static final String KIE_TX_ISOLATION = "KIE_TX_ISOLATION";
+    public static final String KIE_USERNAME = "KIE_USERNAME";
+    public static final String KIE_PASSWORD = "KIE_PASSWORD";
+    public static final String KIE_SERVICE_HOST = "KIE_SERVICE_HOST";
+    public static final String KIE_SERVICE_PORT = "KIE_SERVICE_PORT";
+    public static final String TIMER_SERVICE_DATA_STORE = "TIMER_SERVICE_DATA_STORE";
+    public static final String TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL = "TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL";
 }
