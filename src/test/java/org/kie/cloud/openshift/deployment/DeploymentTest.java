@@ -19,20 +19,7 @@ public class DeploymentTest extends AbstractCloudTest{
 
     @Test
     public void testGetUnsecureServices() {
-        Service unsecureService = new ServiceBuilder().withNewMetadata()
-                                                          .withName("unsecured-service")
-                                                      .endMetadata()
-                                                      .build();
-        Route unsecureRoute = new RouteBuilder().withNewSpec()
-                                                    .withNewTo()
-                                                        .withKind("Service")
-                                                        .withName("unsecured-service")
-                                                    .endTo()
-                                                .endSpec()
-                                                .build();
-        Template template = new TemplateBuilder().withObjects(unsecureService, unsecureRoute)
-                                                 .build();
-
+        Template template = getTemplateWithServiceAndRouteCombinations();
         Deployment deployment = new Deployment(template);
         List<Service> services = deployment.getUnsecureServices();
 
@@ -42,23 +29,7 @@ public class DeploymentTest extends AbstractCloudTest{
 
     @Test
     public void testGetSecureServices() {
-        Service secureService = new ServiceBuilder().withNewMetadata()
-                                                        .withName("secured-service")
-                                                    .endMetadata()
-                                                    .build();
-        Route secureRoute = new RouteBuilder().withNewSpec()
-                                                  .withNewTo()
-                                                      .withKind("Service")
-                                                      .withName("secured-service")
-                                                  .endTo()
-                                                  .withNewTls()
-                                                      .withTermination("Edge")
-                                                  .endTls()
-                                              .endSpec()
-                                              .build();
-        Template template = new TemplateBuilder().withObjects(secureService, secureRoute)
-                                                 .build();
-
+        Template template = getTemplateWithServiceAndRouteCombinations();
         Deployment deployment = new Deployment(template);
         List<Service> services = deployment.getSecureServices();
 
@@ -68,15 +39,7 @@ public class DeploymentTest extends AbstractCloudTest{
 
     @Test
     public void testGetUnsecureRoutes() {
-        Route unsecureRoute = new RouteBuilder().withNewMetadata()
-                                                    .withName("unsecure-route")
-                                                .endMetadata()
-                                                .withNewSpec()
-                                                .endSpec()
-                                                .build();
-        Template template = new TemplateBuilder().withObjects(unsecureRoute)
-                                                 .build();
-
+        Template template = getTemplateWithServiceAndRouteCombinations();
         Deployment deployment = new Deployment(template);
         List<Route> routes = deployment.getUnsecureRoutes();
 
@@ -86,18 +49,7 @@ public class DeploymentTest extends AbstractCloudTest{
 
     @Test
     public void testGetSecureRoutes() {
-        Route unsecureRoute = new RouteBuilder().withNewMetadata()
-                                                    .withName("secure-route")
-                                                .endMetadata()
-                                                .withNewSpec()
-                                                    .withNewTls()
-                                                        .withTermination("Edge")
-                                                    .endTls()
-                                                .endSpec()
-                                                .build();
-        Template template = new TemplateBuilder().withObjects(unsecureRoute)
-                                                 .build();
-
+        Template template = getTemplateWithServiceAndRouteCombinations();
         Deployment deployment = new Deployment(template);
         List<Route> routes = deployment.getSecureRoutes();
 
@@ -107,17 +59,50 @@ public class DeploymentTest extends AbstractCloudTest{
 
     @Test
     public void testGetDeploymentConfigs() {
-        DeploymentConfig deploymentConfig = new DeploymentConfigBuilder().withNewMetadata()
-                                                                             .withName("my-deployment")
-                                                                         .endMetadata()
-                                                                         .build();
-        Template template = new TemplateBuilder().withObjects(deploymentConfig)
-                                                 .build();
-
+        Template template = getTemplateWithServiceAndRouteCombinations();
         Deployment deployment = new Deployment(template);
         List<DeploymentConfig> deploymentConfigs = deployment.getDeploymentConfigs();
 
         assertThat(deploymentConfigs).hasSize(1);
         assertThat(deploymentConfigs.get(0).getMetadata().getName()).isEqualTo("my-deployment");
+    }
+
+    private Template getTemplateWithServiceAndRouteCombinations() {
+        Service unsecureService = new ServiceBuilder().withNewMetadata()
+                                                          .withName("unsecured-service")
+                                                      .endMetadata()
+                                                      .build();
+        Route unsecureRoute = new RouteBuilder().withNewMetadata()
+                                                    .withName("unsecure-route")
+                                                .endMetadata()
+                                                .withNewSpec()
+                                                    .withNewTo()
+                                                        .withKind("Service")
+                                                        .withName("unsecured-service")
+                                                    .endTo()
+                                                .endSpec()
+                                                .build();
+        Service secureService = new ServiceBuilder().withNewMetadata()
+                                                        .withName("secured-service")
+                                                    .endMetadata()
+                                                    .build();
+        Route secureRoute = new RouteBuilder().withNewMetadata()
+                                                  .withName("secure-route")
+                                              .endMetadata()
+                                              .withNewSpec()
+                                                  .withNewTo()
+                                                      .withKind("Service")
+                                                      .withName("secured-service")
+                                                  .endTo()
+                                                  .withNewTls()
+                                                      .withTermination("Edge")
+                                                  .endTls()
+                                              .endSpec()
+                                              .build();
+        DeploymentConfig deploymentConfig = new DeploymentConfigBuilder().withNewMetadata()
+                                                                             .withName("my-deployment")
+                                                                         .endMetadata()
+                                                                         .build();
+        return new TemplateBuilder().withObjects(unsecureService, unsecureRoute, secureService, secureRoute, deploymentConfig).build();
     }
 }
