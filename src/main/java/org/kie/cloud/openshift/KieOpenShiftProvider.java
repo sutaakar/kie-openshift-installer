@@ -1,8 +1,10 @@
 package org.kie.cloud.openshift;
 
 import java.io.ByteArrayInputStream;
+import java.util.Optional;
 
 import io.fabric8.kubernetes.api.model.KubernetesList;
+import io.fabric8.openshift.api.model.Project;
 import io.fabric8.openshift.api.model.ProjectRequest;
 import io.fabric8.openshift.api.model.ProjectRequestBuilder;
 import io.fabric8.openshift.api.model.Template;
@@ -42,8 +44,13 @@ public class KieOpenShiftProvider implements AutoCloseable {
     }
 
     private void createProjectIfNotExists(String projectName) {
-        ProjectRequest projectRequest = new ProjectRequestBuilder().withNewMetadata().withName(projectName).endMetadata().build();
-        openShiftClient.projectrequests().create(projectRequest);
+        Optional<Project> foundProject = openShiftClient.projects().list().getItems().stream()
+                                                                                     .filter(n -> n.getMetadata().getName().equals(projectName))
+                                                                                     .findAny();
+        if(!foundProject.isPresent()) {
+            ProjectRequest projectRequest = new ProjectRequestBuilder().withNewMetadata().withName(projectName).endMetadata().build();
+            openShiftClient.projectrequests().create(projectRequest);
+        }
     }
 
     private void deployScenarioIntoProject(Scenario scenario, String projectName) {
