@@ -24,22 +24,24 @@ public class Deployment {
         List<String> unsecureServiceNames = getUnsecureRoutes().stream()
                                                                .map(r -> r.getSpec().getTo().getName())
                                                                .collect(Collectors.toList());
-        return template.getObjects()
-                       .stream()
-                       .filter(o -> o instanceof Service)
-                       .filter(o -> unsecureServiceNames.contains(o.getMetadata().getName()))
-                       .map(o -> (Service) o)
-                       .collect(Collectors.toList());
+        return getServices().stream()
+                            .filter(o -> unsecureServiceNames.contains(o.getMetadata().getName()))
+                            .collect(Collectors.toList());
     }
 
     public List<Service> getSecureServices() {
         List<String> secureServiceNames = getSecureRoutes().stream()
                                                            .map(r -> r.getSpec().getTo().getName())
                                                            .collect(Collectors.toList());
+        return getServices().stream()
+                            .filter(o -> secureServiceNames.contains(o.getMetadata().getName()))
+                            .collect(Collectors.toList());
+    }
+
+    public List<Service> getServices() {
         return template.getObjects()
                        .stream()
                        .filter(o -> o instanceof Service)
-                       .filter(o -> secureServiceNames.contains(o.getMetadata().getName()))
                        .map(o -> (Service) o)
                        .collect(Collectors.toList());
     }

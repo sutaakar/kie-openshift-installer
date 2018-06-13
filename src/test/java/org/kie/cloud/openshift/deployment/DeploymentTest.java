@@ -38,6 +38,16 @@ public class DeploymentTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testGetServices() {
+        Template template = getTemplateWithServiceAndRouteCombinations();
+        Deployment deployment = new Deployment(template);
+        List<Service> services = deployment.getServices();
+
+        assertThat(services).hasSize(2);
+        assertThat(services).extracting(n -> n.getMetadata().getName()).containsExactly("secured-service", "unsecured-service");
+    }
+
+    @Test
     public void testGetUnsecureRoutes() {
         Template template = getTemplateWithServiceAndRouteCombinations();
         Deployment deployment = new Deployment(template);
