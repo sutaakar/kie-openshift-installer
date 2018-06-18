@@ -2,58 +2,58 @@ package org.kie.cloud.openshift.integrationtests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.UUID;
+import java.net.MalformedURLException;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import io.fabric8.kubernetes.api.model.ServiceList;
-import io.fabric8.openshift.api.model.DeploymentConfigList;
-import io.fabric8.openshift.api.model.Project;
-import io.fabric8.openshift.api.model.RouteList;
+import io.fabric8.openshift.api.model.DeploymentConfig;
 import org.junit.Test;
-import org.kie.cloud.openshift.AbstractCloudTest;
 import org.kie.cloud.openshift.KieOpenShiftProvider;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.deployment.Deployment;
 import org.kie.cloud.openshift.scenario.Scenario;
+import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.KieServiceResponse.ResponseType;
+import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.client.KieServicesClient;
+import org.kie.server.client.KieServicesFactory;
 
-public class KieServerIntegrationTest extends AbstractCloudTest{
+public class KieServerIntegrationTest extends AbstractCloudIntegrationTest {
 
     @Test
-    public void testCreateAndDeployKieServer() {
-        final String projectName = "test-project-" + UUID.randomUUID().toString().substring(0, 4);
+    public void testCreateAndDeployKieServerWithMySql() throws MalformedURLException, InterruptedException {
+        final String kieServerUsername = "john";
+        final String kieServerPassword = "john123";
+        final String mySqlUsername = "mysqluser";
+        final String mySqlPassword = "mysqlpass";
 
         try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
+            Deployment mySqlDeployment = kieOpenShiftProvider.createMySqlDeploymentBuilder()
+                                                             .withDatabaseUser(mySqlUsername, mySqlPassword)
+                                                             .withDatabaseName("mydb")
+                                                             .build();
             Deployment kieServerDeployment = kieOpenShiftProvider.createKieServerDeploymentBuilder()
-                                                                      .withKieServerUser("john", "john123")
-                                                                      .build();
+                                                                 .withKieServerUser(kieServerUsername, kieServerPassword)
+                                                                 .connectToMySqlDatabase(mySqlDeployment)
+                                                                 .build();
             Scenario kieServerScenario = kieOpenShiftProvider.createScenario();
             kieServerScenario.addDeployment(kieServerDeployment);
-            kieOpenShiftProvider.deployScenario(kieServerScenario, projectName, Collections.emptyMap());
+            kieServerScenario.addDeployment(mySqlDeployment);
+            kieOpenShiftProvider.deployScenario(kieServerScenario, projectName, Collections.singletonMap(OpenShiftImageConstants.IMAGE_STREAM_NAMESPACE, projectName));
 
-            Project project = openShiftClient.projects().withName(projectName).get();
-            assertThat(project).isNotNull();
+            // Wait until ready
+            List<DeploymentConfig> items = openShiftClient.deploymentConfigs().inNamespace(projectName).list().getItems();
+            openShiftClient.deploymentConfigs().inNamespace(projectName).withName(items.get(0).getMetadata().getName()).waitUntilReady(5, TimeUnit.MINUTES);
+            OpenShiftSynchronizer.waitUntilAllRoutesAreAvailable(openShiftClient, projectName);
 
-            RouteList routes = openShiftClient.routes().inNamespace(projectName).list();
-            assertThat(routes.getItems()).hasSize(1)
-                                         .anySatisfy(n -> assertThat(n.getMetadata().getName()).isEqualTo("myapp-kieserver"));
+            String host = openShiftClient.routes().inNamespace(projectName).list().getItems().get(0).getSpec().getHost();
+            KieServicesClient kieServerClient = KieServicesFactory.newKieServicesRestClient("http://" + host + "/services/rest/server", kieServerUsername, kieServerPassword);
 
-            ServiceList services = openShiftClient.services().inNamespace(projectName).list();
-            assertThat(services.getItems()).hasSize(1)
-                                           .anySatisfy(n -> assertThat(n.getMetadata().getName()).isEqualTo("myapp-kieserver"));
-
-            DeploymentConfigList deploymentConfigs = openShiftClient.deploymentConfigs().inNamespace(projectName).list();
-            assertThat(deploymentConfigs.getItems()).hasSize(1);
-            assertThat(deploymentConfigs.getItems().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                                                                                           .anySatisfy(e -> {
-                                                                                               assertThat(e.getName()).isEqualTo(OpenShiftImageConstants.KIE_SERVER_USER);
-                                                                                               assertThat(e.getValue()).isEqualTo("john");
-                                                                                           });
-            assertThat(deploymentConfigs.getItems().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                                                                                            .anySatisfy(e -> {
-                                                                                                assertThat(e.getName()).isEqualTo(OpenShiftImageConstants.KIE_SERVER_PWD);
-                                                                                                assertThat(e.getValue()).isEqualTo("john123");
-                                                                                            });
-        } finally {
-            openShiftClient.projects().withName(projectName).delete();
+            ServiceResponse<KieServerInfo> serverInfo = kieServerClient.getServerInfo();
+            assertThat(serverInfo).isNotNull();
+            assertThat(serverInfo.getType()).isEqualTo(ResponseType.SUCCESS);
+            assertThat(serverInfo.getResult().getCapabilities()).contains("BPM");
         }
     }
 }
