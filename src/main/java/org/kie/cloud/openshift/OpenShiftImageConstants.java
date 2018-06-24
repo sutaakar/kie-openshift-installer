@@ -96,6 +96,7 @@ public class OpenShiftImageConstants {
     public static final String KIE_JNDI = "KIE_JNDI";
     public static final String KIE_DRIVER = "KIE_DRIVER";
     public static final String KIE_JTA = "KIE_JTA";
+    // TODO: delete this?
     public static final String KIE_TX_ISOLATION = "KIE_TX_ISOLATION";
     public static final String KIE_USERNAME = "KIE_USERNAME";
     public static final String KIE_PASSWORD = "KIE_PASSWORD";
