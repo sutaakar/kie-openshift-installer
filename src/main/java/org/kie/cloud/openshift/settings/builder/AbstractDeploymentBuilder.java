@@ -1,13 +1,11 @@
 package org.kie.cloud.openshift.settings.builder;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.openshift.api.model.DeploymentConfig;
-import io.fabric8.openshift.api.model.Parameter;
 import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.deployment.Deployment;
 
@@ -39,17 +37,6 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
                 container.getEnv().add(envVar);
             }
         }
-    }
-
-    //TODO make it util class
-    protected String getEnvVarValue(Deployment deployment, String envVarName) {
-        return deployment.getDeploymentConfigs().stream()
-                                                .flatMap(n -> n.getSpec().getTemplate().getSpec().getContainers().stream())
-                                                .flatMap(c -> c.getEnv().stream())
-                                                .filter(e -> e.getName().equals(envVarName))
-                                                .map(e -> e.getValue())
-                                                .findFirst()
-                                                .orElseThrow(() -> new RuntimeException("Environment variable with name " + envVarName + " not found."));
     }
 
     protected void setApplicationName(String applicationName) {

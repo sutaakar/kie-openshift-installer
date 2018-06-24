@@ -56,13 +56,13 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
         EnvVar kieServerPersistenceDialect = new EnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DIALECT, "org.hibernate.dialect.MySQL5Dialect", null);
         EnvVar kieServerPersistenceDatasource = new EnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DS, "java:/jboss/datasources/kie", null);
         EnvVar datasourceName = new EnvVar(OpenShiftImageConstants.DATASOURCES, OpenShiftImageConstants.DATASOURCES_KIE, null);
-        EnvVar datasourceDatabaseName = new EnvVar(OpenShiftImageConstants.KIE_DATABASE, getEnvVarValue(databaseDeployment, OpenShiftImageConstants.MYSQL_DATABASE), null);
+        EnvVar datasourceDatabaseName = new EnvVar(OpenShiftImageConstants.KIE_DATABASE, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_DATABASE), null);
         EnvVar datasourceJndi = new EnvVar(OpenShiftImageConstants.KIE_JNDI, "java:/jboss/datasources/kie", null);
         EnvVar datasourceDriver = new EnvVar(OpenShiftImageConstants.KIE_DRIVER, "mysql", null);
         EnvVar datasourceJta = new EnvVar(OpenShiftImageConstants.KIE_JTA, "true", null);
         EnvVar datasourceTxIsolation = new EnvVar(OpenShiftImageConstants.KIE_TX_ISOLATION, "TRANSACTION_READ_COMMITTED", null);
-        EnvVar datasourceUsername = new EnvVar(OpenShiftImageConstants.KIE_USERNAME, getEnvVarValue(databaseDeployment, OpenShiftImageConstants.MYSQL_USER), null);
-        EnvVar datasourcePassword = new EnvVar(OpenShiftImageConstants.KIE_PASSWORD, getEnvVarValue(databaseDeployment, OpenShiftImageConstants.MYSQL_PASSWORD), null);
+        EnvVar datasourceUsername = new EnvVar(OpenShiftImageConstants.KIE_USERNAME, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_USER), null);
+        EnvVar datasourcePassword = new EnvVar(OpenShiftImageConstants.KIE_PASSWORD, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_PASSWORD), null);
         // Set to first service
         EnvVar datasourceServiceHost = new EnvVar(OpenShiftImageConstants.KIE_SERVICE_HOST, databaseDeployment.getServices().get(0).getMetadata().getName(), null);
         EnvVar datasourceServicePort = new EnvVar(OpenShiftImageConstants.KIE_SERVICE_PORT, "3306", null);

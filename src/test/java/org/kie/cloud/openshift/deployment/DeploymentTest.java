@@ -1,9 +1,13 @@
 package org.kie.cloud.openshift.deployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 
+import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.ContainerBuilder;
+import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.openshift.api.model.DeploymentConfig;
@@ -77,6 +81,24 @@ public class DeploymentTest extends AbstractCloudTest{
         assertThat(deploymentConfigs.get(0).getMetadata().getName()).isEqualTo("my-deployment");
     }
 
+    @Test
+    public void testGetEnvironmentVariableValue() {
+        Template template = getTemplateWithServiceAndRouteCombinations();
+        Deployment deployment = new Deployment(template);
+        String environmentVariableValue = deployment.getEnvironmentVariableValue("custom-variable-name");
+
+        assertThat(environmentVariableValue).isEqualTo("custom-variable-value");
+    }
+
+    @Test
+    public void testGetEnvironmentVariableValueNotExisting() {
+        Template template = getTemplateWithServiceAndRouteCombinations();
+        Deployment deployment = new Deployment(template);
+
+        assertThatThrownBy(() -> deployment.getEnvironmentVariableValue("not-existing-variable-name")).isInstanceOf(RuntimeException.class)
+                                                                                                      .hasMessageContaining("Environment variable with name not-existing-variable-name not found.");
+    }
+
     private Template getTemplateWithServiceAndRouteCombinations() {
         Service unsecureService = new ServiceBuilder().withNewMetadata()
                                                           .withName("unsecured-service")
@@ -109,9 +131,18 @@ public class DeploymentTest extends AbstractCloudTest{
                                                   .endTls()
                                               .endSpec()
                                               .build();
+        Container container = new ContainerBuilder().withEnv(new EnvVar("custom-variable-name", "custom-variable-value", null))
+                                                    .build();
         DeploymentConfig deploymentConfig = new DeploymentConfigBuilder().withNewMetadata()
                                                                              .withName("my-deployment")
                                                                          .endMetadata()
+                                                                         .withNewSpec()
+                                                                             .withNewTemplate()
+                                                                                 .withNewSpec()
+                                                                                     .withContainers(container)
+                                                                                 .endSpec()
+                                                                             .endTemplate()
+                                                                         .endSpec()
                                                                          .build();
         return new TemplateBuilder().withObjects(unsecureService, unsecureRoute, secureService, secureRoute, deploymentConfig).build();
     }

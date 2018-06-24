@@ -71,4 +71,14 @@ public class Deployment {
                        .map(o -> (DeploymentConfig) o)
                        .collect(Collectors.toList());
     }
+
+    public String getEnvironmentVariableValue(String environmentVariableName) {
+        return getDeploymentConfigs().stream()
+                                     .flatMap(n -> n.getSpec().getTemplate().getSpec().getContainers().stream())
+                                     .flatMap(c -> c.getEnv().stream())
+                                     .filter(e -> e.getName().equals(environmentVariableName))
+                                     .map(e -> e.getValue())
+                                     .findFirst()
+                                     .orElseThrow(() -> new RuntimeException("Environment variable with name " + environmentVariableName + " not found."));
+    }
 }
