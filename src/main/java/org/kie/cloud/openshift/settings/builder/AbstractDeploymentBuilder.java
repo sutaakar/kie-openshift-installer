@@ -26,7 +26,8 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
         return deployment;
     }
 
-    protected void addOrReplaceEnvVar(EnvVar envVar) {
+    protected void addOrReplaceEnvVar(String environmentVariableName, String environmentVariableValue) {
+        EnvVar envVar = new EnvVar(environmentVariableName, environmentVariableValue, null);
         for (DeploymentConfig deploymentConfig : deployment.getDeploymentConfigs()) {
             List<Container> containers = deploymentConfig.getSpec()
                                                          .getTemplate()

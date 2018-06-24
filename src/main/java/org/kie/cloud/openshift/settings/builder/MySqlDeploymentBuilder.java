@@ -15,7 +15,6 @@
  */
 package org.kie.cloud.openshift.settings.builder;
 
-import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 
@@ -30,25 +29,19 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
     public MySqlDeploymentBuilder(Template mySqlTemplate) {
         super(mySqlTemplate);
         // Configure default values as these parameters are mandatory
-        EnvVar mySqlUserVar = new EnvVar(OpenShiftImageConstants.MYSQL_USER, "mySqlUser", null);
-        EnvVar mySqlPwdVar = new EnvVar(OpenShiftImageConstants.MYSQL_PASSWORD, "mySqlPwd", null);
-        EnvVar mySqlDbNameVar = new EnvVar(OpenShiftImageConstants.MYSQL_DATABASE, "mysqlDb", null);
-        addOrReplaceEnvVar(mySqlUserVar);
-        addOrReplaceEnvVar(mySqlPwdVar);
-        addOrReplaceEnvVar(mySqlDbNameVar);
+        addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_USER, "mySqlUser");
+        addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_PASSWORD, "mySqlPwd");
+        addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_DATABASE, "mysqlDb");
     }
 
     public MySqlDeploymentBuilder withDatabaseUser(String mySqlUser, String mySqlPwd) {
-        EnvVar mySqlUserVar = new EnvVar(OpenShiftImageConstants.MYSQL_USER, mySqlUser, null);
-        EnvVar mySqlPwdVar = new EnvVar(OpenShiftImageConstants.MYSQL_PASSWORD, mySqlPwd, null);
-        addOrReplaceEnvVar(mySqlUserVar);
-        addOrReplaceEnvVar(mySqlPwdVar);
+        addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_USER, mySqlUser);
+        addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_PASSWORD, mySqlPwd);
         return this;
     }
 
     public MySqlDeploymentBuilder withDatabaseName(String dbName) {
-        EnvVar mySqlDbNameVar = new EnvVar(OpenShiftImageConstants.MYSQL_DATABASE, dbName, null);
-        addOrReplaceEnvVar(mySqlDbNameVar);
+        addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_DATABASE, dbName);
         return this;
     }
 }

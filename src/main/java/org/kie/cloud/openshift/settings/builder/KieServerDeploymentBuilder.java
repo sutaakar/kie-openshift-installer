@@ -15,7 +15,6 @@
  */
 package org.kie.cloud.openshift.settings.builder;
 
-import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.deployment.Deployment;
@@ -45,45 +44,29 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
      * @return Builder
      */
     public KieServerDeploymentBuilder withKieServerUser(String kieServerUser, String kieServerPwd) {
-        EnvVar kieServerUserVar = new EnvVar(OpenShiftImageConstants.KIE_SERVER_USER, kieServerUser, null);
-        EnvVar kieServerPwdVar = new EnvVar(OpenShiftImageConstants.KIE_SERVER_PWD, kieServerPwd, null);
-        addOrReplaceEnvVar(kieServerUserVar);
-        addOrReplaceEnvVar(kieServerPwdVar);
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_USER, kieServerUser);
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PWD, kieServerPwd);
         return this;
     }
 
     public KieServerDeploymentBuilder connectToMySqlDatabase(Deployment databaseDeployment) {
-        EnvVar kieServerPersistenceDialect = new EnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DIALECT, "org.hibernate.dialect.MySQL5Dialect", null);
-        EnvVar kieServerPersistenceDatasource = new EnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DS, "java:/jboss/datasources/kie", null);
-        EnvVar datasourceName = new EnvVar(OpenShiftImageConstants.DATASOURCES, OpenShiftImageConstants.DATASOURCES_KIE, null);
-        EnvVar datasourceDatabaseName = new EnvVar(OpenShiftImageConstants.KIE_DATABASE, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_DATABASE), null);
-        EnvVar datasourceJndi = new EnvVar(OpenShiftImageConstants.KIE_JNDI, "java:/jboss/datasources/kie", null);
-        EnvVar datasourceDriver = new EnvVar(OpenShiftImageConstants.KIE_DRIVER, "mysql", null);
-        EnvVar datasourceJta = new EnvVar(OpenShiftImageConstants.KIE_JTA, "true", null);
-        EnvVar datasourceTxIsolation = new EnvVar(OpenShiftImageConstants.KIE_TX_ISOLATION, "TRANSACTION_READ_COMMITTED", null);
-        EnvVar datasourceUsername = new EnvVar(OpenShiftImageConstants.KIE_USERNAME, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_USER), null);
-        EnvVar datasourcePassword = new EnvVar(OpenShiftImageConstants.KIE_PASSWORD, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_PASSWORD), null);
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DIALECT, "org.hibernate.dialect.MySQL5Dialect");
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DS, "java:/jboss/datasources/kie");
+        addOrReplaceEnvVar(OpenShiftImageConstants.DATASOURCES, OpenShiftImageConstants.DATASOURCES_KIE);
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_DATABASE, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_DATABASE));
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_JNDI, "java:/jboss/datasources/kie");
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_DRIVER, "mysql");
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_JTA, "true");
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_TX_ISOLATION, "TRANSACTION_READ_COMMITTED");
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_USERNAME, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_USER));
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_PASSWORD, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_PASSWORD));
         // Set to first service
-        EnvVar datasourceServiceHost = new EnvVar(OpenShiftImageConstants.KIE_SERVICE_HOST, databaseDeployment.getServices().get(0).getMetadata().getName(), null);
-        EnvVar datasourceServicePort = new EnvVar(OpenShiftImageConstants.KIE_SERVICE_PORT, "3306", null);
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVICE_HOST, databaseDeployment.getServices().get(0).getMetadata().getName());
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVICE_PORT, "3306");
         // Same as service host
-        EnvVar timerServiceDataStore = new EnvVar(OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE, databaseDeployment.getServices().get(0).getMetadata().getName(), null);
+        addOrReplaceEnvVar(OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE, databaseDeployment.getServices().get(0).getMetadata().getName());
         // TODO: is there any default? If so probably delete.
-        EnvVar timerServiceDataStoreRefreshInterval = new EnvVar(OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL, "30000", null);
-        addOrReplaceEnvVar(kieServerPersistenceDialect);
-        addOrReplaceEnvVar(kieServerPersistenceDatasource);
-        addOrReplaceEnvVar(datasourceName);
-        addOrReplaceEnvVar(datasourceDatabaseName);
-        addOrReplaceEnvVar(datasourceJndi);
-        addOrReplaceEnvVar(datasourceDriver);
-        addOrReplaceEnvVar(datasourceJta);
-        addOrReplaceEnvVar(datasourceTxIsolation);
-        addOrReplaceEnvVar(datasourceUsername);
-        addOrReplaceEnvVar(datasourcePassword);
-        addOrReplaceEnvVar(datasourceServiceHost);
-        addOrReplaceEnvVar(datasourceServicePort);
-        addOrReplaceEnvVar(timerServiceDataStore);
-        addOrReplaceEnvVar(timerServiceDataStoreRefreshInterval);
+        addOrReplaceEnvVar(OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL, "30000");
         return this;
     }
 }
