@@ -23,6 +23,26 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildMySqlDeploymentDefaultValues() {
+        Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
+
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
+        Deployment builtMySqlDeployment = settingsBuilder.build();
+
+        assertThat(builtMySqlDeployment).isNotNull();
+        assertThat(builtMySqlDeployment.getDeploymentConfigs()).hasSize(1);
+        assertThat(builtMySqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.MYSQL_DATABASE.equals(e.getName()))
+                        .isNotEmpty();
+        assertThat(builtMySqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.MYSQL_USER.equals(e.getName()))
+                        .isNotEmpty();
+        assertThat(builtMySqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.MYSQL_PASSWORD.equals(e.getName()))
+                        .isNotEmpty();
+    }
+
+    @Test
     public void testBuildMySqlDeploymentWithMySqlUser() {
         Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
 
