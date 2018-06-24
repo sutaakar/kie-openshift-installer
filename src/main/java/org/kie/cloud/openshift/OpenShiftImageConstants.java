@@ -85,6 +85,11 @@ public class OpenShiftImageConstants {
     public static final String MYSQL_PASSWORD = "MYSQL_PASSWORD";
     public static final String MYSQL_DATABASE = "MYSQL_DATABASE";
 
+    public static final String POSTGRESQL_USER = "POSTGRESQL_USER";
+    public static final String POSTGRESQL_PASSWORD = "POSTGRESQL_PASSWORD";
+    public static final String POSTGRESQL_DATABASE = "POSTGRESQL_DATABASE";
+    public static final String POSTGRESQL_MAX_PREPARED_TRANSACTIONS = "POSTGRESQL_MAX_PREPARED_TRANSACTIONS";
+
     public static final String DATASOURCES = "DATASOURCES";
     public static final String DATASOURCES_KIE = "KIE";
     public static final String KIE_DATABASE = "KIE_DATABASE";

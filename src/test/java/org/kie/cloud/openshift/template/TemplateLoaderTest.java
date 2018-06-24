@@ -20,9 +20,18 @@ public class TemplateLoaderTest extends AbstractCloudTest{
     @Test
     public void testGetMySqlTemplate() {
         TemplateLoader templateLoader = new TemplateLoader(openShiftClient);
-        Template kieServerTemplate = templateLoader.loadMySqlTemplate();
+        Template mySqlTemplate = templateLoader.loadMySqlTemplate();
 
-        assertThat(kieServerTemplate).isNotNull();
-        assertThat(kieServerTemplate.getMetadata().getName()).contains("-mysql");
+        assertThat(mySqlTemplate).isNotNull();
+        assertThat(mySqlTemplate.getMetadata().getName()).contains("-mysql");
+    }
+
+    @Test
+    public void testGetPostgreSqlTemplate() {
+        TemplateLoader templateLoader = new TemplateLoader(openShiftClient);
+        Template postgreSqlTemplate = templateLoader.loadPostgeSqlTemplate();
+
+        assertThat(postgreSqlTemplate).isNotNull();
+        assertThat(postgreSqlTemplate.getMetadata().getName()).contains("-postgresql");
     }
 }

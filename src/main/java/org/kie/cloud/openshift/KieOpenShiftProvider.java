@@ -13,6 +13,7 @@ import io.fabric8.openshift.client.OpenShiftClient;
 import org.kie.cloud.openshift.scenario.Scenario;
 import org.kie.cloud.openshift.settings.builder.KieServerDeploymentBuilder;
 import org.kie.cloud.openshift.settings.builder.MySqlDeploymentBuilder;
+import org.kie.cloud.openshift.settings.builder.PostgreSqlDeploymentBuilder;
 import org.kie.cloud.openshift.template.TemplateLoader;
 
 public class KieOpenShiftProvider implements AutoCloseable {
@@ -33,6 +34,11 @@ public class KieOpenShiftProvider implements AutoCloseable {
     public MySqlDeploymentBuilder createMySqlDeploymentBuilder() {
         Template mySqlTemplate = templateLoader.loadMySqlTemplate();
         return new MySqlDeploymentBuilder(mySqlTemplate);
+    }
+
+    public PostgreSqlDeploymentBuilder createPostgreSqlDeploymentBuilder() {
+        Template postgreSqlTemplate = templateLoader.loadPostgeSqlTemplate();
+        return new PostgreSqlDeploymentBuilder(postgreSqlTemplate);
     }
 
     public Scenario createScenario() {

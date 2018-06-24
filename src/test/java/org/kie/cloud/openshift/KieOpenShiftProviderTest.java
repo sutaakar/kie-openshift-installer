@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.kie.cloud.openshift.scenario.Scenario;
 import org.kie.cloud.openshift.settings.builder.KieServerDeploymentBuilder;
 import org.kie.cloud.openshift.settings.builder.MySqlDeploymentBuilder;
+import org.kie.cloud.openshift.settings.builder.PostgreSqlDeploymentBuilder;
 
 public class KieOpenShiftProviderTest extends AbstractCloudTest{
 
@@ -22,6 +23,14 @@ public class KieOpenShiftProviderTest extends AbstractCloudTest{
         try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
             MySqlDeploymentBuilder mySqlSettingsBuilder = kieOpenShiftProvider.createMySqlDeploymentBuilder();
             assertThat(mySqlSettingsBuilder).isNotNull();
+        }
+    }
+
+    @Test
+    public void testCreatePostgreSqlDeploymentBuilder() {
+        try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
+            PostgreSqlDeploymentBuilder postgreSqlDeploymentBuilder = kieOpenShiftProvider.createPostgreSqlDeploymentBuilder();
+            assertThat(postgreSqlDeploymentBuilder).isNotNull();
         }
     }
 

@@ -10,6 +10,7 @@ public class TemplateLoader {
 
     private static final String KIE_SERVER_TEMPLATE_RESOURCE_PATH = "/kieserver.yaml";
     private static final String MYSQL_TEMPLATE_RESOURCE_PATH = "/mysql.yaml";
+    private static final String POSTGRESQL_TEMPLATE_RESOURCE_PATH = "/postgresql.yaml";
 
     private OpenShiftClient openShiftClient;
 
@@ -25,5 +26,10 @@ public class TemplateLoader {
     public Template loadMySqlTemplate() {
         URL mySqlTemplateUrl = KieOpenShiftProvider.class.getResource(MYSQL_TEMPLATE_RESOURCE_PATH);
         return openShiftClient.templates().load(mySqlTemplateUrl).get();
+    }
+
+    public Template loadPostgeSqlTemplate() {
+        URL postgreSqlTemplateUrl = KieOpenShiftProvider.class.getResource(POSTGRESQL_TEMPLATE_RESOURCE_PATH);
+        return openShiftClient.templates().load(postgreSqlTemplateUrl).get();
     }
 }
