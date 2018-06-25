@@ -44,6 +44,7 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
         }
     }
 
+    // TODO adjust to the Deployment name and filter whole object tree (or create some reference)
     protected void setApplicationName(String applicationName) {
         for (HasMetadata object : getDeployment().geTemplate().getObjects()) {
             String newObjectName = object.getMetadata().getName().replace("${APPLICATION_NAME}", applicationName);
