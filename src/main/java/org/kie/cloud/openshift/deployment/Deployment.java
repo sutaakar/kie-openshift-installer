@@ -3,6 +3,7 @@ package org.kie.cloud.openshift.deployment;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.Route;
@@ -69,6 +70,14 @@ public class Deployment {
                        .stream()
                        .filter(o -> o instanceof DeploymentConfig)
                        .map(o -> (DeploymentConfig) o)
+                       .collect(Collectors.toList());
+    }
+
+    public List<PersistentVolumeClaim> getPersistentVolumeClaims() {
+        return template.getObjects()
+                       .stream()
+                       .filter(o -> o instanceof PersistentVolumeClaim)
+                       .map(o -> (PersistentVolumeClaim) o)
                        .collect(Collectors.toList());
     }
 

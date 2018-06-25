@@ -8,6 +8,8 @@ import java.util.List;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.EnvVar;
+import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
+import io.fabric8.kubernetes.api.model.PersistentVolumeClaimBuilder;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.openshift.api.model.DeploymentConfig;
@@ -99,6 +101,16 @@ public class DeploymentTest extends AbstractCloudTest{
                                                                                                       .hasMessageContaining("Environment variable with name not-existing-variable-name not found.");
     }
 
+    @Test
+    public void testGetPersistentVolumeClaims() {
+        Template template = getTemplateWithServiceAndRouteCombinations();
+        Deployment deployment = new Deployment(template);
+        List<PersistentVolumeClaim> persistentVolumeClaims = deployment.getPersistentVolumeClaims();
+
+        assertThat(persistentVolumeClaims).hasSize(1);
+        assertThat(persistentVolumeClaims.get(0).getMetadata().getName()).isEqualTo("my-persistent-volume-claim");
+    }
+
     private Template getTemplateWithServiceAndRouteCombinations() {
         Service unsecureService = new ServiceBuilder().withNewMetadata()
                                                           .withName("unsecured-service")
@@ -144,6 +156,10 @@ public class DeploymentTest extends AbstractCloudTest{
                                                                              .endTemplate()
                                                                          .endSpec()
                                                                          .build();
-        return new TemplateBuilder().withObjects(unsecureService, unsecureRoute, secureService, secureRoute, deploymentConfig).build();
+        PersistentVolumeClaim persistentVolumeClaim = new PersistentVolumeClaimBuilder().withNewMetadata()
+                                                                                            .withName("my-persistent-volume-claim")
+                                                                                        .endMetadata()
+                                                                                        .build();
+        return new TemplateBuilder().withObjects(unsecureService, unsecureRoute, secureService, secureRoute, deploymentConfig, persistentVolumeClaim).build();
     }
 }
