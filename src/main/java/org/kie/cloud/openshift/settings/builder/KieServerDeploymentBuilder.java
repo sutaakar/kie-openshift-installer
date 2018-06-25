@@ -15,6 +15,8 @@
  */
 package org.kie.cloud.openshift.settings.builder;
 
+import io.fabric8.kubernetes.api.model.EnvVar;
+import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.deployment.Deployment;
@@ -29,6 +31,15 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
 
     public KieServerDeploymentBuilder(Template kieServerTemplate) {
         super(kieServerTemplate);
+        // Configure default values
+        EnvVar kieServerHost = new EnvVarBuilder().withName(OpenShiftImageConstants.KIE_SERVER_HOST)
+                                                  .withNewValueFrom()
+                                                      .withNewFieldRef()
+                                                          .withFieldPath("status.podIP")
+                                                      .endFieldRef()
+                                                  .endValueFrom()
+                                                  .build();
+        addOrReplaceEnvVar(kieServerHost);
     }
 
     public KieServerDeploymentBuilder withApplicationName(String applicationName) {

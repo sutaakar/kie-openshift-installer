@@ -123,8 +123,3 @@ objects:
           - name: http
             containerPort: 8080
             protocol: TCP
-          env:
-          - name: KIE_SERVER_HOST
-            valueFrom:
-              fieldRef:
-                fieldPath: status.podIP
