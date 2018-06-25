@@ -22,7 +22,7 @@ import org.kie.server.client.KieServicesFactory;
 public class KieServerIntegrationTest extends AbstractCloudIntegrationTest {
 
     @Test
-    public void testCreateAndDeployKieServerWithMySql() throws MalformedURLException, InterruptedException {
+    public void testCreateAndDeployKieServerWithMySql() throws InterruptedException {
         final String kieServerUsername = "john";
         final String kieServerPassword = "john123";
         final String mySqlUsername = "mysqluser";
@@ -40,6 +40,42 @@ public class KieServerIntegrationTest extends AbstractCloudIntegrationTest {
             Scenario kieServerScenario = kieOpenShiftProvider.createScenario();
             kieServerScenario.addDeployment(kieServerDeployment);
             kieServerScenario.addDeployment(mySqlDeployment);
+            kieOpenShiftProvider.deployScenario(kieServerScenario, projectName, Collections.singletonMap(OpenShiftImageConstants.IMAGE_STREAM_NAMESPACE, projectName));
+
+            // Wait until ready
+            List<DeploymentConfig> items = openShiftClient.deploymentConfigs().inNamespace(projectName).list().getItems();
+            openShiftClient.deploymentConfigs().inNamespace(projectName).withName(items.get(0).getMetadata().getName()).waitUntilReady(5, TimeUnit.MINUTES);
+            OpenShiftSynchronizer.waitUntilAllRoutesAreAvailable(openShiftClient, projectName);
+
+            String host = openShiftClient.routes().inNamespace(projectName).list().getItems().get(0).getSpec().getHost();
+            KieServicesClient kieServerClient = KieServicesFactory.newKieServicesRestClient("http://" + host + "/services/rest/server", kieServerUsername, kieServerPassword);
+
+            ServiceResponse<KieServerInfo> serverInfo = kieServerClient.getServerInfo();
+            assertThat(serverInfo).isNotNull();
+            assertThat(serverInfo.getType()).isEqualTo(ResponseType.SUCCESS);
+            assertThat(serverInfo.getResult().getCapabilities()).contains("BPM");
+        }
+    }
+
+    @Test
+    public void testCreateAndDeployKieServerWithPostgreSql() throws InterruptedException {
+        final String kieServerUsername = "john";
+        final String kieServerPassword = "john123";
+        final String mySqlUsername = "postgresqluser";
+        final String mySqlPassword = "postgresqlpass";
+
+        try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
+            Deployment postgreSqlDeployment = kieOpenShiftProvider.createPostgreSqlDeploymentBuilder()
+                                                                  .withDatabaseUser(mySqlUsername, mySqlPassword)
+                                                                  .withDatabaseName("mydb")
+                                                                  .build();
+            Deployment kieServerDeployment = kieOpenShiftProvider.createKieServerDeploymentBuilder()
+                                                                 .withKieServerUser(kieServerUsername, kieServerPassword)
+                                                                 .connectToPostgreSqlDatabase(postgreSqlDeployment)
+                                                                 .build();
+            Scenario kieServerScenario = kieOpenShiftProvider.createScenario();
+            kieServerScenario.addDeployment(kieServerDeployment);
+            kieServerScenario.addDeployment(postgreSqlDeployment);
             kieOpenShiftProvider.deployScenario(kieServerScenario, projectName, Collections.singletonMap(OpenShiftImageConstants.IMAGE_STREAM_NAMESPACE, projectName));
 
             // Wait until ready
