@@ -23,6 +23,9 @@ public class AbstractCloudIntegrationTest extends AbstractCloudTest{
             imageStreamsUrl = new URL("https://raw.githubusercontent.com/openshift/library/master/community/mysql/imagestreams/mysql-centos7.json");
             resourceList = openShiftClient.templates().inNamespace(projectName).load(imageStreamsUrl).process();
             openShiftClient.lists().inNamespace(projectName).create(resourceList);
+            imageStreamsUrl = new URL("https://raw.githubusercontent.com/openshift/library/master/community/postgresql/imagestreams/postgresql-centos7.json");
+            resourceList = openShiftClient.templates().inNamespace(projectName).load(imageStreamsUrl).process();
+            openShiftClient.lists().inNamespace(projectName).create(resourceList);
         } catch (MalformedURLException e) {
             throw new RuntimeException("Error while parsing image stream URL.", e);
         }
