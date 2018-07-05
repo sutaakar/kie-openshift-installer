@@ -37,7 +37,7 @@ public class KieOpenShiftProvider implements AutoCloseable {
     }
 
     public PostgreSqlDeploymentBuilder createPostgreSqlDeploymentBuilder() {
-        Template postgreSqlTemplate = templateLoader.loadPostgeSqlTemplate();
+        Template postgreSqlTemplate = templateLoader.loadPostgreSqlTemplate();
         return new PostgreSqlDeploymentBuilder(postgreSqlTemplate);
     }
 

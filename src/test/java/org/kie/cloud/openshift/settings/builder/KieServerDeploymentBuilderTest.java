@@ -116,7 +116,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildKieServerDeploymentWithPostgreSqlDatabase() {
-        Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgeSqlTemplate();
+        Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgreSqlTemplate();
         Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
 
         PostgreSqlDeploymentBuilder postgreSqlSettingsBuilder = new PostgreSqlDeploymentBuilder(postgreSqlTemplate);

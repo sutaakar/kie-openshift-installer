@@ -18,7 +18,7 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildPostgreSqlDeployment() {
-        Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgeSqlTemplate();
+        Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgreSqlTemplate();
 
         PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder(postgreSqlTemplate);
         Deployment builtPostgreSqlDeployment = settingsBuilder.build();
@@ -29,7 +29,7 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildPostgreSqlDeploymentDefaultValues() {
-        Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgeSqlTemplate();
+        Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgreSqlTemplate();
 
         PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder(postgreSqlTemplate);
         Deployment builtPostgreSqlDeployment = settingsBuilder.build();
@@ -52,7 +52,7 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildPostgreSqlDeploymentWithPostgreSqlUser() {
-        Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgeSqlTemplate();
+        Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgreSqlTemplate();
 
         PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder(postgreSqlTemplate);
         Deployment builtPostgreSqlDeployment = settingsBuilder.withDatabaseUser("postgreSqlName", "postgreSqlPassword")
@@ -70,7 +70,7 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildPostgreSqlDeploymentWithDbName() {
-        Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgeSqlTemplate();
+        Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgreSqlTemplate();
 
         PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder(postgreSqlTemplate);
         Deployment builtPostgreSqlDeployment = settingsBuilder.withDatabaseName("custom-db")
@@ -85,7 +85,7 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildPostgreSqlDeploymentWithPersistence() {
-        Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgeSqlTemplate();
+        Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgreSqlTemplate();
 
         PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder(postgreSqlTemplate);
         Deployment builtPostgreSqlDeployment = settingsBuilder.makePersistent()

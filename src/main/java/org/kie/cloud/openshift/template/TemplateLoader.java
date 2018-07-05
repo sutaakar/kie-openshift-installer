@@ -28,7 +28,7 @@ public class TemplateLoader {
         return openShiftClient.templates().load(mySqlTemplateUrl).get();
     }
 
-    public Template loadPostgeSqlTemplate() {
+    public Template loadPostgreSqlTemplate() {
         URL postgreSqlTemplateUrl = KieOpenShiftProvider.class.getResource(POSTGRESQL_TEMPLATE_RESOURCE_PATH);
         return openShiftClient.templates().load(postgreSqlTemplateUrl).get();
     }

@@ -29,7 +29,7 @@ public class TemplateLoaderTest extends AbstractCloudTest{
     @Test
     public void testGetPostgreSqlTemplate() {
         TemplateLoader templateLoader = new TemplateLoader(openShiftClient);
-        Template postgreSqlTemplate = templateLoader.loadPostgeSqlTemplate();
+        Template postgreSqlTemplate = templateLoader.loadPostgreSqlTemplate();
 
         assertThat(postgreSqlTemplate).isNotNull();
         assertThat(postgreSqlTemplate.getMetadata().getName()).contains("-postgresql");
