@@ -45,4 +45,9 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder {
         addOrReplaceEnvVar(OpenShiftImageConstants.POSTGRESQL_DATABASE, dbName);
         return this;
     }
+
+    public PostgreSqlDeploymentBuilder makePersistent() {
+        addPersistence("${APPLICATION_NAME}-postgresql", "/var/lib/postgresql/data", "ReadWriteOnce", "1Gi");
+        return this;
+    }
 }
