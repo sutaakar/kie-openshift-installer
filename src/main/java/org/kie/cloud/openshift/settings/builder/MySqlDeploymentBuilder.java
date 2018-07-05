@@ -45,9 +45,8 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
         return this;
     }
 
-    public MySqlDeploymentBuilder makePersistent(String persistentVolumeClaimSize) {
-        // TODO make PV size hardcoded?
-        addPersistence("${APPLICATION_NAME}-mysql", "/var/lib/mysql/data", "ReadWriteOnce", persistentVolumeClaimSize);
+    public MySqlDeploymentBuilder makePersistent() {
+        addPersistence("${APPLICATION_NAME}-mysql", "/var/lib/mysql/data", "ReadWriteOnce", "1Gi");
         return this;
     }
 }

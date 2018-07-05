@@ -53,7 +53,7 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
         }
     }
 
-    protected void addPersistence(String deploymentName, String mountPath, String accessMode, String persistentVolumeClaimSize) {
+    protected void addPersistence(String deploymentName, String mountPath, String accessMode, String persistentVolumeStorageSize) {
         for (DeploymentConfig deploymentConfig : getDeployment().getDeploymentConfigs()) {
             PodSpec podSpec = deploymentConfig.getSpec().getTemplate().getSpec();
             List<Container> containers = podSpec.getContainers();
@@ -81,7 +81,7 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
                                                                                                  .withNewSpec()
                                                                                                      .withAccessModes(accessMode)
                                                                                                      .withNewResources()
-                                                                                                         .withRequests(Collections.singletonMap("storage", new Quantity(persistentVolumeClaimSize)))
+                                                                                                         .withRequests(Collections.singletonMap("storage", new Quantity(persistentVolumeStorageSize)))
                                                                                                      .endResources()
                                                                                                  .endSpec()
                                                                                                  .build();

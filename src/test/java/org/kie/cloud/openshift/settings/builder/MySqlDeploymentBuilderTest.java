@@ -85,7 +85,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
         Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
 
         MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
-        Deployment builtMySqlDeployment = settingsBuilder.makePersistent("1Gi")
+        Deployment builtMySqlDeployment = settingsBuilder.makePersistent()
                                                          .build();
 
         List<VolumeMount> volumeMounts = builtMySqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getVolumeMounts();
