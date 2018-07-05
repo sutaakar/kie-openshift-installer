@@ -42,11 +42,6 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
         addOrReplaceEnvVar(kieServerHost);
     }
 
-    public KieServerDeploymentBuilder withApplicationName(String applicationName) {
-        setApplicationName(applicationName);
-        return this;
-    }
-
     /**
      * Return configured builder with Kie Server user.
      *

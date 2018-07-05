@@ -90,14 +90,4 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
             getDeployment().geTemplate().setObjects(objects);
         }
     }
-
-    // TODO adjust to the Deployment name and filter whole object tree (or create some reference)
-    protected void setApplicationName(String applicationName) {
-        for (HasMetadata object : getDeployment().geTemplate().getObjects()) {
-            String newObjectName = object.getMetadata().getName().replace("${APPLICATION_NAME}", applicationName);
-            object.getMetadata().setName(newObjectName);
-        }
-        // Delete application name property
-        getDeployment().geTemplate().getParameters().removeIf(p -> p.getName().equals("APPLICATION_NAME"));
-    }
 }
