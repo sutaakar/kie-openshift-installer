@@ -65,12 +65,13 @@ public class Deployment {
                        .collect(Collectors.toList());
     }
 
-    public List<DeploymentConfig> getDeploymentConfigs() {
+    public DeploymentConfig getDeploymentConfig() {
         return template.getObjects()
                        .stream()
                        .filter(o -> o instanceof DeploymentConfig)
                        .map(o -> (DeploymentConfig) o)
-                       .collect(Collectors.toList());
+                       .findAny()
+                       .orElseThrow(() -> new RuntimeException("No Deployment config found."));
     }
 
     public List<PersistentVolumeClaim> getPersistentVolumeClaims() {
@@ -82,8 +83,7 @@ public class Deployment {
     }
 
     public String getEnvironmentVariableValue(String environmentVariableName) {
-        return getDeploymentConfigs().stream()
-                                     .flatMap(n -> n.getSpec().getTemplate().getSpec().getContainers().stream())
+        return getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().stream()
                                      .flatMap(c -> c.getEnv().stream())
                                      .filter(e -> e.getName().equals(environmentVariableName))
                                      .map(e -> e.getValue())

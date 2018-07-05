@@ -35,14 +35,13 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
         Deployment builtMySqlDeployment = settingsBuilder.build();
 
         assertThat(builtMySqlDeployment).isNotNull();
-        assertThat(builtMySqlDeployment.getDeploymentConfigs()).hasSize(1);
-        assertThat(builtMySqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.MYSQL_DATABASE.equals(e.getName()))
                         .isNotEmpty();
-        assertThat(builtMySqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.MYSQL_USER.equals(e.getName()))
                         .isNotEmpty();
-        assertThat(builtMySqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.MYSQL_PASSWORD.equals(e.getName()))
                         .isNotEmpty();
     }
@@ -56,11 +55,10 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
                                                          .build();
 
         assertThat(builtMySqlDeployment).isNotNull();
-        assertThat(builtMySqlDeployment.getDeploymentConfigs()).hasSize(1);
-        assertThat(builtMySqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.MYSQL_USER.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("mySqlName"));
-        assertThat(builtMySqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.MYSQL_PASSWORD.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("mySqlPassword"));
     }
@@ -74,8 +72,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
                                                          .build();
 
         assertThat(builtMySqlDeployment).isNotNull();
-        assertThat(builtMySqlDeployment.getDeploymentConfigs()).hasSize(1);
-        assertThat(builtMySqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.MYSQL_DATABASE.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("custom-db"));
     }
@@ -88,8 +85,8 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
         Deployment builtMySqlDeployment = settingsBuilder.makePersistent()
                                                          .build();
 
-        List<VolumeMount> volumeMounts = builtMySqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getVolumeMounts();
-        List<Volume> volumes = builtMySqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getVolumes();
+        List<VolumeMount> volumeMounts = builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getVolumeMounts();
+        List<Volume> volumes = builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getVolumes();
         assertThat(volumeMounts)
                         .hasOnlyOneElementSatisfying(m -> {
                             assertThat(m.getName()).contains("-mysql-pvol");

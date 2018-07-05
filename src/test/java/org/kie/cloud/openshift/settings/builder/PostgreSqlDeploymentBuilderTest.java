@@ -35,17 +35,16 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
         Deployment builtPostgreSqlDeployment = settingsBuilder.build();
 
         assertThat(builtPostgreSqlDeployment).isNotNull();
-        assertThat(builtPostgreSqlDeployment.getDeploymentConfigs()).hasSize(1);
-        assertThat(builtPostgreSqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.POSTGRESQL_DATABASE.equals(e.getName()))
                         .isNotEmpty();
-        assertThat(builtPostgreSqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.POSTGRESQL_USER.equals(e.getName()))
                         .isNotEmpty();
-        assertThat(builtPostgreSqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.POSTGRESQL_PASSWORD.equals(e.getName()))
                         .isNotEmpty();
-        assertThat(builtPostgreSqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.POSTGRESQL_MAX_PREPARED_TRANSACTIONS.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("100"));
     }
@@ -59,11 +58,10 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
                                                               .build();
 
         assertThat(builtPostgreSqlDeployment).isNotNull();
-        assertThat(builtPostgreSqlDeployment.getDeploymentConfigs()).hasSize(1);
-        assertThat(builtPostgreSqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.POSTGRESQL_USER.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("postgreSqlName"));
-        assertThat(builtPostgreSqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.POSTGRESQL_PASSWORD.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("postgreSqlPassword"));
     }
@@ -77,8 +75,7 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
                                                               .build();
 
         assertThat(builtPostgreSqlDeployment).isNotNull();
-        assertThat(builtPostgreSqlDeployment.getDeploymentConfigs()).hasSize(1);
-        assertThat(builtPostgreSqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.POSTGRESQL_DATABASE.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("custom-db"));
     }
@@ -91,8 +88,8 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
         Deployment builtPostgreSqlDeployment = settingsBuilder.makePersistent()
                                                          .build();
 
-        List<VolumeMount> volumeMounts = builtPostgreSqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getContainers().get(0).getVolumeMounts();
-        List<Volume> volumes = builtPostgreSqlDeployment.getDeploymentConfigs().get(0).getSpec().getTemplate().getSpec().getVolumes();
+        List<VolumeMount> volumeMounts = builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getVolumeMounts();
+        List<Volume> volumes = builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getVolumes();
         assertThat(volumeMounts)
                         .hasOnlyOneElementSatisfying(m -> {
                             assertThat(m.getName()).contains("-postgresql-pvol");

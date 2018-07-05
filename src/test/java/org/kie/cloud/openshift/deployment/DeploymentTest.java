@@ -74,13 +74,12 @@ public class DeploymentTest extends AbstractCloudTest{
     }
 
     @Test
-    public void testGetDeploymentConfigs() {
+    public void testGetDeploymentConfig() {
         Template template = getTemplateWithServiceAndRouteCombinations();
         Deployment deployment = new Deployment(template);
-        List<DeploymentConfig> deploymentConfigs = deployment.getDeploymentConfigs();
+        DeploymentConfig deploymentConfig = deployment.getDeploymentConfig();
 
-        assertThat(deploymentConfigs).hasSize(1);
-        assertThat(deploymentConfigs.get(0).getMetadata().getName()).isEqualTo("my-deployment");
+        assertThat(deploymentConfig.getMetadata().getName()).isEqualTo("my-deployment");
     }
 
     @Test

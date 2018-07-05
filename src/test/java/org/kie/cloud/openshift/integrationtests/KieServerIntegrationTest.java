@@ -2,7 +2,6 @@ package org.kie.cloud.openshift.integrationtests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
