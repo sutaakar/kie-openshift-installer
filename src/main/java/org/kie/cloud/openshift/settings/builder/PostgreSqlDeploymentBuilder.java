@@ -47,7 +47,7 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder {
     }
 
     public PostgreSqlDeploymentBuilder makePersistent() {
-        addPersistence("${APPLICATION_NAME}-postgresql", "/var/lib/postgresql/data", "ReadWriteOnce", "1Gi");
+        addPersistence("${APPLICATION_NAME}-postgresql", "/var/lib/pgsql/data", "ReadWriteOnce", "1Gi");
         return this;
     }
 }

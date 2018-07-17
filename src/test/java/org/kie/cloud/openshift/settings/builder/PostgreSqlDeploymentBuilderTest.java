@@ -93,7 +93,7 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(volumeMounts)
                         .hasOnlyOneElementSatisfying(m -> {
                             assertThat(m.getName()).contains("-postgresql-pvol");
-                            assertThat(m.getMountPath()).isEqualTo("/var/lib/postgresql/data");
+                            assertThat(m.getMountPath()).isEqualTo("/var/lib/pgsql/data");
                         });
         assertThat(volumes)
                         .hasOnlyOneElementSatisfying(v -> {
