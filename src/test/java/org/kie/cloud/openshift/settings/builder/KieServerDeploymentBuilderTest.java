@@ -71,9 +71,6 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
                         .filteredOn(e -> OpenShiftImageConstants.KIE_JTA.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("true"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                        .filteredOn(e -> OpenShiftImageConstants.KIE_TX_ISOLATION.equals(e.getName()))
-                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("TRANSACTION_READ_COMMITTED"));
-        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.KIE_USERNAME.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("mySqlName"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
@@ -129,9 +126,6 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.KIE_JTA.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("true"));
-        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                        .filteredOn(e -> OpenShiftImageConstants.KIE_TX_ISOLATION.equals(e.getName()))
-                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("TRANSACTION_READ_COMMITTED"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.KIE_USERNAME.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("postgreSqlName"));

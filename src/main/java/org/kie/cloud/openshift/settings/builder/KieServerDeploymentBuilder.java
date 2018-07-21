@@ -63,7 +63,6 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_JNDI, "java:/jboss/datasources/kie");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_DRIVER, "mysql");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_JTA, "true");
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_TX_ISOLATION, "TRANSACTION_READ_COMMITTED");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_USERNAME, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_USER));
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_PASSWORD, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_PASSWORD));
         // Set to first service
@@ -84,7 +83,6 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_JNDI, "java:/jboss/datasources/kie");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_DRIVER, "postgresql");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_JTA, "true");
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_TX_ISOLATION, "TRANSACTION_READ_COMMITTED");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_USERNAME, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.POSTGRESQL_USER));
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_PASSWORD, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.POSTGRESQL_PASSWORD));
         // Set to first service
