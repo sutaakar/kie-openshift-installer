@@ -31,7 +31,10 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
 
     public KieServerDeploymentBuilder(Template kieServerTemplate) {
         super(kieServerTemplate);
-        // Configure default values
+    }
+
+    @Override
+    protected void initDefaultValues() {
         EnvVar kieServerHost = new EnvVarBuilder().withName(OpenShiftImageConstants.KIE_SERVER_HOST)
                                                   .withNewValueFrom()
                                                       .withNewFieldRef()

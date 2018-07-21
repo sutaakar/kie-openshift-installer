@@ -28,7 +28,10 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
 
     public MySqlDeploymentBuilder(Template mySqlTemplate) {
         super(mySqlTemplate);
-        // Configure default values as these parameters are mandatory
+    }
+
+    @Override
+    protected void initDefaultValues() {
         addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_USER, "mySqlUser");
         addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_PASSWORD, "mySqlPwd");
         addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_DATABASE, "mysqlDb");

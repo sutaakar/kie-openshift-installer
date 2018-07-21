@@ -23,6 +23,7 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
 
     public AbstractDeploymentBuilder(Template deploymentTemplate) {
         deployment = new Deployment(deploymentTemplate);
+        initDefaultValues();
     }
 
     @Override
@@ -86,4 +87,6 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
         objects.add(persistentVolumeClaim);
         getDeployment().geTemplate().setObjects(objects);
     }
+
+    protected abstract void initDefaultValues();
 }

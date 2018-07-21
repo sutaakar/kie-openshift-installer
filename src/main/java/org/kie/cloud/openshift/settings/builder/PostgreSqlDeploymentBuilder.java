@@ -28,7 +28,10 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder {
 
     public PostgreSqlDeploymentBuilder(Template postgreSqlTemplate) {
         super(postgreSqlTemplate);
-        // Configure default values as these parameters are mandatory
+    }
+
+    @Override
+    protected void initDefaultValues() {
         addOrReplaceEnvVar(OpenShiftImageConstants.POSTGRESQL_USER, "postgreSqlUser");
         addOrReplaceEnvVar(OpenShiftImageConstants.POSTGRESQL_PASSWORD, "postgreSqlPwd");
         addOrReplaceEnvVar(OpenShiftImageConstants.POSTGRESQL_DATABASE, "postgreSqlDb");
