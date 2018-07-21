@@ -44,7 +44,8 @@ objects:
   apiVersion: v1
   spec:
     ports:
-    - port: 8080
+    - name: http
+      port: 8080
       targetPort: 8080
     selector:
       deploymentConfig: "${APPLICATION_NAME}-kieserver"
