@@ -2,6 +2,7 @@ package org.kie.cloud.openshift.settings.builder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.openshift.api.model.Template;
 import org.junit.Test;
 import org.kie.cloud.openshift.AbstractCloudTest;
@@ -37,6 +38,38 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_PWD.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("executionUser1!"));
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentLivenessProbe() {
+        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
+
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        Deployment builtKieServerDeployment = settingsBuilder.withKieServerUser("kieServerName", "kieServerPassword").build();
+        Probe livenessProbe = builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getLivenessProbe();
+
+        assertThat(livenessProbe).isNotNull();
+        assertThat(livenessProbe.getExec().getCommand()).containsExactly("/bin/bash", "-c", "curl --fail --silent -u 'kieServerName:kieServerPassword' http://localhost:8080/services/rest/server/healthcheck");
+        assertThat(livenessProbe.getInitialDelaySeconds()).isEqualTo(180);
+        assertThat(livenessProbe.getTimeoutSeconds()).isEqualTo(2);
+        assertThat(livenessProbe.getPeriodSeconds()).isEqualTo(15);
+        assertThat(livenessProbe.getFailureThreshold()).isEqualTo(3);
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentReadinessProbe() {
+        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
+
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        Deployment builtKieServerDeployment = settingsBuilder.withKieServerUser("kieServerName", "kieServerPassword").build();
+        Probe readinessProbe = builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getReadinessProbe();
+
+        assertThat(readinessProbe).isNotNull();
+        assertThat(readinessProbe.getExec().getCommand()).containsExactly("/bin/bash", "-c", "curl --fail --silent -u 'kieServerName:kieServerPassword' http://localhost:8080/services/rest/server/readycheck");
+        assertThat(readinessProbe.getInitialDelaySeconds()).isEqualTo(60);
+        assertThat(readinessProbe.getTimeoutSeconds()).isEqualTo(2);
+        assertThat(readinessProbe.getPeriodSeconds()).isEqualTo(30);
+        assertThat(readinessProbe.getFailureThreshold()).isEqualTo(6);
     }
 
     @Test

@@ -28,6 +28,8 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
 
     @Override
     public Deployment build() {
+        configureLivenessProbe();
+        configureReadinessProbe();
         return deployment;
     }
 
@@ -89,4 +91,8 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
     }
 
     protected abstract void initDefaultValues();
+
+    protected abstract void configureLivenessProbe();
+
+    protected abstract void configureReadinessProbe();
 }

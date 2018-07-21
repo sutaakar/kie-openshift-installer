@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.Volume;
 import io.fabric8.kubernetes.api.model.VolumeMount;
@@ -47,6 +48,34 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.POSTGRESQL_MAX_PREPARED_TRANSACTIONS.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("100"));
+    }
+
+    @Test
+    public void testBuildPostgreSqlDeploymentLivenessProbe() {
+        Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgreSqlTemplate();
+
+        PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder(postgreSqlTemplate);
+        Deployment builtPostgreSqlDeployment = settingsBuilder.build();
+        Probe livenessProbe = builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getLivenessProbe();
+
+        assertThat(livenessProbe).isNotNull();
+        assertThat(livenessProbe.getExec().getCommand()).containsExactly("/usr/libexec/check-container", "--live");
+        assertThat(livenessProbe.getInitialDelaySeconds()).isEqualTo(120);
+        assertThat(livenessProbe.getTimeoutSeconds()).isEqualTo(10);
+    }
+
+    @Test
+    public void testBuildPostgreSqlDeploymentReadinessProbe() {
+        Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgreSqlTemplate();
+
+        PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder(postgreSqlTemplate);
+        Deployment builtPostgreSqlDeployment = settingsBuilder.build();
+        Probe readinessProbe = builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getReadinessProbe();
+
+        assertThat(readinessProbe).isNotNull();
+        assertThat(readinessProbe.getExec().getCommand()).containsExactly("/usr/libexec/check-container");
+        assertThat(readinessProbe.getInitialDelaySeconds()).isEqualTo(5);
+        assertThat(readinessProbe.getTimeoutSeconds()).isEqualTo(1);
     }
 
     @Test

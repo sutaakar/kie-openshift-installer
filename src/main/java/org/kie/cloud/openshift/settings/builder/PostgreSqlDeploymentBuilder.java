@@ -15,6 +15,9 @@
  */
 package org.kie.cloud.openshift.settings.builder;
 
+import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.Probe;
+import io.fabric8.kubernetes.api.model.ProbeBuilder;
 import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 
@@ -36,6 +39,32 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder {
         addOrReplaceEnvVar(OpenShiftImageConstants.POSTGRESQL_PASSWORD, "postgreSqlPwd");
         addOrReplaceEnvVar(OpenShiftImageConstants.POSTGRESQL_DATABASE, "postgreSqlDb");
         addOrReplaceEnvVar(OpenShiftImageConstants.POSTGRESQL_MAX_PREPARED_TRANSACTIONS, "100");
+    }
+
+    @Override
+    protected void configureLivenessProbe() {
+        Probe livenessProbe = new ProbeBuilder().withNewExec()
+                                                     .withCommand("/usr/libexec/check-container", "--live")
+                                                 .endExec()
+                                                 .withInitialDelaySeconds(120)
+                                                 .withTimeoutSeconds(10)
+                                                 .build();
+        // Just one container should be available
+        Container container = getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0);
+        container.setLivenessProbe(livenessProbe);
+    }
+
+    @Override
+    protected void configureReadinessProbe() {
+        Probe readinessProbe = new ProbeBuilder().withNewExec()
+                                                     .withCommand("/usr/libexec/check-container")
+                                                 .endExec()
+                                                 .withInitialDelaySeconds(5)
+                                                 .withTimeoutSeconds(1)
+                                                 .build();
+        // Just one container should be available
+        Container container = getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0);
+        container.setReadinessProbe(readinessProbe);
     }
 
     public PostgreSqlDeploymentBuilder withDatabaseUser(String postgreSqlUser, String postgreSqlPwd) {

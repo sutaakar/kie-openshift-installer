@@ -104,18 +104,6 @@ objects:
           resources:
             limits:
               memory: "${EXCECUTION_SERVER_MEMORY_LIMIT}"
-          livenessProbe:
-            exec:
-              command:
-              - "/bin/bash"
-              - "-c"
-              - "/opt/eap/bin/livenessProbe.sh"
-          readinessProbe:
-            exec:
-              command:
-              - "/bin/bash"
-              - "-c"
-              - "/opt/eap/bin/readinessProbe.sh"
           ports:
           - name: jolokia
             containerPort: 8778

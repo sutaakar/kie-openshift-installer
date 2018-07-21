@@ -15,6 +15,9 @@
  */
 package org.kie.cloud.openshift.settings.builder;
 
+import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.Probe;
+import io.fabric8.kubernetes.api.model.ProbeBuilder;
 import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 
@@ -35,6 +38,25 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
         addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_USER, "mySqlUser");
         addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_PASSWORD, "mySqlPwd");
         addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_DATABASE, "mysqlDb");
+    }
+
+    @Override
+    protected void configureLivenessProbe() {
+        // No liveness probe set for MySQL
+    }
+
+    @Override
+    protected void configureReadinessProbe() {
+        // TODO: Should the port be configured too? See original template.
+        Probe readinessProbe = new ProbeBuilder().withNewExec()
+                                                     .withCommand("/bin/bash", "-i", "-c", "MYSQL_PWD=\"$MYSQL_PASSWORD\" mysql -h 127.0.0.1 -u $MYSQL_USER -D $MYSQL_DATABASE -e 'SELECT 1'")
+                                                 .endExec()
+                                                 .withInitialDelaySeconds(5)
+                                                 .withTimeoutSeconds(1)
+                                                 .build();
+        // Just one container should be available
+        Container container = getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0);
+        container.setReadinessProbe(readinessProbe);
     }
 
     public MySqlDeploymentBuilder withDatabaseUser(String mySqlUser, String mySqlPwd) {

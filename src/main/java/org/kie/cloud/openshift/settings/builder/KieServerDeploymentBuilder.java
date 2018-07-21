@@ -15,8 +15,11 @@
  */
 package org.kie.cloud.openshift.settings.builder;
 
+import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
+import io.fabric8.kubernetes.api.model.Probe;
+import io.fabric8.kubernetes.api.model.ProbeBuilder;
 import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.deployment.Deployment;
@@ -46,6 +49,40 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
         addOrReplaceEnvVar(kieServerHost);
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_USER, "executionUser");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PWD, "executionUser1!");
+    }
+
+    @Override
+    protected void configureLivenessProbe() {
+        String kieServerUser = getDeployment().getEnvironmentVariableValue(OpenShiftImageConstants.KIE_SERVER_USER);
+        String kieServerPassword = getDeployment().getEnvironmentVariableValue(OpenShiftImageConstants.KIE_SERVER_PWD);
+        Probe livenessProbe = new ProbeBuilder().withNewExec()
+                                                    .withCommand("/bin/bash", "-c", "curl --fail --silent -u '" + kieServerUser + ":" + kieServerPassword + "' http://localhost:8080/services/rest/server/healthcheck")
+                                                .endExec()
+                                                .withInitialDelaySeconds(180)
+                                                .withTimeoutSeconds(2)
+                                                .withPeriodSeconds(15)
+                                                .withFailureThreshold(3)
+                                                .build();
+        // Just one container should be available
+        Container container = getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0);
+        container.setLivenessProbe(livenessProbe);
+    }
+
+    @Override
+    protected void configureReadinessProbe() {
+        String kieServerUser = getDeployment().getEnvironmentVariableValue(OpenShiftImageConstants.KIE_SERVER_USER);
+        String kieServerPassword = getDeployment().getEnvironmentVariableValue(OpenShiftImageConstants.KIE_SERVER_PWD);
+        Probe readinessProbe = new ProbeBuilder().withNewExec()
+                                                     .withCommand("/bin/bash", "-c", "curl --fail --silent -u '" + kieServerUser + ":" + kieServerPassword + "' http://localhost:8080/services/rest/server/readycheck")
+                                                 .endExec()
+                                                 .withInitialDelaySeconds(60)
+                                                 .withTimeoutSeconds(2)
+                                                 .withPeriodSeconds(30)
+                                                 .withFailureThreshold(6)
+                                                 .build();
+        // Just one container should be available
+        Container container = getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0);
+        container.setReadinessProbe(readinessProbe);
     }
 
     /**

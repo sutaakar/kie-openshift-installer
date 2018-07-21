@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.Volume;
 import io.fabric8.kubernetes.api.model.VolumeMount;
@@ -44,6 +45,20 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.MYSQL_PASSWORD.equals(e.getName()))
                         .isNotEmpty();
+    }
+
+    @Test
+    public void testBuildMySqlDeploymentReadinessProbe() {
+        Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
+
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
+        Deployment builtMySqlDeployment = settingsBuilder.build();
+        Probe readinessProbe = builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getReadinessProbe();
+
+        assertThat(readinessProbe).isNotNull();
+        assertThat(readinessProbe.getExec().getCommand()).containsExactly("/bin/bash", "-i", "-c", "MYSQL_PWD=\"$MYSQL_PASSWORD\" mysql -h 127.0.0.1 -u $MYSQL_USER -D $MYSQL_DATABASE -e 'SELECT 1'");
+        assertThat(readinessProbe.getInitialDelaySeconds()).isEqualTo(5);
+        assertThat(readinessProbe.getTimeoutSeconds()).isEqualTo(1);
     }
 
     @Test
