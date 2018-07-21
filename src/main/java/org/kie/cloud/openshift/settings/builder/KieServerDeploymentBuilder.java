@@ -39,7 +39,10 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
                                                       .endFieldRef()
                                                   .endValueFrom()
                                                   .build();
+        // TODO this should be deleted
         addOrReplaceEnvVar(kieServerHost);
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_USER, "executionUser");
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PWD, "executionUser1!");
     }
 
     /**

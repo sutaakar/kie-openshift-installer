@@ -24,6 +24,22 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildKieServerDeploymentDefaultValues() {
+        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
+
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        Deployment builtKieServerDeployment = settingsBuilder.build();
+
+        assertThat(builtKieServerDeployment).isNotNull();
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_USER.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("executionUser"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_PWD.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("executionUser1!"));
+    }
+
+    @Test
     public void testBuildKieServerDeploymentWithKieServerUser() {
         Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
 
