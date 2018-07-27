@@ -26,6 +26,8 @@ import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServicePortBuilder;
+import io.fabric8.openshift.api.model.DeploymentConfig;
+import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 
@@ -47,6 +49,59 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder {
         addOrReplaceEnvVar(OpenShiftImageConstants.POSTGRESQL_PASSWORD, "postgreSqlPwd");
         addOrReplaceEnvVar(OpenShiftImageConstants.POSTGRESQL_DATABASE, "postgreSqlDb");
         addOrReplaceEnvVar(OpenShiftImageConstants.POSTGRESQL_MAX_PREPARED_TRANSACTIONS, "100");
+    }
+
+    @Override
+    protected void configureDeploymentConfig() {
+        DeploymentConfig deploymentConfig = new DeploymentConfigBuilder().withApiVersion("v1")
+                                                                         .withNewMetadata()
+                                                                             .withName("${APPLICATION_NAME}-postgresql")
+                                                                         .endMetadata()
+                                                                         .withNewSpec()
+                                                                             .withNewStrategy()
+                                                                                 .withType("Recreate")
+                                                                             .endStrategy()
+                                                                             .addNewTrigger()
+                                                                                 .withType("ImageChange")
+                                                                                 .withNewImageChangeParams()
+                                                                                     .withAutomatic(true)
+                                                                                     .withContainerNames("${APPLICATION_NAME}-postgresql")
+                                                                                     .withNewFrom()
+                                                                                         .withKind("ImageStreamTag")
+                                                                                         .withNamespace("${IMAGE_STREAM_NAMESPACE}")
+                                                                                         .withName("postgresql:${POSTGRESQL_IMAGE_STREAM_TAG}")
+                                                                                     .endFrom()
+                                                                                 .endImageChangeParams()
+                                                                             .endTrigger()
+                                                                             .addNewTrigger()
+                                                                                 .withType("ConfigChange")
+                                                                             .endTrigger()
+                                                                             .withReplicas(1)
+                                                                             .withSelector(Collections.singletonMap("deploymentConfig", "${APPLICATION_NAME}-postgresql"))
+                                                                             .withNewTemplate()
+                                                                                 .withNewMetadata()
+                                                                                     .withName("${APPLICATION_NAME}-postgresql")
+                                                                                     .withLabels(Collections.singletonMap("deploymentConfig", "${APPLICATION_NAME}-postgresql"))
+                                                                                 .endMetadata()
+                                                                                 .withNewSpec()
+                                                                                     .withTerminationGracePeriodSeconds(60L)
+                                                                                     .addNewContainer()
+                                                                                         .withName("${APPLICATION_NAME}-postgresql")
+                                                                                         .withImage("postgresql")
+                                                                                         .withImagePullPolicy("Always")
+                                                                                         .addNewPort()
+                                                                                             .withContainerPort(5432)
+                                                                                             .withProtocol("TCP")
+                                                                                         .endPort()
+                                                                                     .endContainer()
+                                                                                 .endSpec()
+                                                                             .endTemplate()
+                                                                         .endSpec()
+                                                                         .build();
+
+        List<HasMetadata> objects = getDeployment().geTemplate().getObjects();
+        objects.add(deploymentConfig);
+        getDeployment().geTemplate().setObjects(objects);
     }
 
     @Override

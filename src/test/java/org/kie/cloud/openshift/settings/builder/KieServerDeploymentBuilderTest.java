@@ -3,6 +3,7 @@ package org.kie.cloud.openshift.settings.builder;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.fabric8.kubernetes.api.model.Probe;
+import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.openshift.api.model.Template;
 import org.junit.Test;
 import org.kie.cloud.openshift.AbstractCloudTest;
@@ -22,6 +23,51 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtKieServerDeployment).isNotNull();
         assertThat(builtKieServerDeployment.geTemplate().getMetadata().getName()).contains("-kieserver");
         assertThat(builtKieServerDeployment.geTemplate().getParameters()).extracting(n -> n.getName()).contains("APPLICATION_NAME");
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentDeploymentConfig() {
+        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
+
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        Deployment builtKieServerDeployment = settingsBuilder.build();
+
+        assertThat(builtKieServerDeployment).isNotNull();
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getApiVersion()).isEqualTo("v1");
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-kieserver");
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getStrategy().getType()).isEqualTo("Recreate");
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTriggers()).hasSize(2);
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ConfigChange"))
+                    .hasSize(1);
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ImageChange"))
+                    .hasOnlyOneElementSatisfying(e -> {
+                        assertThat(e.getImageChangeParams().getAutomatic()).isTrue();
+                        assertThat(e.getImageChangeParams().getContainerNames()).containsExactly("${APPLICATION_NAME}-kieserver");
+                        assertThat(e.getImageChangeParams().getFrom().getKind()).isEqualTo("ImageStreamTag");
+                        assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("${IMAGE_STREAM_NAMESPACE}");
+                        assertThat(e.getImageChangeParams().getFrom().getName()).isEqualTo("rhpam70-kieserver-openshift:${IMAGE_STREAM_TAG}");
+                    });
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getReplicas()).isEqualTo(1);
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getSelector()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-kieserver");
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-kieserver");
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getLabels()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-kieserver");
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getTerminationGracePeriodSeconds()).isEqualTo(60L);
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers())
+                    .hasOnlyOneElementSatisfying(c -> {
+                        assertThat(c.getName()).isEqualTo("${APPLICATION_NAME}-kieserver");
+                        assertThat(c.getImage()).isEqualTo("rhpam70-kieserver-openshift");
+                        assertThat(c.getImagePullPolicy()).isEqualTo("Always");
+                        assertThat(c.getResources().getLimits()).containsEntry("memory", new Quantity("${EXCECUTION_SERVER_MEMORY_LIMIT}"));
+                        assertThat(c.getPorts()).hasSize(2);
+                        assertThat(c.getPorts().get(0).getName()).isEqualTo("jolokia");
+                        assertThat(c.getPorts().get(0).getContainerPort()).isEqualTo(8778);
+                        assertThat(c.getPorts().get(0).getProtocol()).isEqualTo("TCP");
+                        assertThat(c.getPorts().get(1).getName()).isEqualTo("http");
+                        assertThat(c.getPorts().get(1).getContainerPort()).isEqualTo(8080);
+                        assertThat(c.getPorts().get(1).getProtocol()).isEqualTo("TCP");
+                    });
     }
 
     @Test

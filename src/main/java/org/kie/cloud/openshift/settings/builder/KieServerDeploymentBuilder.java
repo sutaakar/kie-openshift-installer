@@ -24,10 +24,13 @@ import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.kubernetes.api.model.ProbeBuilder;
+import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServicePortBuilder;
+import io.fabric8.openshift.api.model.DeploymentConfig;
+import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.api.model.RouteBuilder;
 import io.fabric8.openshift.api.model.Template;
@@ -59,6 +62,68 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
         addOrReplaceEnvVar(kieServerHost);
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_USER, "executionUser");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PWD, "executionUser1!");
+    }
+
+    @Override
+    protected void configureDeploymentConfig() {
+        DeploymentConfig deploymentConfig = new DeploymentConfigBuilder().withApiVersion("v1")
+                                                                         .withNewMetadata()
+                                                                             .withName("${APPLICATION_NAME}-kieserver")
+                                                                         .endMetadata()
+                                                                         .withNewSpec()
+                                                                             .withNewStrategy()
+                                                                                 .withType("Recreate")
+                                                                             .endStrategy()
+                                                                             .addNewTrigger()
+                                                                                 .withType("ImageChange")
+                                                                                 .withNewImageChangeParams()
+                                                                                     .withAutomatic(true)
+                                                                                     .withContainerNames("${APPLICATION_NAME}-kieserver")
+                                                                                     .withNewFrom()
+                                                                                         .withKind("ImageStreamTag")
+                                                                                         .withNamespace("${IMAGE_STREAM_NAMESPACE}")
+                                                                                         .withName("rhpam70-kieserver-openshift:${IMAGE_STREAM_TAG}")
+                                                                                     .endFrom()
+                                                                                 .endImageChangeParams()
+                                                                             .endTrigger()
+                                                                             .addNewTrigger()
+                                                                                 .withType("ConfigChange")
+                                                                             .endTrigger()
+                                                                             .withReplicas(1)
+                                                                             .withSelector(Collections.singletonMap("deploymentConfig", "${APPLICATION_NAME}-kieserver"))
+                                                                             .withNewTemplate()
+                                                                                 .withNewMetadata()
+                                                                                     .withName("${APPLICATION_NAME}-kieserver")
+                                                                                     .withLabels(Collections.singletonMap("deploymentConfig", "${APPLICATION_NAME}-kieserver"))
+                                                                                 .endMetadata()
+                                                                                 .withNewSpec()
+                                                                                     .withTerminationGracePeriodSeconds(60L)
+                                                                                     .addNewContainer()
+                                                                                         .withName("${APPLICATION_NAME}-kieserver")
+                                                                                         .withImage("rhpam70-kieserver-openshift")
+                                                                                         .withImagePullPolicy("Always")
+                                                                                         .withNewResources()
+                                                                                             .withLimits(Collections.singletonMap("memory", new Quantity("${EXCECUTION_SERVER_MEMORY_LIMIT}")))
+                                                                                         .endResources()
+                                                                                         .addNewPort()
+                                                                                             .withName("jolokia")
+                                                                                             .withContainerPort(8778)
+                                                                                             .withProtocol("TCP")
+                                                                                         .endPort()
+                                                                                         .addNewPort()
+                                                                                             .withName("http")
+                                                                                             .withContainerPort(8080)
+                                                                                             .withProtocol("TCP")
+                                                                                         .endPort()
+                                                                                     .endContainer()
+                                                                                 .endSpec()
+                                                                             .endTemplate()
+                                                                         .endSpec()
+                                                                         .build();
+
+        List<HasMetadata> objects = getDeployment().geTemplate().getObjects();
+        objects.add(deploymentConfig);
+        getDeployment().geTemplate().setObjects(objects);
     }
 
     @Override

@@ -23,9 +23,10 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
 
     public AbstractDeploymentBuilder(Template deploymentTemplate) {
         deployment = new Deployment(deploymentTemplate);
-        initDefaultValues();
+        configureDeploymentConfig();
         configureService();
         configureRoute();
+        initDefaultValues();
     }
 
     @Override
@@ -96,6 +97,8 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
     }
 
     protected abstract void initDefaultValues();
+
+    protected abstract void configureDeploymentConfig();
 
     protected abstract void configureService();
 

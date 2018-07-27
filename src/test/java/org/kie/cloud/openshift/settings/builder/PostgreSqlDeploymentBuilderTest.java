@@ -29,6 +29,46 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildKieServerDeploymentDeploymentConfig() {
+        Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgreSqlTemplate();
+
+        PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder(postgreSqlTemplate);
+        Deployment builtPostgreSqlDeployment = settingsBuilder.build();
+
+        assertThat(builtPostgreSqlDeployment).isNotNull();
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getApiVersion()).isEqualTo("v1");
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-postgresql");
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getStrategy().getType()).isEqualTo("Recreate");
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTriggers()).hasSize(2);
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ConfigChange"))
+                    .hasSize(1);
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ImageChange"))
+                    .hasOnlyOneElementSatisfying(e -> {
+                        assertThat(e.getImageChangeParams().getAutomatic()).isTrue();
+                        assertThat(e.getImageChangeParams().getContainerNames()).containsExactly("${APPLICATION_NAME}-postgresql");
+                        assertThat(e.getImageChangeParams().getFrom().getKind()).isEqualTo("ImageStreamTag");
+                        assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("${IMAGE_STREAM_NAMESPACE}");
+                        assertThat(e.getImageChangeParams().getFrom().getName()).isEqualTo("postgresql:${POSTGRESQL_IMAGE_STREAM_TAG}");
+                    });
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getReplicas()).isEqualTo(1);
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getSelector()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-postgresql");
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-postgresql");
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getLabels()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-postgresql");
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getTerminationGracePeriodSeconds()).isEqualTo(60L);
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers())
+                    .hasOnlyOneElementSatisfying(c -> {
+                        assertThat(c.getName()).isEqualTo("${APPLICATION_NAME}-postgresql");
+                        assertThat(c.getImage()).isEqualTo("postgresql");
+                        assertThat(c.getImagePullPolicy()).isEqualTo("Always");
+                        assertThat(c.getPorts()).hasSize(1);
+                        assertThat(c.getPorts().get(0).getContainerPort()).isEqualTo(5432);
+                        assertThat(c.getPorts().get(0).getProtocol()).isEqualTo("TCP");
+                    });
+    }
+
+    @Test
     public void testBuildPostgreSqlDeploymentService() {
         Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgreSqlTemplate();
 

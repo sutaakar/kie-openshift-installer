@@ -29,6 +29,46 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildKieServerDeploymentDeploymentConfig() {
+        Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
+
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
+        Deployment builtMySqlDeployment = settingsBuilder.build();
+
+        assertThat(builtMySqlDeployment).isNotNull();
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getApiVersion()).isEqualTo("v1");
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-mysql");
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getStrategy().getType()).isEqualTo("Recreate");
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTriggers()).hasSize(2);
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ConfigChange"))
+                    .hasSize(1);
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ImageChange"))
+                    .hasOnlyOneElementSatisfying(e -> {
+                        assertThat(e.getImageChangeParams().getAutomatic()).isTrue();
+                        assertThat(e.getImageChangeParams().getContainerNames()).containsExactly("${APPLICATION_NAME}-mysql");
+                        assertThat(e.getImageChangeParams().getFrom().getKind()).isEqualTo("ImageStreamTag");
+                        assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("${IMAGE_STREAM_NAMESPACE}");
+                        assertThat(e.getImageChangeParams().getFrom().getName()).isEqualTo("mysql:${MYSQL_IMAGE_STREAM_TAG}");
+                    });
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getReplicas()).isEqualTo(1);
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getSelector()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-mysql");
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-mysql");
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getLabels()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-mysql");
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getTerminationGracePeriodSeconds()).isEqualTo(60L);
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers())
+                    .hasOnlyOneElementSatisfying(c -> {
+                        assertThat(c.getName()).isEqualTo("${APPLICATION_NAME}-mysql");
+                        assertThat(c.getImage()).isEqualTo("mysql");
+                        assertThat(c.getImagePullPolicy()).isEqualTo("Always");
+                        assertThat(c.getPorts()).hasSize(1);
+                        assertThat(c.getPorts().get(0).getContainerPort()).isEqualTo(3306);
+                        assertThat(c.getPorts().get(0).getProtocol()).isEqualTo("TCP");
+                    });
+    }
+
+    @Test
     public void testBuildMySqlDeploymentService() {
         Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
 
