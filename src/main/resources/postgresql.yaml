@@ -34,21 +34,6 @@ parameters:
   value: "9.6"
   required: false
 objects:
-- apiVersion: v1
-  kind: Service
-  metadata:
-    annotations:
-      description: The database server's port.
-    labels:
-      application: ${APPLICATION_NAME}
-      service: "${APPLICATION_NAME}-postgresql"
-    name: ${APPLICATION_NAME}-postgresql
-  spec:
-    ports:
-    - port: 5432
-      targetPort: 5432
-    selector:
-      deploymentConfig: ${APPLICATION_NAME}-postgresql
 - kind: DeploymentConfig
   apiVersion: v1
   metadata:

@@ -29,6 +29,23 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildMySqlDeploymentService() {
+        Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
+
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
+        Deployment builtMySqlDeployment = settingsBuilder.build();
+
+        assertThat(builtMySqlDeployment).isNotNull();
+        assertThat(builtMySqlDeployment.getServices()).hasSize(1);
+        assertThat(builtMySqlDeployment.getServices().get(0).getApiVersion()).isEqualTo("v1");
+        assertThat(builtMySqlDeployment.getServices().get(0).getSpec().getPorts()).hasSize(1);
+        assertThat(builtMySqlDeployment.getServices().get(0).getSpec().getPorts().get(0).getPort()).isEqualTo(3306);
+        assertThat(builtMySqlDeployment.getServices().get(0).getSpec().getPorts().get(0).getTargetPort().getIntVal()).isEqualTo(3306);
+        assertThat(builtMySqlDeployment.getServices().get(0).getSpec().getSelector()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-mysql");
+        assertThat(builtMySqlDeployment.getServices().get(0).getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-mysql");
+    }
+
+    @Test
     public void testBuildMySqlDeploymentDefaultValues() {
         Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
 

@@ -40,21 +40,6 @@ parameters:
   value: 1Gi
   required: false
 objects:
-- kind: Service
-  apiVersion: v1
-  spec:
-    ports:
-    - name: http
-      port: 8080
-      targetPort: 8080
-    selector:
-      deploymentConfig: "${APPLICATION_NAME}-kieserver"
-  metadata:
-    name: "${APPLICATION_NAME}-kieserver"
-    labels:
-      application: "${APPLICATION_NAME}"
-    annotations:
-      description: The execution server web server's http port.
 - kind: Route
   apiVersion: v1
   id: "${APPLICATION_NAME}-kieserver-http"

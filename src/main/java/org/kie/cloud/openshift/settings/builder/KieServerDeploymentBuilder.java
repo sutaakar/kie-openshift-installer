@@ -15,11 +15,19 @@
  */
 package org.kie.cloud.openshift.settings.builder;
 
+import java.util.Collections;
+import java.util.List;
+
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.kubernetes.api.model.ProbeBuilder;
+import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.kubernetes.api.model.ServiceBuilder;
+import io.fabric8.kubernetes.api.model.ServicePort;
+import io.fabric8.kubernetes.api.model.ServicePortBuilder;
 import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.deployment.Deployment;
@@ -49,6 +57,26 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
         addOrReplaceEnvVar(kieServerHost);
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_USER, "executionUser");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PWD, "executionUser1!");
+    }
+
+    @Override
+    protected void configureService() {
+        ServicePort httpPort = new ServicePortBuilder().withName("http")
+                                                       .withPort(8080)
+                                                       .withNewTargetPort(8080)
+                                                       .build();
+        Service service = new ServiceBuilder().withApiVersion("v1")
+                                              .withNewMetadata()
+                                                  .withName("${APPLICATION_NAME}-kieserver")
+                                              .endMetadata()
+                                              .withNewSpec()
+                                                  .withPorts(httpPort)
+                                                  .withSelector(Collections.singletonMap("deploymentConfig", "${APPLICATION_NAME}-kieserver"))
+                                              .endSpec()
+                                              .build();
+        List<HasMetadata> objects = getDeployment().geTemplate().getObjects();
+        objects.add(service);
+        getDeployment().geTemplate().setObjects(objects);
     }
 
     @Override

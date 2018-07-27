@@ -15,9 +15,17 @@
  */
 package org.kie.cloud.openshift.settings.builder;
 
+import java.util.Collections;
+import java.util.List;
+
 import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.kubernetes.api.model.ProbeBuilder;
+import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.kubernetes.api.model.ServiceBuilder;
+import io.fabric8.kubernetes.api.model.ServicePort;
+import io.fabric8.kubernetes.api.model.ServicePortBuilder;
 import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 
@@ -38,6 +46,25 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
         addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_USER, "mySqlUser");
         addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_PASSWORD, "mySqlPwd");
         addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_DATABASE, "mysqlDb");
+    }
+
+    @Override
+    protected void configureService() {
+        ServicePort httpPort = new ServicePortBuilder().withPort(3306)
+                                                       .withNewTargetPort(3306)
+                                                       .build();
+        Service service = new ServiceBuilder().withApiVersion("v1")
+                                              .withNewMetadata()
+                                                  .withName("${APPLICATION_NAME}-mysql")
+                                              .endMetadata()
+                                              .withNewSpec()
+                                                  .withPorts(httpPort)
+                                                  .withSelector(Collections.singletonMap("deploymentConfig", "${APPLICATION_NAME}-mysql"))
+                                              .endSpec()
+                                              .build();
+        List<HasMetadata> objects = getDeployment().geTemplate().getObjects();
+        objects.add(service);
+        getDeployment().geTemplate().setObjects(objects);
     }
 
     @Override

@@ -25,6 +25,24 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildKieServerDeploymentService() {
+        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
+
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        Deployment builtKieServerDeployment = settingsBuilder.build();
+
+        assertThat(builtKieServerDeployment).isNotNull();
+        assertThat(builtKieServerDeployment.getServices()).hasSize(1);
+        assertThat(builtKieServerDeployment.getServices().get(0).getApiVersion()).isEqualTo("v1");
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts()).hasSize(1);
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(0).getName()).isEqualTo("http");
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(0).getPort()).isEqualTo(8080);
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(0).getTargetPort().getIntVal()).isEqualTo(8080);
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getSelector()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-kieserver");
+        assertThat(builtKieServerDeployment.getServices().get(0).getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-kieserver");
+    }
+
+    @Test
     public void testBuildKieServerDeploymentDefaultValues() {
         Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
 

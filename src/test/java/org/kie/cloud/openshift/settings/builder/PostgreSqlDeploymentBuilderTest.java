@@ -29,6 +29,23 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildPostgreSqlDeploymentService() {
+        Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgreSqlTemplate();
+
+        PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder(postgreSqlTemplate);
+        Deployment builtPostgreSqlDeployment = settingsBuilder.build();
+
+        assertThat(builtPostgreSqlDeployment).isNotNull();
+        assertThat(builtPostgreSqlDeployment.getServices()).hasSize(1);
+        assertThat(builtPostgreSqlDeployment.getServices().get(0).getApiVersion()).isEqualTo("v1");
+        assertThat(builtPostgreSqlDeployment.getServices().get(0).getSpec().getPorts()).hasSize(1);
+        assertThat(builtPostgreSqlDeployment.getServices().get(0).getSpec().getPorts().get(0).getPort()).isEqualTo(5432);
+        assertThat(builtPostgreSqlDeployment.getServices().get(0).getSpec().getPorts().get(0).getTargetPort().getIntVal()).isEqualTo(5432);
+        assertThat(builtPostgreSqlDeployment.getServices().get(0).getSpec().getSelector()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-postgresql");
+        assertThat(builtPostgreSqlDeployment.getServices().get(0).getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-postgresql");
+    }
+
+    @Test
     public void testBuildPostgreSqlDeploymentDefaultValues() {
         Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgreSqlTemplate();
 

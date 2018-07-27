@@ -33,20 +33,6 @@ parameters:
   value: "5.7"
   required: false
 objects:
-- apiVersion: v1
-  kind: Service
-  metadata:
-    annotations:
-      description: The database server's port.
-    labels:
-      application: ${APPLICATION_NAME}
-    name: ${APPLICATION_NAME}-mysql
-  spec:
-    ports:
-    - port: 3306
-      targetPort: 3306
-    selector:
-      deploymentConfig: ${APPLICATION_NAME}-mysql
 - kind: DeploymentConfig
   apiVersion: v1
   metadata:
