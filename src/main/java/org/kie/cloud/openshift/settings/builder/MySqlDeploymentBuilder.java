@@ -69,14 +69,22 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
 
     @Override
     protected void configureLivenessProbe() {
-        // No liveness probe set for MySQL
+        Probe livenessProbe = new ProbeBuilder().withNewTcpSocket()
+                                                    .withNewPort(3306)
+                                                .endTcpSocket()
+                                                .withInitialDelaySeconds(30)
+                                                .withTimeoutSeconds(1)
+                                                .build();
+        // Just one container should be available
+        Container container = getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0);
+        container.setLivenessProbe(livenessProbe);
     }
 
     @Override
     protected void configureReadinessProbe() {
         // TODO: Should the port be configured too? See original template.
         Probe readinessProbe = new ProbeBuilder().withNewExec()
-                                                     .withCommand("/bin/bash", "-i", "-c", "MYSQL_PWD=\"$MYSQL_PASSWORD\" mysql -h 127.0.0.1 -u $MYSQL_USER -D $MYSQL_DATABASE -e 'SELECT 1'")
+                                                     .withCommand("/bin/sh", "-i", "-c", "MYSQL_PWD=\"$MYSQL_PASSWORD\" mysql -h 127.0.0.1 -u $MYSQL_USER -D $MYSQL_DATABASE -e 'SELECT 1'")
                                                  .endExec()
                                                  .withInitialDelaySeconds(5)
                                                  .withTimeoutSeconds(1)

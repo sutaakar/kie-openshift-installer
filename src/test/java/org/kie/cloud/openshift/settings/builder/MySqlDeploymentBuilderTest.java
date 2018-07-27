@@ -65,6 +65,20 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildMySqlDeploymentLivenessProbe() {
+        Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
+
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
+        Deployment builtMySqlDeployment = settingsBuilder.build();
+        Probe livenessProbe = builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getLivenessProbe();
+
+        assertThat(livenessProbe).isNotNull();
+        assertThat(livenessProbe.getTcpSocket().getPort().getIntVal()).isEqualTo(3306);
+        assertThat(livenessProbe.getInitialDelaySeconds()).isEqualTo(30);
+        assertThat(livenessProbe.getTimeoutSeconds()).isEqualTo(1);
+    }
+
+    @Test
     public void testBuildMySqlDeploymentReadinessProbe() {
         Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
 
@@ -73,7 +87,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
         Probe readinessProbe = builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getReadinessProbe();
 
         assertThat(readinessProbe).isNotNull();
-        assertThat(readinessProbe.getExec().getCommand()).containsExactly("/bin/bash", "-i", "-c", "MYSQL_PWD=\"$MYSQL_PASSWORD\" mysql -h 127.0.0.1 -u $MYSQL_USER -D $MYSQL_DATABASE -e 'SELECT 1'");
+        assertThat(readinessProbe.getExec().getCommand()).containsExactly("/bin/sh", "-i", "-c", "MYSQL_PWD=\"$MYSQL_PASSWORD\" mysql -h 127.0.0.1 -u $MYSQL_USER -D $MYSQL_DATABASE -e 'SELECT 1'");
         assertThat(readinessProbe.getInitialDelaySeconds()).isEqualTo(5);
         assertThat(readinessProbe.getTimeoutSeconds()).isEqualTo(1);
     }
