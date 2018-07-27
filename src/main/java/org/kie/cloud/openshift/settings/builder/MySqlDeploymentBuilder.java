@@ -40,7 +40,7 @@ import org.kie.cloud.openshift.OpenShiftImageConstants;
 public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
 
     public MySqlDeploymentBuilder(Template mySqlTemplate) {
-        super(mySqlTemplate);
+        super(mySqlTemplate, "mysql");
     }
 
     @Override

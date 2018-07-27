@@ -40,7 +40,7 @@ import org.kie.cloud.openshift.OpenShiftImageConstants;
 public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder {
 
     public PostgreSqlDeploymentBuilder(Template postgreSqlTemplate) {
-        super(postgreSqlTemplate);
+        super(postgreSqlTemplate, "postgresql");
     }
 
     @Override

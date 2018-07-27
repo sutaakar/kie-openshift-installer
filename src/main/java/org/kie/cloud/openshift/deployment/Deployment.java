@@ -12,13 +12,19 @@ import io.fabric8.openshift.api.model.Template;
 public class Deployment {
 
     private Template template;
+    private String deploymentName;
 
-    public Deployment(Template template) {
+    public Deployment(Template template, String deploymentName) {
         this.template = template;
+        this.deploymentName = deploymentName;
     }
 
     public Template geTemplate() {
         return template;
+    }
+
+    public String getDeploymentName() {
+        return deploymentName;
     }
 
     public List<Service> getUnsecureServices() {

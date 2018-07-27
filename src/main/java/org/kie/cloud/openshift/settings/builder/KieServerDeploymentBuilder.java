@@ -46,7 +46,7 @@ import org.kie.cloud.openshift.deployment.Deployment;
 public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
 
     public KieServerDeploymentBuilder(Template kieServerTemplate) {
-        super(kieServerTemplate);
+        super(kieServerTemplate, "kieserver");
     }
 
     @Override

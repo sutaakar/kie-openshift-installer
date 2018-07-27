@@ -2,6 +2,7 @@ package org.kie.cloud.openshift.settings.builder;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
@@ -21,8 +22,9 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
 
     private Deployment deployment;
 
-    public AbstractDeploymentBuilder(Template deploymentTemplate) {
-        deployment = new Deployment(deploymentTemplate);
+    public AbstractDeploymentBuilder(Template deploymentTemplate, String deploymentPrefix) {
+        String deploymentName = deploymentPrefix + "-" + UUID.randomUUID().toString().substring(0, 4);
+        deployment = new Deployment(deploymentTemplate, deploymentName);
         configureDeploymentConfig();
         configureService();
         configureRoute();

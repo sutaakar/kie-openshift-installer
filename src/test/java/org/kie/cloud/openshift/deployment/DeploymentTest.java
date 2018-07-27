@@ -26,7 +26,7 @@ public class DeploymentTest extends AbstractCloudTest{
     @Test
     public void testGetUnsecureServices() {
         Template template = getTemplateWithServiceAndRouteCombinations();
-        Deployment deployment = new Deployment(template);
+        Deployment deployment = new Deployment(template, "custom");
         List<Service> services = deployment.getUnsecureServices();
 
         assertThat(services).hasSize(1);
@@ -36,7 +36,7 @@ public class DeploymentTest extends AbstractCloudTest{
     @Test
     public void testGetSecureServices() {
         Template template = getTemplateWithServiceAndRouteCombinations();
-        Deployment deployment = new Deployment(template);
+        Deployment deployment = new Deployment(template, "custom");
         List<Service> services = deployment.getSecureServices();
 
         assertThat(services).hasSize(1);
@@ -46,7 +46,7 @@ public class DeploymentTest extends AbstractCloudTest{
     @Test
     public void testGetServices() {
         Template template = getTemplateWithServiceAndRouteCombinations();
-        Deployment deployment = new Deployment(template);
+        Deployment deployment = new Deployment(template, "custom");
         List<Service> services = deployment.getServices();
 
         assertThat(services).hasSize(2);
@@ -56,7 +56,7 @@ public class DeploymentTest extends AbstractCloudTest{
     @Test
     public void testGetUnsecureRoutes() {
         Template template = getTemplateWithServiceAndRouteCombinations();
-        Deployment deployment = new Deployment(template);
+        Deployment deployment = new Deployment(template, "custom");
         List<Route> routes = deployment.getUnsecureRoutes();
 
         assertThat(routes).hasSize(1);
@@ -66,7 +66,7 @@ public class DeploymentTest extends AbstractCloudTest{
     @Test
     public void testGetSecureRoutes() {
         Template template = getTemplateWithServiceAndRouteCombinations();
-        Deployment deployment = new Deployment(template);
+        Deployment deployment = new Deployment(template, "custom");
         List<Route> routes = deployment.getSecureRoutes();
 
         assertThat(routes).hasSize(1);
@@ -76,7 +76,7 @@ public class DeploymentTest extends AbstractCloudTest{
     @Test
     public void testGetDeploymentConfig() {
         Template template = getTemplateWithServiceAndRouteCombinations();
-        Deployment deployment = new Deployment(template);
+        Deployment deployment = new Deployment(template, "custom");
         DeploymentConfig deploymentConfig = deployment.getDeploymentConfig();
 
         assertThat(deploymentConfig.getMetadata().getName()).isEqualTo("my-deployment");
@@ -85,7 +85,7 @@ public class DeploymentTest extends AbstractCloudTest{
     @Test
     public void testGetEnvironmentVariableValue() {
         Template template = getTemplateWithServiceAndRouteCombinations();
-        Deployment deployment = new Deployment(template);
+        Deployment deployment = new Deployment(template, "custom");
         String environmentVariableValue = deployment.getEnvironmentVariableValue("custom-variable-name");
 
         assertThat(environmentVariableValue).isEqualTo("custom-variable-value");
@@ -94,7 +94,7 @@ public class DeploymentTest extends AbstractCloudTest{
     @Test
     public void testGetEnvironmentVariableValueNotExisting() {
         Template template = getTemplateWithServiceAndRouteCombinations();
-        Deployment deployment = new Deployment(template);
+        Deployment deployment = new Deployment(template, "custom");
 
         assertThatThrownBy(() -> deployment.getEnvironmentVariableValue("not-existing-variable-name")).isInstanceOf(RuntimeException.class)
                                                                                                       .hasMessageContaining("Environment variable with name not-existing-variable-name not found.");
@@ -103,7 +103,7 @@ public class DeploymentTest extends AbstractCloudTest{
     @Test
     public void testGetPersistentVolumeClaims() {
         Template template = getTemplateWithServiceAndRouteCombinations();
-        Deployment deployment = new Deployment(template);
+        Deployment deployment = new Deployment(template, "custom");
         List<PersistentVolumeClaim> persistentVolumeClaims = deployment.getPersistentVolumeClaims();
 
         assertThat(persistentVolumeClaims).hasSize(1);

@@ -55,7 +55,7 @@ public class ScenarioTest extends AbstractCloudTest{
         Template customTemplate = new Template();
         customTemplate.setParameters(Arrays.asList(templateParameter, duplicatedTemplateParameter));
 
-        Deployment customDeployment = new Deployment(customTemplate);
+        Deployment customDeployment = new Deployment(customTemplate, "custom");
         Scenario customScenario = new Scenario();
         customScenario.addDeployment(customDeployment);
 
