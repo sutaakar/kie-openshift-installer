@@ -25,6 +25,7 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
         deployment = new Deployment(deploymentTemplate);
         initDefaultValues();
         configureService();
+        configureRoute();
     }
 
     @Override
@@ -97,6 +98,9 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
     protected abstract void initDefaultValues();
 
     protected abstract void configureService();
+
+    // Routes are not mandatory
+    protected void configureRoute() {};
 
     protected abstract void configureLivenessProbe();
 

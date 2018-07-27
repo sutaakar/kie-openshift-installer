@@ -28,6 +28,8 @@ import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServicePortBuilder;
+import io.fabric8.openshift.api.model.Route;
+import io.fabric8.openshift.api.model.RouteBuilder;
 import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.deployment.Deployment;
@@ -76,6 +78,23 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
                                               .build();
         List<HasMetadata> objects = getDeployment().geTemplate().getObjects();
         objects.add(service);
+        getDeployment().geTemplate().setObjects(objects);
+    }
+
+    @Override
+    protected void configureRoute() {
+        Route route = new RouteBuilder().withApiVersion("v1")
+                                        .withNewMetadata()
+                                            .withName("${APPLICATION_NAME}-kieserver")
+                                        .endMetadata()
+                                        .withNewSpec()
+                                            .withNewTo()
+                                                .withName("${APPLICATION_NAME}-kieserver")
+                                            .endTo()
+                                        .endSpec()
+                                        .build();
+        List<HasMetadata> objects = getDeployment().geTemplate().getObjects();
+        objects.add(route);
         getDeployment().geTemplate().setObjects(objects);
     }
 

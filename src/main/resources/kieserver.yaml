@@ -40,18 +40,6 @@ parameters:
   value: 1Gi
   required: false
 objects:
-- kind: Route
-  apiVersion: v1
-  id: "${APPLICATION_NAME}-kieserver-http"
-  metadata:
-    name: "${APPLICATION_NAME}-kieserver"
-    labels:
-      application: "${APPLICATION_NAME}"
-    annotations:
-      description: Route for execution server's http service.
-  spec:
-    to:
-      name: "${APPLICATION_NAME}-kieserver"
 - kind: DeploymentConfig
   apiVersion: v1
   metadata:

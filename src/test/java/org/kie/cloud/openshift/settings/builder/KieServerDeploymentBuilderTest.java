@@ -43,6 +43,20 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildKieServerDeploymentRoute() {
+        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
+
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        Deployment builtKieServerDeployment = settingsBuilder.build();
+
+        assertThat(builtKieServerDeployment).isNotNull();
+        assertThat(builtKieServerDeployment.getUnsecureRoutes()).hasSize(1);
+        assertThat(builtKieServerDeployment.getUnsecureRoutes().get(0).getApiVersion()).isEqualTo("v1");
+        assertThat(builtKieServerDeployment.getUnsecureRoutes().get(0).getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-kieserver");
+        assertThat(builtKieServerDeployment.getUnsecureRoutes().get(0).getSpec().getTo().getName()).isEqualTo("${APPLICATION_NAME}-kieserver");
+    }
+
+    @Test
     public void testBuildKieServerDeploymentDefaultValues() {
         Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
 
