@@ -56,6 +56,9 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
     }
 
     protected void addPersistence(String deploymentName, String mountPath, String accessMode, String persistentVolumeStorageSize) {
+        String volumeName = deploymentName + "-pvol";
+        String volumeClaimName = deploymentName + "-claim";
+
         PodSpec podSpec = getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec();
         List<Container> containers = podSpec.getContainers();
 
@@ -63,21 +66,21 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
             throw new RuntimeException("Corrent configuration doesn't support multiple containers in Deployment config.");
         }
 
-        VolumeMount mySqlVolumeMount = new VolumeMountBuilder().withName(deploymentName + "-pvol")
+        VolumeMount mySqlVolumeMount = new VolumeMountBuilder().withName(volumeName)
                                                                .withMountPath(mountPath)
                                                                .build();
         containers.get(0).getVolumeMounts().add(mySqlVolumeMount);
 
-        Volume volume = new VolumeBuilder().withName(deploymentName + "-pvol")
+        Volume volume = new VolumeBuilder().withName(volumeName)
                                                 .withNewPersistentVolumeClaim()
-                                                    .withClaimName(deploymentName + "-claim")
+                                                    .withClaimName(volumeClaimName)
                                                 .endPersistentVolumeClaim()
                                                 .build();
         podSpec.getVolumes().add(volume);
 
         PersistentVolumeClaim persistentVolumeClaim = new PersistentVolumeClaimBuilder().withKind("PersistentVolumeClaim")
                                                                                              .withNewMetadata()
-                                                                                                 .withName(deploymentName + "-claim")
+                                                                                                 .withName(volumeClaimName)
                                                                                              .endMetadata()
                                                                                              .withNewSpec()
                                                                                                  .withAccessModes(accessMode)
