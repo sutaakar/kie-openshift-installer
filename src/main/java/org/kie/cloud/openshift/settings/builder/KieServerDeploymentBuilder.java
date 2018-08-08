@@ -156,6 +156,9 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
                                             .withNewTo()
                                                 .withName(getDeployment().getDeploymentName())
                                             .endTo()
+                                            .withNewPort()
+                                                .withNewTargetPort("http")
+                                            .endPort()
                                         .endSpec()
                                         .build();
         List<HasMetadata> objects = getDeployment().geTemplate().getObjects();
