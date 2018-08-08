@@ -37,7 +37,7 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
 
         assertThat(builtPostgreSqlDeployment).isNotNull();
         assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getApiVersion()).isEqualTo("v1");
-        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-postgresql");
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getMetadata().getName()).startsWith("postgresql");
         assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getStrategy().getType()).isEqualTo("Recreate");
         assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTriggers()).hasSize(2);
         assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTriggers())
@@ -82,7 +82,7 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtPostgreSqlDeployment.getServices().get(0).getSpec().getPorts().get(0).getPort()).isEqualTo(5432);
         assertThat(builtPostgreSqlDeployment.getServices().get(0).getSpec().getPorts().get(0).getTargetPort().getIntVal()).isEqualTo(5432);
         assertThat(builtPostgreSqlDeployment.getServices().get(0).getSpec().getSelector()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-postgresql");
-        assertThat(builtPostgreSqlDeployment.getServices().get(0).getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-postgresql");
+        assertThat(builtPostgreSqlDeployment.getServices().get(0).getMetadata().getName()).isEqualTo(builtPostgreSqlDeployment.getDeploymentName());
     }
 
     @Test
@@ -178,13 +178,13 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
         List<Volume> volumes = builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getVolumes();
         assertThat(volumeMounts)
                         .hasOnlyOneElementSatisfying(m -> {
-                            assertThat(m.getName()).contains("-postgresql-pvol");
+                            assertThat(m.getName()).isEqualTo(builtPostgreSqlDeployment.getDeploymentName() + "-pvol");
                             assertThat(m.getMountPath()).isEqualTo("/var/lib/pgsql/data");
                         });
         assertThat(volumes)
                         .hasOnlyOneElementSatisfying(v -> {
                             assertThat(v.getName()).isEqualTo(volumeMounts.get(0).getName());
-                            assertThat(v.getPersistentVolumeClaim().getClaimName()).contains("-postgresql-claim");
+                            assertThat(v.getPersistentVolumeClaim().getClaimName()).isEqualTo(builtPostgreSqlDeployment.getDeploymentName() + "-claim");
                         });
         assertThat(builtPostgreSqlDeployment.getPersistentVolumeClaims())
                         .hasOnlyOneElementSatisfying(p -> {

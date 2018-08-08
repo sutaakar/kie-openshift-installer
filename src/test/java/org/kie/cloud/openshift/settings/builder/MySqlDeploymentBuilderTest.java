@@ -37,7 +37,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
 
         assertThat(builtMySqlDeployment).isNotNull();
         assertThat(builtMySqlDeployment.getDeploymentConfig().getApiVersion()).isEqualTo("v1");
-        assertThat(builtMySqlDeployment.getDeploymentConfig().getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-mysql");
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getMetadata().getName()).startsWith("mysql");
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getStrategy().getType()).isEqualTo("Recreate");
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTriggers()).hasSize(2);
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTriggers())
@@ -82,7 +82,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtMySqlDeployment.getServices().get(0).getSpec().getPorts().get(0).getPort()).isEqualTo(3306);
         assertThat(builtMySqlDeployment.getServices().get(0).getSpec().getPorts().get(0).getTargetPort().getIntVal()).isEqualTo(3306);
         assertThat(builtMySqlDeployment.getServices().get(0).getSpec().getSelector()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-mysql");
-        assertThat(builtMySqlDeployment.getServices().get(0).getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-mysql");
+        assertThat(builtMySqlDeployment.getServices().get(0).getMetadata().getName()).isEqualTo(builtMySqlDeployment.getDeploymentName());
     }
 
     @Test
@@ -175,13 +175,13 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
         List<Volume> volumes = builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getVolumes();
         assertThat(volumeMounts)
                         .hasOnlyOneElementSatisfying(m -> {
-                            assertThat(m.getName()).contains("-mysql-pvol");
+                            assertThat(m.getName()).isEqualTo(builtMySqlDeployment.getDeploymentName() + "-pvol");
                             assertThat(m.getMountPath()).isEqualTo("/var/lib/mysql/data");
                         });
         assertThat(volumes)
                         .hasOnlyOneElementSatisfying(v -> {
                             assertThat(v.getName()).isEqualTo(volumeMounts.get(0).getName());
-                            assertThat(v.getPersistentVolumeClaim().getClaimName()).contains("-mysql-claim");
+                            assertThat(v.getPersistentVolumeClaim().getClaimName()).isEqualTo(builtMySqlDeployment.getDeploymentName() + "-claim");
                         });
         assertThat(builtMySqlDeployment.getPersistentVolumeClaims())
                         .hasOnlyOneElementSatisfying(p -> {

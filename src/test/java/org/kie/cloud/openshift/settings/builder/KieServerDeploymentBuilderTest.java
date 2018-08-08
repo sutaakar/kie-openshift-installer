@@ -34,7 +34,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
         assertThat(builtKieServerDeployment).isNotNull();
         assertThat(builtKieServerDeployment.getDeploymentConfig().getApiVersion()).isEqualTo("v1");
-        assertThat(builtKieServerDeployment.getDeploymentConfig().getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-kieserver");
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getMetadata().getName()).startsWith("kieserver");
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getStrategy().getType()).isEqualTo("Recreate");
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTriggers()).hasSize(2);
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTriggers())
@@ -85,7 +85,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(0).getPort()).isEqualTo(8080);
         assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(0).getTargetPort().getIntVal()).isEqualTo(8080);
         assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getSelector()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-kieserver");
-        assertThat(builtKieServerDeployment.getServices().get(0).getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-kieserver");
+        assertThat(builtKieServerDeployment.getServices().get(0).getMetadata().getName()).isEqualTo(builtKieServerDeployment.getDeploymentName());
     }
 
     @Test
@@ -98,8 +98,8 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtKieServerDeployment).isNotNull();
         assertThat(builtKieServerDeployment.getUnsecureRoutes()).hasSize(1);
         assertThat(builtKieServerDeployment.getUnsecureRoutes().get(0).getApiVersion()).isEqualTo("v1");
-        assertThat(builtKieServerDeployment.getUnsecureRoutes().get(0).getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-kieserver");
-        assertThat(builtKieServerDeployment.getUnsecureRoutes().get(0).getSpec().getTo().getName()).isEqualTo("${APPLICATION_NAME}-kieserver");
+        assertThat(builtKieServerDeployment.getUnsecureRoutes().get(0).getMetadata().getName()).isEqualTo(builtKieServerDeployment.getDeploymentName());
+        assertThat(builtKieServerDeployment.getUnsecureRoutes().get(0).getSpec().getTo().getName()).isEqualTo(builtKieServerDeployment.getServices().get(0).getMetadata().getName());
     }
 
     @Test
@@ -205,13 +205,13 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("mySqlPassword"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.KIE_SERVICE_HOST.equals(e.getName()))
-                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${APPLICATION_NAME}-mysql"));
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo(builtMySqlDeployment.getDeploymentName()));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.KIE_SERVICE_PORT.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("3306"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE.equals(e.getName()))
-                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${APPLICATION_NAME}-mysql"));
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo(builtMySqlDeployment.getDeploymentName()));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("30000"));
@@ -261,13 +261,13 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("postgreSqlPassword"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.KIE_SERVICE_HOST.equals(e.getName()))
-                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${APPLICATION_NAME}-postgresql"));
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo(builtPostgreSqlDeployment.getDeploymentName()));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.KIE_SERVICE_PORT.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("5432"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE.equals(e.getName()))
-                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${APPLICATION_NAME}-postgresql"));
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo(builtPostgreSqlDeployment.getDeploymentName()));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("30000"));

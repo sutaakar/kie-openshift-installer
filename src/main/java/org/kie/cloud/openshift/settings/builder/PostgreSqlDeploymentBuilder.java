@@ -55,7 +55,7 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder {
     protected void configureDeploymentConfig() {
         DeploymentConfig deploymentConfig = new DeploymentConfigBuilder().withApiVersion("v1")
                                                                          .withNewMetadata()
-                                                                             .withName("${APPLICATION_NAME}-postgresql")
+                                                                             .withName(getDeployment().getDeploymentName())
                                                                          .endMetadata()
                                                                          .withNewSpec()
                                                                              .withNewStrategy()
@@ -111,7 +111,7 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder {
                                                        .build();
         Service service = new ServiceBuilder().withApiVersion("v1")
                                               .withNewMetadata()
-                                                  .withName("${APPLICATION_NAME}-postgresql")
+                                                  .withName(getDeployment().getDeploymentName())
                                               .endMetadata()
                                               .withNewSpec()
                                                   .withPorts(httpPort)
@@ -161,7 +161,7 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder {
     }
 
     public PostgreSqlDeploymentBuilder makePersistent() {
-        addPersistence("${APPLICATION_NAME}-postgresql", "/var/lib/pgsql/data", "ReadWriteOnce", "1Gi");
+        addPersistence(getDeployment().getDeploymentName(), "/var/lib/pgsql/data", "ReadWriteOnce", "1Gi");
         return this;
     }
 }

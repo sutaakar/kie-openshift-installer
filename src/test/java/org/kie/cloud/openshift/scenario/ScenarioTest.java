@@ -28,9 +28,12 @@ public class ScenarioTest extends AbstractCloudTest{
         KieServerDeploymentBuilder kieServersettingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
         MySqlDeploymentBuilder mySqlSettingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
 
+        Deployment kieServerDeployment = kieServersettingsBuilder.build();
+        Deployment mySqlDeployment = mySqlSettingsBuilder.build();
+
         Scenario scenario = new Scenario();
-        scenario.addDeployment(kieServersettingsBuilder.build());
-        scenario.addDeployment(mySqlSettingsBuilder.build());
+        scenario.addDeployment(kieServerDeployment);
+        scenario.addDeployment(mySqlDeployment);
 
         String yamlTemplate = scenario.getTemplateAsYaml();
         assertThat(yamlTemplate).isNotNull();
@@ -44,7 +47,7 @@ public class ScenarioTest extends AbstractCloudTest{
                                                            .map(o -> (DeploymentConfig) o)
                                                            .collect(Collectors.toList());
         assertThat(deploymentConfigs).hasSize(2);
-        assertThat(deploymentConfigs).extracting(n -> n.getMetadata().getName()).containsSequence("${APPLICATION_NAME}-kieserver", "${APPLICATION_NAME}-mysql");
+        assertThat(deploymentConfigs).extracting(n -> n.getMetadata().getName()).contains(kieServerDeployment.getDeploymentName(), mySqlDeployment.getDeploymentName());
     }
 
     @Test

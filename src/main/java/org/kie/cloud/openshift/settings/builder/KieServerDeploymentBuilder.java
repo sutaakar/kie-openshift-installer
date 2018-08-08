@@ -68,7 +68,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
     protected void configureDeploymentConfig() {
         DeploymentConfig deploymentConfig = new DeploymentConfigBuilder().withApiVersion("v1")
                                                                          .withNewMetadata()
-                                                                             .withName("${APPLICATION_NAME}-kieserver")
+                                                                             .withName(getDeployment().getDeploymentName())
                                                                          .endMetadata()
                                                                          .withNewSpec()
                                                                              .withNewStrategy()
@@ -134,7 +134,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
                                                        .build();
         Service service = new ServiceBuilder().withApiVersion("v1")
                                               .withNewMetadata()
-                                                  .withName("${APPLICATION_NAME}-kieserver")
+                                                  .withName(getDeployment().getDeploymentName())
                                               .endMetadata()
                                               .withNewSpec()
                                                   .withPorts(httpPort)
@@ -150,11 +150,11 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
     protected void configureRoute() {
         Route route = new RouteBuilder().withApiVersion("v1")
                                         .withNewMetadata()
-                                            .withName("${APPLICATION_NAME}-kieserver")
+                                            .withName(getDeployment().getDeploymentName())
                                         .endMetadata()
                                         .withNewSpec()
                                             .withNewTo()
-                                                .withName("${APPLICATION_NAME}-kieserver")
+                                                .withName(getDeployment().getDeploymentName())
                                             .endTo()
                                         .endSpec()
                                         .build();

@@ -54,7 +54,7 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
     protected void configureDeploymentConfig() {
         DeploymentConfig deploymentConfig = new DeploymentConfigBuilder().withApiVersion("v1")
                                                                          .withNewMetadata()
-                                                                             .withName("${APPLICATION_NAME}-mysql")
+                                                                             .withName(getDeployment().getDeploymentName())
                                                                          .endMetadata()
                                                                          .withNewSpec()
                                                                              .withNewStrategy()
@@ -110,7 +110,7 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
                                                        .build();
         Service service = new ServiceBuilder().withApiVersion("v1")
                                               .withNewMetadata()
-                                                  .withName("${APPLICATION_NAME}-mysql")
+                                                  .withName(getDeployment().getDeploymentName())
                                               .endMetadata()
                                               .withNewSpec()
                                                   .withPorts(httpPort)
@@ -161,7 +161,7 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
     }
 
     public MySqlDeploymentBuilder makePersistent() {
-        addPersistence("${APPLICATION_NAME}-mysql", "/var/lib/mysql/data", "ReadWriteOnce", "1Gi");
+        addPersistence(getDeployment().getDeploymentName(), "/var/lib/mysql/data", "ReadWriteOnce", "1Gi");
         return this;
     }
 }
