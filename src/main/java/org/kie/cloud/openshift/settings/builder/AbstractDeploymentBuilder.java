@@ -93,9 +93,9 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
                                                                                                  .endResources()
                                                                                              .endSpec()
                                                                                              .build();
-        List<HasMetadata> objects = getDeployment().geTemplate().getObjects();
+        List<HasMetadata> objects = getDeployment().getTemplate().getObjects();
         objects.add(persistentVolumeClaim);
-        getDeployment().geTemplate().setObjects(objects);
+        getDeployment().getTemplate().setObjects(objects);
     }
 
     protected abstract void initDefaultValues();

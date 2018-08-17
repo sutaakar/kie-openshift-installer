@@ -25,7 +25,7 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
         Deployment builtPostgreSqlDeployment = settingsBuilder.build();
 
         assertThat(builtPostgreSqlDeployment).isNotNull();
-        assertThat(builtPostgreSqlDeployment.geTemplate().getMetadata().getName()).contains("-postgresql");
+        assertThat(builtPostgreSqlDeployment.getTemplate().getMetadata().getName()).contains("-postgresql");
     }
 
     @Test

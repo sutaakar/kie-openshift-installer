@@ -21,8 +21,8 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
         Deployment builtKieServerDeployment = settingsBuilder.build();
 
         assertThat(builtKieServerDeployment).isNotNull();
-        assertThat(builtKieServerDeployment.geTemplate().getMetadata().getName()).contains("-kieserver");
-        assertThat(builtKieServerDeployment.geTemplate().getParameters()).extracting(n -> n.getName()).contains("APPLICATION_NAME");
+        assertThat(builtKieServerDeployment.getTemplate().getMetadata().getName()).contains("-kieserver");
+        assertThat(builtKieServerDeployment.getTemplate().getParameters()).extracting(n -> n.getName()).contains("APPLICATION_NAME");
     }
 
     @Test

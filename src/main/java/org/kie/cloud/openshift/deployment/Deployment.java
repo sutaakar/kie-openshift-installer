@@ -19,7 +19,7 @@ public class Deployment {
         this.deploymentName = deploymentName;
     }
 
-    public Template geTemplate() {
+    public Template getTemplate() {
         return template;
     }
 

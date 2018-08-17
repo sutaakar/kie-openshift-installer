@@ -121,9 +121,9 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
                                                                          .endSpec()
                                                                          .build();
 
-        List<HasMetadata> objects = getDeployment().geTemplate().getObjects();
+        List<HasMetadata> objects = getDeployment().getTemplate().getObjects();
         objects.add(deploymentConfig);
-        getDeployment().geTemplate().setObjects(objects);
+        getDeployment().getTemplate().setObjects(objects);
     }
 
     @Override
@@ -141,9 +141,9 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
                                                   .withSelector(Collections.singletonMap("deploymentConfig", "${APPLICATION_NAME}-kieserver"))
                                               .endSpec()
                                               .build();
-        List<HasMetadata> objects = getDeployment().geTemplate().getObjects();
+        List<HasMetadata> objects = getDeployment().getTemplate().getObjects();
         objects.add(service);
-        getDeployment().geTemplate().setObjects(objects);
+        getDeployment().getTemplate().setObjects(objects);
     }
 
     @Override
@@ -161,9 +161,9 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
                                             .endPort()
                                         .endSpec()
                                         .build();
-        List<HasMetadata> objects = getDeployment().geTemplate().getObjects();
+        List<HasMetadata> objects = getDeployment().getTemplate().getObjects();
         objects.add(route);
-        getDeployment().geTemplate().setObjects(objects);
+        getDeployment().getTemplate().setObjects(objects);
     }
 
     @Override

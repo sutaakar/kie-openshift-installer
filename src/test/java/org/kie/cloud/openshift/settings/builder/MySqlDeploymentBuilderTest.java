@@ -25,7 +25,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
         Deployment builtMySqlDeployment = settingsBuilder.build();
 
         assertThat(builtMySqlDeployment).isNotNull();
-        assertThat(builtMySqlDeployment.geTemplate().getMetadata().getName()).contains("-mysql");
+        assertThat(builtMySqlDeployment.getTemplate().getMetadata().getName()).contains("-mysql");
     }
 
     @Test

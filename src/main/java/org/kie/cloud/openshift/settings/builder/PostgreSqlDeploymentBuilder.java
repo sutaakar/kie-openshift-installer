@@ -99,9 +99,9 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder {
                                                                          .endSpec()
                                                                          .build();
 
-        List<HasMetadata> objects = getDeployment().geTemplate().getObjects();
+        List<HasMetadata> objects = getDeployment().getTemplate().getObjects();
         objects.add(deploymentConfig);
-        getDeployment().geTemplate().setObjects(objects);
+        getDeployment().getTemplate().setObjects(objects);
     }
 
     @Override
@@ -118,9 +118,9 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder {
                                                   .withSelector(Collections.singletonMap("deploymentConfig", "${APPLICATION_NAME}-postgresql"))
                                               .endSpec()
                                               .build();
-        List<HasMetadata> objects = getDeployment().geTemplate().getObjects();
+        List<HasMetadata> objects = getDeployment().getTemplate().getObjects();
         objects.add(service);
-        getDeployment().geTemplate().setObjects(objects);
+        getDeployment().getTemplate().setObjects(objects);
     }
 
     @Override
