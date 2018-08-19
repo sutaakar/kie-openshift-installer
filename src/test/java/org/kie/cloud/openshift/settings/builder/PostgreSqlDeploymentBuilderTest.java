@@ -37,7 +37,7 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
 
         assertThat(builtPostgreSqlDeployment).isNotNull();
         assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getApiVersion()).isEqualTo("v1");
-        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getMetadata().getName()).startsWith("postgresql");
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getMetadata().getName()).isEqualTo(builtPostgreSqlDeployment.getDeploymentName());
         assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getStrategy().getType()).isEqualTo("Recreate");
         assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTriggers()).hasSize(2);
         assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTriggers())
@@ -47,19 +47,19 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
                     .filteredOn(t -> t.getType().equals("ImageChange"))
                     .hasOnlyOneElementSatisfying(e -> {
                         assertThat(e.getImageChangeParams().getAutomatic()).isTrue();
-                        assertThat(e.getImageChangeParams().getContainerNames()).containsExactly("${APPLICATION_NAME}-postgresql");
+                        assertThat(e.getImageChangeParams().getContainerNames()).containsExactly(builtPostgreSqlDeployment.getDeploymentName());
                         assertThat(e.getImageChangeParams().getFrom().getKind()).isEqualTo("ImageStreamTag");
                         assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("${IMAGE_STREAM_NAMESPACE}");
                         assertThat(e.getImageChangeParams().getFrom().getName()).isEqualTo("postgresql:${POSTGRESQL_IMAGE_STREAM_TAG}");
                     });
         assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getReplicas()).isEqualTo(1);
-        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getSelector()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-postgresql");
-        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-postgresql");
-        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getLabels()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-postgresql");
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getSelector()).containsEntry("deploymentConfig", builtPostgreSqlDeployment.getDeploymentName());
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getName()).isEqualTo(builtPostgreSqlDeployment.getDeploymentName());
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getLabels()).containsEntry("deploymentConfig", builtPostgreSqlDeployment.getDeploymentName());
         assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getTerminationGracePeriodSeconds()).isEqualTo(60L);
         assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers())
                     .hasOnlyOneElementSatisfying(c -> {
-                        assertThat(c.getName()).isEqualTo("${APPLICATION_NAME}-postgresql");
+                        assertThat(c.getName()).isEqualTo(builtPostgreSqlDeployment.getDeploymentName());
                         assertThat(c.getImage()).isEqualTo("postgresql");
                         assertThat(c.getImagePullPolicy()).isEqualTo("Always");
                         assertThat(c.getPorts()).hasSize(1);
@@ -81,7 +81,7 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtPostgreSqlDeployment.getServices().get(0).getSpec().getPorts()).hasSize(1);
         assertThat(builtPostgreSqlDeployment.getServices().get(0).getSpec().getPorts().get(0).getPort()).isEqualTo(5432);
         assertThat(builtPostgreSqlDeployment.getServices().get(0).getSpec().getPorts().get(0).getTargetPort().getIntVal()).isEqualTo(5432);
-        assertThat(builtPostgreSqlDeployment.getServices().get(0).getSpec().getSelector()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-postgresql");
+        assertThat(builtPostgreSqlDeployment.getServices().get(0).getSpec().getSelector()).containsEntry("deploymentConfig", builtPostgreSqlDeployment.getDeploymentName());
         assertThat(builtPostgreSqlDeployment.getServices().get(0).getMetadata().getName()).isEqualTo(builtPostgreSqlDeployment.getDeploymentName());
     }
 

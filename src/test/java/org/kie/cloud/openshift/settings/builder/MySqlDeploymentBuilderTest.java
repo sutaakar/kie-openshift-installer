@@ -37,7 +37,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
 
         assertThat(builtMySqlDeployment).isNotNull();
         assertThat(builtMySqlDeployment.getDeploymentConfig().getApiVersion()).isEqualTo("v1");
-        assertThat(builtMySqlDeployment.getDeploymentConfig().getMetadata().getName()).startsWith("mysql");
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getMetadata().getName()).isEqualTo(builtMySqlDeployment.getDeploymentName());
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getStrategy().getType()).isEqualTo("Recreate");
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTriggers()).hasSize(2);
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTriggers())
@@ -47,19 +47,19 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
                     .filteredOn(t -> t.getType().equals("ImageChange"))
                     .hasOnlyOneElementSatisfying(e -> {
                         assertThat(e.getImageChangeParams().getAutomatic()).isTrue();
-                        assertThat(e.getImageChangeParams().getContainerNames()).containsExactly("${APPLICATION_NAME}-mysql");
+                        assertThat(e.getImageChangeParams().getContainerNames()).containsExactly(builtMySqlDeployment.getDeploymentName());
                         assertThat(e.getImageChangeParams().getFrom().getKind()).isEqualTo("ImageStreamTag");
                         assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("${IMAGE_STREAM_NAMESPACE}");
                         assertThat(e.getImageChangeParams().getFrom().getName()).isEqualTo("mysql:${MYSQL_IMAGE_STREAM_TAG}");
                     });
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getReplicas()).isEqualTo(1);
-        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getSelector()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-mysql");
-        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-mysql");
-        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getLabels()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-mysql");
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getSelector()).containsEntry("deploymentConfig", builtMySqlDeployment.getDeploymentName());
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getName()).isEqualTo(builtMySqlDeployment.getDeploymentName());
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getLabels()).containsEntry("deploymentConfig", builtMySqlDeployment.getDeploymentName());
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getTerminationGracePeriodSeconds()).isEqualTo(60L);
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers())
                     .hasOnlyOneElementSatisfying(c -> {
-                        assertThat(c.getName()).isEqualTo("${APPLICATION_NAME}-mysql");
+                        assertThat(c.getName()).isEqualTo(builtMySqlDeployment.getDeploymentName());
                         assertThat(c.getImage()).isEqualTo("mysql");
                         assertThat(c.getImagePullPolicy()).isEqualTo("Always");
                         assertThat(c.getPorts()).hasSize(1);
@@ -81,7 +81,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtMySqlDeployment.getServices().get(0).getSpec().getPorts()).hasSize(1);
         assertThat(builtMySqlDeployment.getServices().get(0).getSpec().getPorts().get(0).getPort()).isEqualTo(3306);
         assertThat(builtMySqlDeployment.getServices().get(0).getSpec().getPorts().get(0).getTargetPort().getIntVal()).isEqualTo(3306);
-        assertThat(builtMySqlDeployment.getServices().get(0).getSpec().getSelector()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-mysql");
+        assertThat(builtMySqlDeployment.getServices().get(0).getSpec().getSelector()).containsEntry("deploymentConfig", builtMySqlDeployment.getDeploymentName());
         assertThat(builtMySqlDeployment.getServices().get(0).getMetadata().getName()).isEqualTo(builtMySqlDeployment.getDeploymentName());
     }
 

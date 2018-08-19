@@ -53,7 +53,6 @@ public class OpenShiftImageConstants {
     public static final String MAVEN_REPO_PASSWORD = "MAVEN_REPO_PASSWORD";
 
     public static final String IMAGE_STREAM_NAMESPACE = "IMAGE_STREAM_NAMESPACE";
-    public static final String APPLICATION_NAME = "APPLICATION_NAME";
 
     public static final String DBE_SERVICE_HOST = "DBE_SERVICE_HOST";
     public static final String DBE_SERVICE_PORT = "DBE_SERVICE_PORT";

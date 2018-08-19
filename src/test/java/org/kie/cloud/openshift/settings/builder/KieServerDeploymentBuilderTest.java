@@ -22,7 +22,6 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
         assertThat(builtKieServerDeployment).isNotNull();
         assertThat(builtKieServerDeployment.getTemplate().getMetadata().getName()).contains("-kieserver");
-        assertThat(builtKieServerDeployment.getTemplate().getParameters()).extracting(n -> n.getName()).contains("APPLICATION_NAME");
     }
 
     @Test
@@ -34,7 +33,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
         assertThat(builtKieServerDeployment).isNotNull();
         assertThat(builtKieServerDeployment.getDeploymentConfig().getApiVersion()).isEqualTo("v1");
-        assertThat(builtKieServerDeployment.getDeploymentConfig().getMetadata().getName()).startsWith("kieserver");
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getMetadata().getName()).isEqualTo(builtKieServerDeployment.getDeploymentName());
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getStrategy().getType()).isEqualTo("Recreate");
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTriggers()).hasSize(2);
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTriggers())
@@ -44,19 +43,19 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
                     .filteredOn(t -> t.getType().equals("ImageChange"))
                     .hasOnlyOneElementSatisfying(e -> {
                         assertThat(e.getImageChangeParams().getAutomatic()).isTrue();
-                        assertThat(e.getImageChangeParams().getContainerNames()).containsExactly("${APPLICATION_NAME}-kieserver");
+                        assertThat(e.getImageChangeParams().getContainerNames()).containsExactly(builtKieServerDeployment.getDeploymentName());
                         assertThat(e.getImageChangeParams().getFrom().getKind()).isEqualTo("ImageStreamTag");
                         assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("${IMAGE_STREAM_NAMESPACE}");
                         assertThat(e.getImageChangeParams().getFrom().getName()).isEqualTo("rhpam70-kieserver-openshift:${IMAGE_STREAM_TAG}");
                     });
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getReplicas()).isEqualTo(1);
-        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getSelector()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-kieserver");
-        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getName()).isEqualTo("${APPLICATION_NAME}-kieserver");
-        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getLabels()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-kieserver");
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getSelector()).containsEntry("deploymentConfig", builtKieServerDeployment.getDeploymentName());
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getName()).isEqualTo(builtKieServerDeployment.getDeploymentName());
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getLabels()).containsEntry("deploymentConfig", builtKieServerDeployment.getDeploymentName());
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getTerminationGracePeriodSeconds()).isEqualTo(60L);
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers())
                     .hasOnlyOneElementSatisfying(c -> {
-                        assertThat(c.getName()).isEqualTo("${APPLICATION_NAME}-kieserver");
+                        assertThat(c.getName()).isEqualTo(builtKieServerDeployment.getDeploymentName());
                         assertThat(c.getImage()).isEqualTo("rhpam70-kieserver-openshift");
                         assertThat(c.getImagePullPolicy()).isEqualTo("Always");
                         assertThat(c.getResources().getLimits()).containsEntry("memory", new Quantity("${EXCECUTION_SERVER_MEMORY_LIMIT}"));
@@ -84,7 +83,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(0).getName()).isEqualTo("http");
         assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(0).getPort()).isEqualTo(8080);
         assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(0).getTargetPort().getIntVal()).isEqualTo(8080);
-        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getSelector()).containsEntry("deploymentConfig", "${APPLICATION_NAME}-kieserver");
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getSelector()).containsEntry("deploymentConfig", builtKieServerDeployment.getDeploymentName());
         assertThat(builtKieServerDeployment.getServices().get(0).getMetadata().getName()).isEqualTo(builtKieServerDeployment.getDeploymentName());
     }
 

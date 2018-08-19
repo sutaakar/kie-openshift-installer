@@ -16,11 +16,6 @@ message: A new Process Automation Manager Execution Server application has been 
   project. Please be sure to create the secret named "${HTTPS_SECRET}" containing the ${HTTPS_KEYSTORE} file used for
   serving secure content.
 parameters:
-- displayName: Application Name
-  description: The name for the application.
-  name: APPLICATION_NAME
-  value: myapp
-  required: true
 - displayName: ImageStream Namespace
   description: Namespace in which the ImageStreams for Red Hat Middleware images are
     installed. These ImageStreams are normally installed in the openshift namespace.
