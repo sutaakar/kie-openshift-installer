@@ -16,6 +16,7 @@
 package org.kie.cloud.openshift.settings.builder;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import io.fabric8.kubernetes.api.model.Container;
@@ -24,6 +25,7 @@ import io.fabric8.kubernetes.api.model.ContainerPortBuilder;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.IntOrString;
 import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.kubernetes.api.model.ProbeBuilder;
@@ -137,7 +139,8 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
     protected void configureService() {
         ServicePort httpPort = new ServicePortBuilder().withName("http")
                                                        .withPort(8080)
-                                                       .withNewTargetPort(8080)
+                                                       .withNewTargetPortLike(new IntOrString(8080, null, null, new HashMap<String, Object>()))
+                                                       .endTargetPort()
                                                        .build();
         Service service = new ServiceBuilder().withApiVersion("v1")
                                               .withNewMetadata()
@@ -248,7 +251,8 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
         // Adjust service ports
         ServicePort httpsServicePort = new ServicePortBuilder().withName("https")
                                                                .withPort(8443)
-                                                               .withNewTargetPort(8443)
+                                                               .withNewTargetPortLike(new IntOrString(8443, null, null, new HashMap<String, Object>()))
+                                                               .endTargetPort()
                                                                .build();
         getDeployment().getServices().get(0).getSpec().getPorts().add(httpsServicePort);
 
