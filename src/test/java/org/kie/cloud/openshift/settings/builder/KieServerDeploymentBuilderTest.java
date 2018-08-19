@@ -2,8 +2,12 @@ package org.kie.cloud.openshift.settings.builder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+
 import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.kubernetes.api.model.Quantity;
+import io.fabric8.kubernetes.api.model.Volume;
+import io.fabric8.kubernetes.api.model.VolumeMount;
 import io.fabric8.openshift.api.model.Template;
 import org.junit.Test;
 import org.kie.cloud.openshift.AbstractCloudTest;
@@ -165,6 +169,72 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_PWD.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("kieServerPassword"));
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithHttps() {
+        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
+
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        Deployment builtKieServerDeployment = settingsBuilder.withHttps("custom-secret", "custom-keystore", "custom-name", "custom-password")
+                                                             .build();
+
+        assertThat(builtKieServerDeployment).isNotNull();
+
+        // Check route
+        assertThat(builtKieServerDeployment.getSecureRoutes()).hasSize(1);
+        assertThat(builtKieServerDeployment.getSecureRoutes().get(0).getApiVersion()).isEqualTo("v1");
+        assertThat(builtKieServerDeployment.getSecureRoutes().get(0).getMetadata().getName()).isEqualTo("secure-" + builtKieServerDeployment.getDeploymentName());
+        assertThat(builtKieServerDeployment.getSecureRoutes().get(0).getSpec().getTo().getName()).isEqualTo(builtKieServerDeployment.getServices().get(0).getMetadata().getName());
+        assertThat(builtKieServerDeployment.getSecureRoutes().get(0).getSpec().getPort().getTargetPort().getStrVal()).isEqualTo("https");
+        assertThat(builtKieServerDeployment.getSecureRoutes().get(0).getSpec().getTls().getTermination()).isEqualTo("passthrough");
+
+        // Check service
+        assertThat(builtKieServerDeployment.getServices()).hasSize(1);
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts()).hasSize(2);
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(0).getName()).isEqualTo("http");
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(0).getPort()).isEqualTo(8080);
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(0).getTargetPort().getIntVal()).isEqualTo(8080);
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(1).getName()).isEqualTo("https");
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(1).getPort()).isEqualTo(8443);
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(1).getTargetPort().getIntVal()).isEqualTo(8443);
+
+        // Check volume
+        List<VolumeMount> volumeMounts = builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getVolumeMounts();
+        List<Volume> volumes = builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getVolumes();
+        assertThat(volumeMounts)
+                        .hasOnlyOneElementSatisfying(m -> {
+                            assertThat(m.getName()).isEqualTo("kieserver-keystore-volume");
+                            assertThat(m.getMountPath()).isEqualTo("/etc/kieserver-secret-volume");
+                            assertThat(m.getReadOnly()).isTrue();
+                        });
+        assertThat(volumes)
+                        .hasOnlyOneElementSatisfying(v -> {
+                            assertThat(v.getName()).isEqualTo(volumeMounts.get(0).getName());
+                            assertThat(v.getSecret().getSecretName()).isEqualTo("custom-secret");
+                        });
+
+        // Check HTTPS ports
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getPorts())
+                        .anySatisfy(p -> {
+                            assertThat(p.getName()).isEqualTo("https");
+                            assertThat(p.getContainerPort()).isEqualTo(8443);
+                            assertThat(p.getProtocol()).isEqualTo("TCP");
+                        });
+
+        // Check environment variables
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.HTTPS_KEYSTORE_DIR.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("/etc/kieserver-secret-volume"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.HTTPS_KEYSTORE.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("custom-keystore"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.HTTPS_NAME.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("custom-name"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.HTTPS_PASSWORD.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("custom-password"));
     }
 
     @Test

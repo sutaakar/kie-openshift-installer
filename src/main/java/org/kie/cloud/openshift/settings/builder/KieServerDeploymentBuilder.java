@@ -19,9 +19,12 @@ import java.util.Collections;
 import java.util.List;
 
 import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.ContainerPort;
+import io.fabric8.kubernetes.api.model.ContainerPortBuilder;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.kubernetes.api.model.ProbeBuilder;
 import io.fabric8.kubernetes.api.model.Quantity;
@@ -29,6 +32,10 @@ import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServicePortBuilder;
+import io.fabric8.kubernetes.api.model.Volume;
+import io.fabric8.kubernetes.api.model.VolumeBuilder;
+import io.fabric8.kubernetes.api.model.VolumeMount;
+import io.fabric8.kubernetes.api.model.VolumeMountBuilder;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.api.model.Route;
@@ -210,6 +217,69 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
     public KieServerDeploymentBuilder withKieServerUser(String kieServerUser, String kieServerPwd) {
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_USER, kieServerUser);
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PWD, kieServerPwd);
+        return this;
+    }
+
+    public KieServerDeploymentBuilder withHttps(String secretName, String keystore, String name, String password) {
+        String volumeName = "kieserver-keystore-volume";
+        String volumeDir = "/etc/kieserver-secret-volume";
+
+        // Create route
+        Route httpsRoute = new RouteBuilder().withApiVersion("v1")
+                                             .withNewMetadata()
+                                                 .withName("secure-" + getDeployment().getDeploymentName())
+                                             .endMetadata()
+                                             .withNewSpec()
+                                                 .withNewTo()
+                                                     .withName(getDeployment().getDeploymentName())
+                                                 .endTo()
+                                                 .withNewPort()
+                                                     .withNewTargetPort("https")
+                                                 .endPort()
+                                                 .withNewTls()
+                                                     .withTermination("passthrough")
+                                                 .endTls()
+                                             .endSpec()
+                                             .build();
+        List<HasMetadata> objects = getDeployment().getTemplate().getObjects();
+        objects.add(httpsRoute);
+        getDeployment().getTemplate().setObjects(objects);
+
+        // Adjust service ports
+        ServicePort httpsServicePort = new ServicePortBuilder().withName("https")
+                                                               .withPort(8443)
+                                                               .withNewTargetPort(8443)
+                                                               .build();
+        getDeployment().getServices().get(0).getSpec().getPorts().add(httpsServicePort);
+
+        // Create volumes
+        PodSpec podSpec = getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec();
+        Container container = podSpec.getContainers().get(0);
+        VolumeMount secretVolumeMount = new VolumeMountBuilder().withName(volumeName)
+                                                               .withMountPath(volumeDir)
+                                                               .withReadOnly(Boolean.TRUE)
+                                                               .build();
+        container.getVolumeMounts().add(secretVolumeMount);
+
+        Volume volume = new VolumeBuilder().withName(volumeName)
+                                                .withNewSecret()
+                                                    .withSecretName(secretName)
+                                                .endSecret()
+                                                .build();
+        podSpec.getVolumes().add(volume);
+
+        // Set container port
+        ContainerPort httpsContainerPort = new ContainerPortBuilder().withName("https")
+                                                                     .withContainerPort(8443)
+                                                                     .withProtocol("TCP")
+                                                                     .build();
+        container.getPorts().add(httpsContainerPort);
+
+        // Configure environment variables
+        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_KEYSTORE_DIR, volumeDir);
+        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_KEYSTORE, keystore);
+        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_NAME, name);
+        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_PASSWORD, password);
         return this;
     }
 
