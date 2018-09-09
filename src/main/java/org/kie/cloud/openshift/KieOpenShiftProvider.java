@@ -31,14 +31,29 @@ public class KieOpenShiftProvider implements AutoCloseable {
         return new KieServerDeploymentBuilder(kieServerTemplate);
     }
 
+    public KieServerDeploymentBuilder createKieServerDeploymentBuilder(String deploymentName) {
+        Template kieServerTemplate = templateLoader.loadKieServerTemplate();
+        return new KieServerDeploymentBuilder(kieServerTemplate, deploymentName);
+    }
+
     public MySqlDeploymentBuilder createMySqlDeploymentBuilder() {
         Template mySqlTemplate = templateLoader.loadMySqlTemplate();
         return new MySqlDeploymentBuilder(mySqlTemplate);
     }
 
+    public MySqlDeploymentBuilder createMySqlDeploymentBuilder(String deploymentName) {
+        Template mySqlTemplate = templateLoader.loadMySqlTemplate();
+        return new MySqlDeploymentBuilder(mySqlTemplate, deploymentName);
+    }
+
     public PostgreSqlDeploymentBuilder createPostgreSqlDeploymentBuilder() {
         Template postgreSqlTemplate = templateLoader.loadPostgreSqlTemplate();
         return new PostgreSqlDeploymentBuilder(postgreSqlTemplate);
+    }
+
+    public PostgreSqlDeploymentBuilder createPostgreSqlDeploymentBuilder(String deploymentName) {
+        Template postgreSqlTemplate = templateLoader.loadPostgreSqlTemplate();
+        return new PostgreSqlDeploymentBuilder(postgreSqlTemplate, deploymentName);
     }
 
     public Scenario createScenario() {
