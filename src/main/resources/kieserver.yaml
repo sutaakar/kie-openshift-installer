@@ -24,8 +24,3 @@ parameters:
   name: IMAGE_STREAM_NAMESPACE
   value: openshift
   required: true
-- displayName: ImageStream Tag
-  description: A named pointer to an image in an image stream. Default is "1.0".
-  name: IMAGE_STREAM_TAG
-  value: "1.0"
-  required: false

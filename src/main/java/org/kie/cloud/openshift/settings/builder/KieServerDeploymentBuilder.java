@@ -44,6 +44,7 @@ import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.api.model.RouteBuilder;
 import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
+import org.kie.cloud.openshift.configuration.ConfigurationLoader;
 import org.kie.cloud.openshift.deployment.Deployment;
 import org.kie.cloud.openshift.util.NameGenerator;
 
@@ -80,6 +81,9 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
 
     @Override
     protected void configureDeploymentConfig() {
+        String kieServerImageStreamName = ConfigurationLoader.getKieServerImageStreamName();
+        String kieServerImageStreamTag = ConfigurationLoader.getKieServerImageStreamTag();
+
         DeploymentConfig deploymentConfig = new DeploymentConfigBuilder().withApiVersion("v1")
                                                                          .withNewMetadata()
                                                                              .withName(getDeployment().getDeploymentName())
@@ -96,7 +100,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
                                                                                      .withNewFrom()
                                                                                          .withKind("ImageStreamTag")
                                                                                          .withNamespace("${IMAGE_STREAM_NAMESPACE}")
-                                                                                         .withName("rhpam70-kieserver-openshift:${IMAGE_STREAM_TAG}")
+                                                                                         .withName(kieServerImageStreamName + ":" + kieServerImageStreamTag)
                                                                                      .endFrom()
                                                                                  .endImageChangeParams()
                                                                              .endTrigger()
