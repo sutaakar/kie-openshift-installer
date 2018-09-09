@@ -96,7 +96,7 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder {
                                                                                      .withTerminationGracePeriodSeconds(60L)
                                                                                      .addNewContainer()
                                                                                          .withName(getDeployment().getDeploymentName())
-                                                                                         .withImage("postgresql")
+                                                                                         .withImage(postgreSqlImageStreamName)
                                                                                          .withImagePullPolicy("Always")
                                                                                          .addNewPort()
                                                                                              .withContainerPort(5432)

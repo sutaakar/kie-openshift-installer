@@ -72,7 +72,8 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers())
                     .hasOnlyOneElementSatisfying(c -> {
                         assertThat(c.getName()).isEqualTo(builtKieServerDeployment.getDeploymentName());
-                        assertThat(c.getImage()).isEqualTo("rhpam70-kieserver-openshift");
+                        // TODO: This config needs to be compared with template compatibility test
+                        // assertThat(c.getImage()).isEqualTo("rhpam70-kieserver-openshift");
                         assertThat(c.getImagePullPolicy()).isEqualTo("Always");
                         assertThat(c.getResources().getLimits()).containsEntry("memory", new Quantity("1Gi"));
                         assertThat(c.getPorts()).hasSize(2);

@@ -118,7 +118,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
                                                                                      .withTerminationGracePeriodSeconds(60L)
                                                                                      .addNewContainer()
                                                                                          .withName(getDeployment().getDeploymentName())
-                                                                                         .withImage("rhpam70-kieserver-openshift")
+                                                                                         .withImage(kieServerImageStreamName)
                                                                                          .withImagePullPolicy("Always")
                                                                                          .withNewResources()
                                                                                              .withLimits(Collections.singletonMap("memory", new Quantity("1Gi")))

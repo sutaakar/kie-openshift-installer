@@ -95,7 +95,7 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
                                                                                      .withTerminationGracePeriodSeconds(60L)
                                                                                      .addNewContainer()
                                                                                          .withName(getDeployment().getDeploymentName())
-                                                                                         .withImage("mysql")
+                                                                                         .withImage(mySqlImageStreamName)
                                                                                          .withImagePullPolicy("Always")
                                                                                          .addNewPort()
                                                                                              .withContainerPort(3306)
