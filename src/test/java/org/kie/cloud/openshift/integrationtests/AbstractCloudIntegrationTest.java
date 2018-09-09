@@ -16,7 +16,7 @@ public class AbstractCloudIntegrationTest extends AbstractCloudTest{
     @Before
     public void createProjectWithImageStreams() {
         try {
-            URL imageStreamsUrl = new URL("https://raw.githubusercontent.com/jboss-container-images/rhpam-7-openshift-image/rhpam70-dev/rhpam70-image-streams.yaml");
+            URL imageStreamsUrl = new URL("https://raw.githubusercontent.com/jboss-container-images/rhpam-7-openshift-image/rhpam71-dev/rhpam71-image-streams.yaml");
             openShiftClient.projectrequests().createNew().withNewMetadata().withName(projectName).endMetadata().done();
             KubernetesList resourceList = openShiftClient.templates().inNamespace(projectName).load(imageStreamsUrl).process();
             openShiftClient.lists().inNamespace(projectName).create(resourceList);
