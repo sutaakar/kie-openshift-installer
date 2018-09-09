@@ -100,6 +100,8 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(0).getTargetPort().getIntVal()).isEqualTo(8080);
         assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getSelector()).containsEntry("deploymentConfig", builtKieServerDeployment.getDeploymentName());
         assertThat(builtKieServerDeployment.getServices().get(0).getMetadata().getName()).isEqualTo(builtKieServerDeployment.getDeploymentName());
+        assertThat(builtKieServerDeployment.getServices().get(0).getMetadata().getAnnotations()).containsEntry("description", "All the KIE server web server's ports.");
+        assertThat(builtKieServerDeployment.getServices().get(0).getMetadata().getLabels()).containsEntry("service", builtKieServerDeployment.getDeploymentName());
     }
 
     @Test

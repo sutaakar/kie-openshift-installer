@@ -150,6 +150,8 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
         Service service = new ServiceBuilder().withApiVersion("v1")
                                               .withNewMetadata()
                                                   .withName(getDeployment().getDeploymentName())
+                                                  .addToAnnotations("description", "All the KIE server web server's ports.")
+                                                  .addToLabels("service", getDeployment().getDeploymentName())
                                               .endMetadata()
                                               .withNewSpec()
                                                   .withPorts(httpPort)
