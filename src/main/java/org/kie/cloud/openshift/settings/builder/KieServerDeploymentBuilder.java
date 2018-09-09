@@ -117,7 +117,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
                                                                                          .withImage("rhpam70-kieserver-openshift")
                                                                                          .withImagePullPolicy("Always")
                                                                                          .withNewResources()
-                                                                                             .withLimits(Collections.singletonMap("memory", new Quantity("${EXCECUTION_SERVER_MEMORY_LIMIT}")))
+                                                                                             .withLimits(Collections.singletonMap("memory", new Quantity("1Gi")))
                                                                                          .endResources()
                                                                                          .addNewPort()
                                                                                              .withName("jolokia")

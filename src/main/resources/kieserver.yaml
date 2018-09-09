@@ -29,8 +29,3 @@ parameters:
   name: IMAGE_STREAM_TAG
   value: "1.0"
   required: false
-- displayName: Execution Server Container Memory Limit
-  description: Execution Server Container memory limit
-  name: EXCECUTION_SERVER_MEMORY_LIMIT
-  value: 1Gi
-  required: false

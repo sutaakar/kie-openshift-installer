@@ -73,7 +73,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
                         assertThat(c.getName()).isEqualTo(builtKieServerDeployment.getDeploymentName());
                         assertThat(c.getImage()).isEqualTo("rhpam70-kieserver-openshift");
                         assertThat(c.getImagePullPolicy()).isEqualTo("Always");
-                        assertThat(c.getResources().getLimits()).containsEntry("memory", new Quantity("${EXCECUTION_SERVER_MEMORY_LIMIT}"));
+                        assertThat(c.getResources().getLimits()).containsEntry("memory", new Quantity("1Gi"));
                         assertThat(c.getPorts()).hasSize(2);
                         assertThat(c.getPorts().get(0).getName()).isEqualTo("jolokia");
                         assertThat(c.getPorts().get(0).getContainerPort()).isEqualTo(8778);
