@@ -40,7 +40,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
-    public void testBuildKieServerDeploymentDeploymentConfig() {
+    public void testBuildMySqlDeploymentDeploymentConfig() {
         Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
 
         MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
@@ -61,7 +61,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
                         assertThat(e.getImageChangeParams().getContainerNames()).containsExactly(builtMySqlDeployment.getDeploymentName());
                         assertThat(e.getImageChangeParams().getFrom().getKind()).isEqualTo("ImageStreamTag");
                         assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("${IMAGE_STREAM_NAMESPACE}");
-                        assertThat(e.getImageChangeParams().getFrom().getName()).isEqualTo("mysql:${MYSQL_IMAGE_STREAM_TAG}");
+                        assertThat(e.getImageChangeParams().getFrom().getName()).isEqualTo("mysql:5.7");
                     });
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getReplicas()).isEqualTo(1);
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getSelector()).containsEntry("deploymentConfig", builtMySqlDeployment.getDeploymentName());

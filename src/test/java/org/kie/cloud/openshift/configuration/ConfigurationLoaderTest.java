@@ -15,7 +15,19 @@ public class ConfigurationLoaderTest extends AbstractCloudTest {
 
     @Test
     public void testGetKieServerImageStreamTag() {
-        String kieServerImageStreamName = ConfigurationLoader.getKieServerImageStreamTag();
-        assertThat(kieServerImageStreamName).containsPattern("[0-9]\\.[0-9]*");
+        String kieServerImageStreamTag = ConfigurationLoader.getKieServerImageStreamTag();
+        assertThat(kieServerImageStreamTag).containsPattern("[0-9]\\.[0-9]*");
+    }
+
+    @Test
+    public void testGetMySqlImageStreamName() {
+        String mySqlImageStreamName = ConfigurationLoader.getMySqlImageStreamName();
+        assertThat(mySqlImageStreamName).isEqualTo("mysql");
+    }
+
+    @Test
+    public void testGetMySqlImageStreamTag() {
+        String mySqlImageStreamTag = ConfigurationLoader.getMySqlImageStreamTag();
+        assertThat(mySqlImageStreamTag).isEqualTo("5.7");
     }
 }

@@ -11,6 +11,9 @@ public class ConfigurationLoader {
     private static final String KIE_SERVER_IMAGE_STREAM_NAME_PROPERTY = "kie.server.image.stream.name";
     private static final String IMAGE_STREAM_TAG_PROPERTY = "image.stream.tag";
 
+    private static final String MYSQL_IMAGE_STREAM_NAME_PROPERTY = "mysql.image.stream.name";
+    private static final String MYSQL_IMAGE_STREAM_TAG_PROPERTY = "mysql.image.stream.tag";
+
     private static Properties properties = new Properties();
 
     static {
@@ -38,5 +41,13 @@ public class ConfigurationLoader {
 
     public static String getKieServerImageStreamTag() {
         return properties.getProperty(IMAGE_STREAM_TAG_PROPERTY);
+    }
+
+    public static String getMySqlImageStreamName() {
+        return properties.getProperty(MYSQL_IMAGE_STREAM_NAME_PROPERTY);
+    }
+
+    public static String getMySqlImageStreamTag() {
+        return properties.getProperty(MYSQL_IMAGE_STREAM_TAG_PROPERTY);
     }
 }

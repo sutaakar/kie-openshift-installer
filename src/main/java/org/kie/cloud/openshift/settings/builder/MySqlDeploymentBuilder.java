@@ -30,6 +30,7 @@ import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
+import org.kie.cloud.openshift.configuration.ConfigurationLoader;
 import org.kie.cloud.openshift.util.NameGenerator;
 
 /**
@@ -57,6 +58,9 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
 
     @Override
     protected void configureDeploymentConfig() {
+        String mySqlImageStreamName = ConfigurationLoader.getMySqlImageStreamName();
+        String mySqlImageStreamTag = ConfigurationLoader.getMySqlImageStreamTag();
+
         DeploymentConfig deploymentConfig = new DeploymentConfigBuilder().withApiVersion("v1")
                                                                          .withNewMetadata()
                                                                              .withName(getDeployment().getDeploymentName())
@@ -73,7 +77,7 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
                                                                                      .withNewFrom()
                                                                                          .withKind("ImageStreamTag")
                                                                                          .withNamespace("${IMAGE_STREAM_NAMESPACE}")
-                                                                                         .withName("mysql:${MYSQL_IMAGE_STREAM_TAG}")
+                                                                                         .withName(mySqlImageStreamName + ":" + mySqlImageStreamTag)
                                                                                      .endFrom()
                                                                                  .endImageChangeParams()
                                                                              .endTrigger()
