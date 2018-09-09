@@ -20,6 +20,12 @@ public class ConfigurationLoaderTest extends AbstractCloudTest {
     }
 
     @Test
+    public void testGetKieServerMemoryLimit() {
+        String kieServerMemoryLimit = ConfigurationLoader.getKieServerMemoryLimit();
+        assertThat(kieServerMemoryLimit).isEqualTo("1Gi");
+    }
+
+    @Test
     public void testGetMySqlImageStreamName() {
         String mySqlImageStreamName = ConfigurationLoader.getMySqlImageStreamName();
         assertThat(mySqlImageStreamName).isEqualTo("mysql");

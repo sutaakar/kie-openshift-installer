@@ -11,6 +11,8 @@ public class ConfigurationLoader {
     private static final String KIE_SERVER_IMAGE_STREAM_NAME_PROPERTY = "kie.server.image.stream.name";
     private static final String IMAGE_STREAM_TAG_PROPERTY = "image.stream.tag";
 
+    private static final String KIE_SERVER_MEMORY_LIMIT_PROPERTY = "kie.server.memory.limit";
+
     private static final String MYSQL_IMAGE_STREAM_NAME_PROPERTY = "mysql.image.stream.name";
     private static final String MYSQL_IMAGE_STREAM_TAG_PROPERTY = "mysql.image.stream.tag";
     private static final String POSTGRESQL_IMAGE_STREAM_NAME_PROPERTY = "postgresql.image.stream.name";
@@ -43,6 +45,10 @@ public class ConfigurationLoader {
 
     public static String getKieServerImageStreamTag() {
         return properties.getProperty(IMAGE_STREAM_TAG_PROPERTY);
+    }
+
+    public static String getKieServerMemoryLimit() {
+        return properties.getProperty(KIE_SERVER_MEMORY_LIMIT_PROPERTY);
     }
 
     public static String getMySqlImageStreamName() {

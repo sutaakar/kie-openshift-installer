@@ -83,6 +83,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
     protected void configureDeploymentConfig() {
         String kieServerImageStreamName = ConfigurationLoader.getKieServerImageStreamName();
         String kieServerImageStreamTag = ConfigurationLoader.getKieServerImageStreamTag();
+        String kieServerMemoryLimit = ConfigurationLoader.getKieServerMemoryLimit();
 
         DeploymentConfig deploymentConfig = new DeploymentConfigBuilder().withApiVersion("v1")
                                                                          .withNewMetadata()
@@ -121,7 +122,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
                                                                                          .withImage(kieServerImageStreamName)
                                                                                          .withImagePullPolicy("Always")
                                                                                          .withNewResources()
-                                                                                             .withLimits(Collections.singletonMap("memory", new Quantity("1Gi")))
+                                                                                             .withLimits(Collections.singletonMap("memory", new Quantity(kieServerMemoryLimit)))
                                                                                          .endResources()
                                                                                          .addNewPort()
                                                                                              .withName("jolokia")
