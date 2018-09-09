@@ -30,4 +30,16 @@ public class ConfigurationLoaderTest extends AbstractCloudTest {
         String mySqlImageStreamTag = ConfigurationLoader.getMySqlImageStreamTag();
         assertThat(mySqlImageStreamTag).isEqualTo("5.7");
     }
+
+    @Test
+    public void testGetPostgreSqlImageStreamName() {
+        String postgreSqlImageStreamName = ConfigurationLoader.getPostgreSqlImageStreamName();
+        assertThat(postgreSqlImageStreamName).isEqualTo("postgresql");
+    }
+
+    @Test
+    public void testGetPostgreSqlImageStreamTag() {
+        String postgreSqlImageStreamTag = ConfigurationLoader.getPostgreSqlImageStreamTag();
+        assertThat(postgreSqlImageStreamTag).isEqualTo("9.6");
+    }
 }

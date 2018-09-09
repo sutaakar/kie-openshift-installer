@@ -23,8 +23,3 @@ parameters:
   name: IMAGE_STREAM_NAMESPACE
   value: openshift
   required: true
-- displayName: PostgreSQL ImageStream Tag
-  description: The PostgreSQL image version, which is intended to correspond to the PostgreSQL version. Default is "9.6".
-  name: POSTGRESQL_IMAGE_STREAM_TAG
-  value: "9.6"
-  required: false

@@ -13,6 +13,8 @@ public class ConfigurationLoader {
 
     private static final String MYSQL_IMAGE_STREAM_NAME_PROPERTY = "mysql.image.stream.name";
     private static final String MYSQL_IMAGE_STREAM_TAG_PROPERTY = "mysql.image.stream.tag";
+    private static final String POSTGRESQL_IMAGE_STREAM_NAME_PROPERTY = "postgresql.image.stream.name";
+    private static final String POSTGRESQL_IMAGE_STREAM_TAG_PROPERTY = "postgresql.image.stream.tag";
 
     private static Properties properties = new Properties();
 
@@ -49,5 +51,13 @@ public class ConfigurationLoader {
 
     public static String getMySqlImageStreamTag() {
         return properties.getProperty(MYSQL_IMAGE_STREAM_TAG_PROPERTY);
+    }
+
+    public static String getPostgreSqlImageStreamName() {
+        return properties.getProperty(POSTGRESQL_IMAGE_STREAM_NAME_PROPERTY);
+    }
+
+    public static String getPostgreSqlImageStreamTag() {
+        return properties.getProperty(POSTGRESQL_IMAGE_STREAM_TAG_PROPERTY);
     }
 }

@@ -30,6 +30,7 @@ import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
+import org.kie.cloud.openshift.configuration.ConfigurationLoader;
 import org.kie.cloud.openshift.util.NameGenerator;
 
 /**
@@ -58,6 +59,9 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder {
 
     @Override
     protected void configureDeploymentConfig() {
+        String postgreSqlImageStreamName = ConfigurationLoader.getPostgreSqlImageStreamName();
+        String postgreSqlImageStreamTag = ConfigurationLoader.getPostgreSqlImageStreamTag();
+
         DeploymentConfig deploymentConfig = new DeploymentConfigBuilder().withApiVersion("v1")
                                                                          .withNewMetadata()
                                                                              .withName(getDeployment().getDeploymentName())
@@ -74,7 +78,7 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder {
                                                                                      .withNewFrom()
                                                                                          .withKind("ImageStreamTag")
                                                                                          .withNamespace("${IMAGE_STREAM_NAMESPACE}")
-                                                                                         .withName("postgresql:${POSTGRESQL_IMAGE_STREAM_TAG}")
+                                                                                         .withName(postgreSqlImageStreamName + ":" + postgreSqlImageStreamTag)
                                                                                      .endFrom()
                                                                                  .endImageChangeParams()
                                                                              .endTrigger()
