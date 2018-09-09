@@ -30,6 +30,7 @@ import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
+import org.kie.cloud.openshift.util.NameGenerator;
 
 /**
  * Cloud settings builder for Kie Server.
@@ -40,7 +41,11 @@ import org.kie.cloud.openshift.OpenShiftImageConstants;
 public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
 
     public MySqlDeploymentBuilder(Template mySqlTemplate) {
-        super(mySqlTemplate, "mysql");
+        super(mySqlTemplate, NameGenerator.generateDeploymentName("mysql"));
+    }
+
+    public MySqlDeploymentBuilder(Template mySqlTemplate, String deploymentName) {
+        super(mySqlTemplate, deploymentName);
     }
 
     @Override

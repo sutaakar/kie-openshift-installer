@@ -29,6 +29,17 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildMySqlDeploymentCustomDeploymentName() {
+        Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
+
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate, "custom-sql");
+        Deployment builtMySqlDeployment = settingsBuilder.build();
+
+        assertThat(builtMySqlDeployment).isNotNull();
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getMetadata().getName()).isEqualTo("custom-sql");
+    }
+
+    @Test
     public void testBuildKieServerDeploymentDeploymentConfig() {
         Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
 

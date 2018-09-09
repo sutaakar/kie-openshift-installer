@@ -30,6 +30,7 @@ import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
+import org.kie.cloud.openshift.util.NameGenerator;
 
 /**
  * Cloud settings builder for Kie Server.
@@ -40,7 +41,11 @@ import org.kie.cloud.openshift.OpenShiftImageConstants;
 public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder {
 
     public PostgreSqlDeploymentBuilder(Template postgreSqlTemplate) {
-        super(postgreSqlTemplate, "postgresql");
+        super(postgreSqlTemplate, NameGenerator.generateDeploymentName("postgresql"));
+    }
+
+    public PostgreSqlDeploymentBuilder(Template postgreSqlTemplate, String deploymentName) {
+        super(postgreSqlTemplate, deploymentName);
     }
 
     @Override

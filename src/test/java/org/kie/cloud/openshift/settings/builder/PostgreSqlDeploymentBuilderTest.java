@@ -29,6 +29,17 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildPostgreSqlDeploymentCustomDeploymentName() {
+        Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgreSqlTemplate();
+
+        PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder(postgreSqlTemplate, "custom-sql");
+        Deployment builtPostgreSqlDeployment = settingsBuilder.build();
+
+        assertThat(builtPostgreSqlDeployment).isNotNull();
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getMetadata().getName()).isEqualTo("custom-sql");
+    }
+
+    @Test
     public void testBuildKieServerDeploymentDeploymentConfig() {
         Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgreSqlTemplate();
 

@@ -45,6 +45,7 @@ import io.fabric8.openshift.api.model.RouteBuilder;
 import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.deployment.Deployment;
+import org.kie.cloud.openshift.util.NameGenerator;
 
 /**
  * Cloud settings builder for Kie Server.
@@ -55,7 +56,11 @@ import org.kie.cloud.openshift.deployment.Deployment;
 public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
 
     public KieServerDeploymentBuilder(Template kieServerTemplate) {
-        super(kieServerTemplate, "kieserver");
+        super(kieServerTemplate, NameGenerator.generateDeploymentName("kieserver"));
+    }
+
+    public KieServerDeploymentBuilder(Template kieServerTemplate, String deploymentName) {
+        super(kieServerTemplate, deploymentName);
     }
 
     @Override
