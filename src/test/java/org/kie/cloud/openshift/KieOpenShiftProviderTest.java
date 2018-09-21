@@ -12,60 +12,46 @@ public class KieOpenShiftProviderTest extends AbstractCloudTest{
 
     @Test
     public void testCreateKieServerDeploymentBuilder() {
-        try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
-            KieServerDeploymentBuilder kieServerSettingsBuilder = kieOpenShiftProvider.createKieServerDeploymentBuilder();
-            assertThat(kieServerSettingsBuilder).isNotNull();
-        }
+        KieServerDeploymentBuilder kieServerSettingsBuilder = KieOpenShiftProvider.createKieServerDeploymentBuilder();
+        assertThat(kieServerSettingsBuilder).isNotNull();
     }
 
     @Test
     public void testCreateKieServerDeploymentBuilderCustomDeploymentName() {
-        try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
-            KieServerDeploymentBuilder kieServerSettingsBuilder = kieOpenShiftProvider.createKieServerDeploymentBuilder("custom-server");
-            assertThat(kieServerSettingsBuilder).isNotNull();
-            assertThat(kieServerSettingsBuilder.build().getDeploymentName()).isEqualTo("custom-server");
-        }
+        KieServerDeploymentBuilder kieServerSettingsBuilder = KieOpenShiftProvider.createKieServerDeploymentBuilder("custom-server");
+        assertThat(kieServerSettingsBuilder).isNotNull();
+        assertThat(kieServerSettingsBuilder.build().getDeploymentName()).isEqualTo("custom-server");
     }
 
     @Test
     public void testCreateMySqlDeploymentBuilder() {
-        try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
-            MySqlDeploymentBuilder mySqlSettingsBuilder = kieOpenShiftProvider.createMySqlDeploymentBuilder();
-            assertThat(mySqlSettingsBuilder).isNotNull();
-        }
+        MySqlDeploymentBuilder mySqlSettingsBuilder = KieOpenShiftProvider.createMySqlDeploymentBuilder();
+        assertThat(mySqlSettingsBuilder).isNotNull();
     }
 
     @Test
     public void testCreateMySqlDeploymentBuilderCustomDeploymentName() {
-        try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
-            MySqlDeploymentBuilder mySqlSettingsBuilder = kieOpenShiftProvider.createMySqlDeploymentBuilder("custom-sql");
-            assertThat(mySqlSettingsBuilder).isNotNull();
-            assertThat(mySqlSettingsBuilder.build().getDeploymentName()).isEqualTo("custom-sql");
-        }
+        MySqlDeploymentBuilder mySqlSettingsBuilder = KieOpenShiftProvider.createMySqlDeploymentBuilder("custom-sql");
+        assertThat(mySqlSettingsBuilder).isNotNull();
+        assertThat(mySqlSettingsBuilder.build().getDeploymentName()).isEqualTo("custom-sql");
     }
 
     @Test
     public void testCreatePostgreSqlDeploymentBuilder() {
-        try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
-            PostgreSqlDeploymentBuilder postgreSqlDeploymentBuilder = kieOpenShiftProvider.createPostgreSqlDeploymentBuilder();
-            assertThat(postgreSqlDeploymentBuilder).isNotNull();
-        }
+        PostgreSqlDeploymentBuilder postgreSqlDeploymentBuilder = KieOpenShiftProvider.createPostgreSqlDeploymentBuilder();
+        assertThat(postgreSqlDeploymentBuilder).isNotNull();
     }
 
     @Test
     public void testCreatePostgreSqlDeploymentBuilderCustomDeploymentName() {
-        try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
-            PostgreSqlDeploymentBuilder postgreSqlDeploymentBuilder = kieOpenShiftProvider.createPostgreSqlDeploymentBuilder("custom-sql");
-            assertThat(postgreSqlDeploymentBuilder).isNotNull();
-            assertThat(postgreSqlDeploymentBuilder.build().getDeploymentName()).isEqualTo("custom-sql");
-        }
+        PostgreSqlDeploymentBuilder postgreSqlDeploymentBuilder = KieOpenShiftProvider.createPostgreSqlDeploymentBuilder("custom-sql");
+        assertThat(postgreSqlDeploymentBuilder).isNotNull();
+        assertThat(postgreSqlDeploymentBuilder.build().getDeploymentName()).isEqualTo("custom-sql");
     }
 
     @Test
     public void testCreateScenario() {
-        try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
-            Scenario scenario = kieOpenShiftProvider.createScenario();
-            assertThat(scenario).isNotNull();
-        }
+        Scenario scenario = KieOpenShiftProvider.createScenario();
+        assertThat(scenario).isNotNull();
     }
 }

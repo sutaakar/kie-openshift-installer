@@ -14,48 +14,42 @@ import org.kie.cloud.openshift.settings.builder.KieServerDeploymentBuilder;
 import org.kie.cloud.openshift.settings.builder.MySqlDeploymentBuilder;
 import org.kie.cloud.openshift.settings.builder.PostgreSqlDeploymentBuilder;
 
-public class KieOpenShiftProvider implements AutoCloseable {
+public class KieOpenShiftProvider {
 
-    private OpenShiftClient openShiftClient;
-
-    public KieOpenShiftProvider(OpenShiftClient openShiftClient) {
-        this.openShiftClient = openShiftClient;
-    }
-
-    public KieServerDeploymentBuilder createKieServerDeploymentBuilder() {
+    public static KieServerDeploymentBuilder createKieServerDeploymentBuilder() {
         return new KieServerDeploymentBuilder();
     }
 
-    public KieServerDeploymentBuilder createKieServerDeploymentBuilder(String deploymentName) {
+    public static KieServerDeploymentBuilder createKieServerDeploymentBuilder(String deploymentName) {
         return new KieServerDeploymentBuilder(deploymentName);
     }
 
-    public MySqlDeploymentBuilder createMySqlDeploymentBuilder() {
+    public static MySqlDeploymentBuilder createMySqlDeploymentBuilder() {
         return new MySqlDeploymentBuilder();
     }
 
-    public MySqlDeploymentBuilder createMySqlDeploymentBuilder(String deploymentName) {
+    public static MySqlDeploymentBuilder createMySqlDeploymentBuilder(String deploymentName) {
         return new MySqlDeploymentBuilder(deploymentName);
     }
 
-    public PostgreSqlDeploymentBuilder createPostgreSqlDeploymentBuilder() {
+    public static PostgreSqlDeploymentBuilder createPostgreSqlDeploymentBuilder() {
         return new PostgreSqlDeploymentBuilder();
     }
 
-    public PostgreSqlDeploymentBuilder createPostgreSqlDeploymentBuilder(String deploymentName) {
+    public static PostgreSqlDeploymentBuilder createPostgreSqlDeploymentBuilder(String deploymentName) {
         return new PostgreSqlDeploymentBuilder(deploymentName);
     }
 
-    public Scenario createScenario() {
+    public static Scenario createScenario() {
         return new Scenario();
     }
 
-    public void deployScenario(Scenario scenario, String projectName, Map<String, String> parameters) {
-        createProjectIfNotExists(projectName);
-        deployScenarioIntoProject(scenario, projectName, parameters);
+    public static void deployScenario(OpenShiftClient openShiftClient, Scenario scenario, String projectName, Map<String, String> parameters) {
+        createProjectIfNotExists(openShiftClient, projectName);
+        deployScenarioIntoProject(openShiftClient, scenario, projectName, parameters);
     }
 
-    private void createProjectIfNotExists(String projectName) {
+    private static void createProjectIfNotExists(OpenShiftClient openShiftClient, String projectName) {
         Optional<Project> foundProject = openShiftClient.projects().list().getItems().stream()
                                                                                      .filter(n -> n.getMetadata().getName().equals(projectName))
                                                                                      .findAny();
@@ -65,15 +59,9 @@ public class KieOpenShiftProvider implements AutoCloseable {
         }
     }
 
-    private void deployScenarioIntoProject(Scenario scenario, String projectName, Map<String, String> parameters) {
+    private static void deployScenarioIntoProject(OpenShiftClient openShiftClient, Scenario scenario, String projectName, Map<String, String> parameters) {
         String yaml = scenario.getTemplateAsYaml();
         KubernetesList resourceList = openShiftClient.templates().load(new ByteArrayInputStream(yaml.getBytes())).processLocally(parameters);
         openShiftClient.lists().inNamespace(projectName).create(resourceList);
-    }
-
-    @Override
-    public void close() {
-        // Should be closed? Maybe not if passed in constructor.
-        openShiftClient.close();
     }
 }

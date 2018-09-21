@@ -21,9 +21,9 @@ public class KieOpenShiftProviderIntegrationTest extends AbstractCloudTest{
     public void testDeployEmptyScenario() {
         final String projectName = "test-project-" + UUID.randomUUID().toString().substring(0, 4);
 
-        try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
-            Scenario scenario = kieOpenShiftProvider.createScenario();
-            kieOpenShiftProvider.deployScenario(scenario, projectName, Collections.emptyMap());
+        try {
+            Scenario scenario = KieOpenShiftProvider.createScenario();
+            KieOpenShiftProvider.deployScenario(openShiftClient, scenario, projectName, Collections.emptyMap());
 
             Project project = openShiftClient.projects().withName(projectName).get();
             assertThat(project).isNotNull();
@@ -36,13 +36,13 @@ public class KieOpenShiftProviderIntegrationTest extends AbstractCloudTest{
     public void testDeployEmptyScenarioExistingProject() {
         final String projectName = "test-project-" + UUID.randomUUID().toString().substring(0, 4);
 
-        try (KieOpenShiftProvider kieOpenShiftProvider = new KieOpenShiftProvider(openShiftClient)) {
-            Scenario scenario = kieOpenShiftProvider.createScenario();
-            kieOpenShiftProvider.deployScenario(scenario, projectName, Collections.emptyMap());
+        try {
+            Scenario scenario = KieOpenShiftProvider.createScenario();
+            KieOpenShiftProvider.deployScenario(openShiftClient, scenario, projectName, Collections.emptyMap());
 
             waitUntilProjectExists(projectName);
 
-            kieOpenShiftProvider.deployScenario(scenario, projectName, Collections.emptyMap());
+            KieOpenShiftProvider.deployScenario(openShiftClient, scenario, projectName, Collections.emptyMap());
 
             Project project = openShiftClient.projects().withName(projectName).get();
             assertThat(project).isNotNull();
