@@ -60,7 +60,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
                         assertThat(e.getImageChangeParams().getAutomatic()).isTrue();
                         assertThat(e.getImageChangeParams().getContainerNames()).containsExactly(builtMySqlDeployment.getDeploymentName());
                         assertThat(e.getImageChangeParams().getFrom().getKind()).isEqualTo("ImageStreamTag");
-                        assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("${IMAGE_STREAM_NAMESPACE}");
+                        assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("openshift");
                         assertThat(e.getImageChangeParams().getFrom().getName()).isEqualTo("mysql:5.7");
                     });
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getReplicas()).isEqualTo(1);

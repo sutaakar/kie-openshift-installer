@@ -60,7 +60,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
                         assertThat(e.getImageChangeParams().getAutomatic()).isTrue();
                         assertThat(e.getImageChangeParams().getContainerNames()).containsExactly(builtKieServerDeployment.getDeploymentName());
                         assertThat(e.getImageChangeParams().getFrom().getKind()).isEqualTo("ImageStreamTag");
-                        assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("${IMAGE_STREAM_NAMESPACE}");
+                        assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("openshift");
                         // TODO: This config needs to be compared with template compatibility test
                         // assertThat(e.getImageChangeParams().getFrom().getName()).isEqualTo("rhpam71-kieserver-openshift:1.0");
                     });

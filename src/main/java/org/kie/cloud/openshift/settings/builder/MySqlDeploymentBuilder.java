@@ -58,6 +58,7 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
 
     @Override
     protected void configureDeploymentConfig() {
+        String imageStreamNamespace = ConfigurationLoader.getImageStreamNamespaceDefault();
         String mySqlImageStreamName = ConfigurationLoader.getMySqlImageStreamName();
         String mySqlImageStreamTag = ConfigurationLoader.getMySqlImageStreamTag();
 
@@ -76,7 +77,7 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
                                                                                      .withContainerNames(getDeployment().getDeploymentName())
                                                                                      .withNewFrom()
                                                                                          .withKind("ImageStreamTag")
-                                                                                         .withNamespace("${IMAGE_STREAM_NAMESPACE}")
+                                                                                         .withNamespace(imageStreamNamespace)
                                                                                          .withName(mySqlImageStreamName + ":" + mySqlImageStreamTag)
                                                                                      .endFrom()
                                                                                  .endImageChangeParams()

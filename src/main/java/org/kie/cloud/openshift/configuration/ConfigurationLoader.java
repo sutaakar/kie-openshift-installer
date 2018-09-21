@@ -10,6 +10,7 @@ public class ConfigurationLoader {
 
     private static final String KIE_SERVER_IMAGE_STREAM_NAME_PROPERTY = "kie.server.image.stream.name";
     private static final String IMAGE_STREAM_TAG_PROPERTY = "image.stream.tag";
+    private static final String IMAGE_STREAM_NAMESPACE_DEFAULT_PROPERTY = "image.stream.namespace.default";
 
     private static final String KIE_SERVER_MEMORY_LIMIT_PROPERTY = "kie.server.memory.limit";
 
@@ -45,6 +46,10 @@ public class ConfigurationLoader {
 
     public static String getImageStreamTag() {
         return properties.getProperty(IMAGE_STREAM_TAG_PROPERTY);
+    }
+
+    public static String getImageStreamNamespaceDefault() {
+        return properties.getProperty(IMAGE_STREAM_NAMESPACE_DEFAULT_PROPERTY);
     }
 
     public static String getKieServerMemoryLimit() {

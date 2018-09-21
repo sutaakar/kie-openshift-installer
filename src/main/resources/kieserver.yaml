@@ -15,12 +15,3 @@ labels:
 message: A new Process Automation Manager Execution Server application has been created in your
   project. Please be sure to create the secret named "${HTTPS_SECRET}" containing the ${HTTPS_KEYSTORE} file used for
   serving secure content.
-parameters:
-- displayName: ImageStream Namespace
-  description: Namespace in which the ImageStreams for Red Hat Middleware images are
-    installed. These ImageStreams are normally installed in the openshift namespace.
-    You should only need to modify this if you've installed the ImageStreams in a
-    different namespace/project.
-  name: IMAGE_STREAM_NAMESPACE
-  value: openshift
-  required: true

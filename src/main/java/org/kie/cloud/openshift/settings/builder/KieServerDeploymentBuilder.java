@@ -83,6 +83,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
     protected void configureDeploymentConfig() {
         String kieServerImageStreamName = ConfigurationLoader.getKieServerImageStreamName();
         String imageStreamTag = ConfigurationLoader.getImageStreamTag();
+        String imageStreamNamespace = ConfigurationLoader.getImageStreamNamespaceDefault();
         String kieServerMemoryLimit = ConfigurationLoader.getKieServerMemoryLimit();
 
         DeploymentConfig deploymentConfig = new DeploymentConfigBuilder().withApiVersion("v1")
@@ -100,7 +101,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
                                                                                      .withContainerNames(getDeployment().getDeploymentName())
                                                                                      .withNewFrom()
                                                                                          .withKind("ImageStreamTag")
-                                                                                         .withNamespace("${IMAGE_STREAM_NAMESPACE}")
+                                                                                         .withNamespace(imageStreamNamespace)
                                                                                          .withName(kieServerImageStreamName + ":" + imageStreamTag)
                                                                                      .endFrom()
                                                                                  .endImageChangeParams()

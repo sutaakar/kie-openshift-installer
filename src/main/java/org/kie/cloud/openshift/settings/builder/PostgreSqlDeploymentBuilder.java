@@ -59,6 +59,7 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder {
 
     @Override
     protected void configureDeploymentConfig() {
+        String imageStreamNamespace = ConfigurationLoader.getImageStreamNamespaceDefault();
         String postgreSqlImageStreamName = ConfigurationLoader.getPostgreSqlImageStreamName();
         String postgreSqlImageStreamTag = ConfigurationLoader.getPostgreSqlImageStreamTag();
 
@@ -77,7 +78,7 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder {
                                                                                      .withContainerNames(getDeployment().getDeploymentName())
                                                                                      .withNewFrom()
                                                                                          .withKind("ImageStreamTag")
-                                                                                         .withNamespace("${IMAGE_STREAM_NAMESPACE}")
+                                                                                         .withNamespace(imageStreamNamespace)
                                                                                          .withName(postgreSqlImageStreamName + ":" + postgreSqlImageStreamTag)
                                                                                      .endFrom()
                                                                                  .endImageChangeParams()

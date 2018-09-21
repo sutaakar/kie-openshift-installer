@@ -20,6 +20,12 @@ public class ConfigurationLoaderTest extends AbstractCloudTest {
     }
 
     @Test
+    public void testGetKieServerImageStreamNamespaceDefault() {
+        String imageStreamTag = ConfigurationLoader.getImageStreamNamespaceDefault();
+        assertThat(imageStreamTag).isEqualTo("openshift");
+    }
+
+    @Test
     public void testGetKieServerMemoryLimit() {
         String kieServerMemoryLimit = ConfigurationLoader.getKieServerMemoryLimit();
         assertThat(kieServerMemoryLimit).isEqualTo("1Gi");
