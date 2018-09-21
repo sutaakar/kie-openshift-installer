@@ -35,8 +35,8 @@ public class Scenario {
         Map<String, Parameter> parameters = new HashMap<>();
 
         for (Deployment deployment : deployments) {
-            objects.addAll(deployment.getTemplate().getObjects());
-            for (Parameter parameter : deployment.getTemplate().getParameters()) {
+            objects.addAll(deployment.getObjects());
+            for (Parameter parameter : deployment.getParameters()) {
                 parameters.putIfAbsent(parameter.getName(), parameter);
             }
         }

@@ -17,14 +17,12 @@ package org.kie.cloud.openshift.settings.builder;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerPort;
 import io.fabric8.kubernetes.api.model.ContainerPortBuilder;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
-import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.IntOrString;
 import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.api.model.Probe;
@@ -42,7 +40,6 @@ import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.api.model.RouteBuilder;
-import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.configuration.ConfigurationLoader;
 import org.kie.cloud.openshift.deployment.Deployment;
@@ -56,12 +53,12 @@ import org.kie.cloud.openshift.util.NameGenerator;
  */
 public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
 
-    public KieServerDeploymentBuilder(Template kieServerTemplate) {
-        super(kieServerTemplate, NameGenerator.generateDeploymentName("kieserver"));
+    public KieServerDeploymentBuilder() {
+        this(NameGenerator.generateDeploymentName("kieserver"));
     }
 
-    public KieServerDeploymentBuilder(Template kieServerTemplate, String deploymentName) {
-        super(kieServerTemplate, deploymentName);
+    public KieServerDeploymentBuilder(String deploymentName) {
+        super(deploymentName);
     }
 
     @Override
@@ -141,9 +138,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
                                                                          .endSpec()
                                                                          .build();
 
-        List<HasMetadata> objects = getDeployment().getTemplate().getObjects();
-        objects.add(deploymentConfig);
-        getDeployment().getTemplate().setObjects(objects);
+        getDeployment().getObjects().add(deploymentConfig);
     }
 
     @Override
@@ -164,9 +159,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
                                                   .withSelector(Collections.singletonMap("deploymentConfig", getDeployment().getDeploymentName()))
                                               .endSpec()
                                               .build();
-        List<HasMetadata> objects = getDeployment().getTemplate().getObjects();
-        objects.add(service);
-        getDeployment().getTemplate().setObjects(objects);
+        getDeployment().getObjects().add(service);
     }
 
     @Override
@@ -184,9 +177,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
                                             .endPort()
                                         .endSpec()
                                         .build();
-        List<HasMetadata> objects = getDeployment().getTemplate().getObjects();
-        objects.add(route);
-        getDeployment().getTemplate().setObjects(objects);
+        getDeployment().getObjects().add(route);
     }
 
     @Override
@@ -257,9 +248,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
                                                  .endTls()
                                              .endSpec()
                                              .build();
-        List<HasMetadata> objects = getDeployment().getTemplate().getObjects();
-        objects.add(httpsRoute);
-        getDeployment().getTemplate().setObjects(objects);
+        getDeployment().getObjects().add(httpsRoute);
 
         // Adjust service ports
         ServicePort httpsServicePort = new ServicePortBuilder().withName("https")

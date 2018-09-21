@@ -5,7 +5,6 @@ import java.util.List;
 
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
-import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaimBuilder;
 import io.fabric8.kubernetes.api.model.PodSpec;
@@ -14,15 +13,14 @@ import io.fabric8.kubernetes.api.model.Volume;
 import io.fabric8.kubernetes.api.model.VolumeBuilder;
 import io.fabric8.kubernetes.api.model.VolumeMount;
 import io.fabric8.kubernetes.api.model.VolumeMountBuilder;
-import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.deployment.Deployment;
 
 public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
 
     private Deployment deployment;
 
-    protected AbstractDeploymentBuilder(Template deploymentTemplate, String deploymentName) {
-        deployment = new Deployment(deploymentTemplate, deploymentName);
+    protected AbstractDeploymentBuilder(String deploymentName) {
+        deployment = new Deployment(deploymentName);
         configureDeploymentConfig();
         configureService();
         configureRoute();
@@ -91,9 +89,7 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
                                                                                                  .endResources()
                                                                                              .endSpec()
                                                                                              .build();
-        List<HasMetadata> objects = getDeployment().getTemplate().getObjects();
-        objects.add(persistentVolumeClaim);
-        getDeployment().getTemplate().setObjects(objects);
+        getDeployment().getObjects().add(persistentVolumeClaim);
     }
 
     protected abstract void initDefaultValues();

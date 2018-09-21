@@ -16,8 +16,6 @@ import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.api.model.RouteBuilder;
-import io.fabric8.openshift.api.model.Template;
-import io.fabric8.openshift.api.model.TemplateBuilder;
 import org.junit.Test;
 import org.kie.cloud.openshift.AbstractCloudTest;
 
@@ -25,8 +23,7 @@ public class DeploymentTest extends AbstractCloudTest{
 
     @Test
     public void testGetUnsecureServices() {
-        Template template = getTemplateWithServiceAndRouteCombinations();
-        Deployment deployment = new Deployment(template, "custom");
+        Deployment deployment = getDeploymentWithServiceAndRouteCombinations("custom");
         List<Service> services = deployment.getUnsecureServices();
 
         assertThat(services).hasSize(1);
@@ -35,8 +32,7 @@ public class DeploymentTest extends AbstractCloudTest{
 
     @Test
     public void testGetSecureServices() {
-        Template template = getTemplateWithServiceAndRouteCombinations();
-        Deployment deployment = new Deployment(template, "custom");
+        Deployment deployment = getDeploymentWithServiceAndRouteCombinations("custom");
         List<Service> services = deployment.getSecureServices();
 
         assertThat(services).hasSize(1);
@@ -45,18 +41,16 @@ public class DeploymentTest extends AbstractCloudTest{
 
     @Test
     public void testGetServices() {
-        Template template = getTemplateWithServiceAndRouteCombinations();
-        Deployment deployment = new Deployment(template, "custom");
+        Deployment deployment = getDeploymentWithServiceAndRouteCombinations("custom");
         List<Service> services = deployment.getServices();
 
         assertThat(services).hasSize(2);
-        assertThat(services).extracting(n -> n.getMetadata().getName()).containsExactly("secured-service", "unsecured-service");
+        assertThat(services).extracting(n -> n.getMetadata().getName()).contains("secured-service", "unsecured-service");
     }
 
     @Test
     public void testGetUnsecureRoutes() {
-        Template template = getTemplateWithServiceAndRouteCombinations();
-        Deployment deployment = new Deployment(template, "custom");
+        Deployment deployment = getDeploymentWithServiceAndRouteCombinations("custom");
         List<Route> routes = deployment.getUnsecureRoutes();
 
         assertThat(routes).hasSize(1);
@@ -65,8 +59,7 @@ public class DeploymentTest extends AbstractCloudTest{
 
     @Test
     public void testGetSecureRoutes() {
-        Template template = getTemplateWithServiceAndRouteCombinations();
-        Deployment deployment = new Deployment(template, "custom");
+        Deployment deployment = getDeploymentWithServiceAndRouteCombinations("custom");
         List<Route> routes = deployment.getSecureRoutes();
 
         assertThat(routes).hasSize(1);
@@ -75,8 +68,7 @@ public class DeploymentTest extends AbstractCloudTest{
 
     @Test
     public void testGetDeploymentConfig() {
-        Template template = getTemplateWithServiceAndRouteCombinations();
-        Deployment deployment = new Deployment(template, "custom");
+        Deployment deployment = getDeploymentWithServiceAndRouteCombinations("custom");
         DeploymentConfig deploymentConfig = deployment.getDeploymentConfig();
 
         assertThat(deploymentConfig.getMetadata().getName()).isEqualTo("my-deployment");
@@ -84,8 +76,7 @@ public class DeploymentTest extends AbstractCloudTest{
 
     @Test
     public void testGetEnvironmentVariableValue() {
-        Template template = getTemplateWithServiceAndRouteCombinations();
-        Deployment deployment = new Deployment(template, "custom");
+        Deployment deployment = getDeploymentWithServiceAndRouteCombinations("custom");
         String environmentVariableValue = deployment.getEnvironmentVariableValue("custom-variable-name");
 
         assertThat(environmentVariableValue).isEqualTo("custom-variable-value");
@@ -93,8 +84,7 @@ public class DeploymentTest extends AbstractCloudTest{
 
     @Test
     public void testGetEnvironmentVariableValueNotExisting() {
-        Template template = getTemplateWithServiceAndRouteCombinations();
-        Deployment deployment = new Deployment(template, "custom");
+        Deployment deployment = getDeploymentWithServiceAndRouteCombinations("custom");
 
         assertThatThrownBy(() -> deployment.getEnvironmentVariableValue("not-existing-variable-name")).isInstanceOf(RuntimeException.class)
                                                                                                       .hasMessageContaining("Environment variable with name not-existing-variable-name not found.");
@@ -102,19 +92,22 @@ public class DeploymentTest extends AbstractCloudTest{
 
     @Test
     public void testGetPersistentVolumeClaims() {
-        Template template = getTemplateWithServiceAndRouteCombinations();
-        Deployment deployment = new Deployment(template, "custom");
+        Deployment deployment = getDeploymentWithServiceAndRouteCombinations("custom");
         List<PersistentVolumeClaim> persistentVolumeClaims = deployment.getPersistentVolumeClaims();
 
         assertThat(persistentVolumeClaims).hasSize(1);
         assertThat(persistentVolumeClaims.get(0).getMetadata().getName()).isEqualTo("my-persistent-volume-claim");
     }
 
-    private Template getTemplateWithServiceAndRouteCombinations() {
+    private Deployment getDeploymentWithServiceAndRouteCombinations(String deploymentName) {
+        Deployment deployment = new Deployment(deploymentName);
+
         Service unsecureService = new ServiceBuilder().withNewMetadata()
                                                           .withName("unsecured-service")
                                                       .endMetadata()
                                                       .build();
+        deployment.getObjects().add(unsecureService);
+
         Route unsecureRoute = new RouteBuilder().withNewMetadata()
                                                     .withName("unsecure-route")
                                                 .endMetadata()
@@ -125,10 +118,14 @@ public class DeploymentTest extends AbstractCloudTest{
                                                     .endTo()
                                                 .endSpec()
                                                 .build();
+        deployment.getObjects().add(unsecureRoute);
+
         Service secureService = new ServiceBuilder().withNewMetadata()
                                                         .withName("secured-service")
                                                     .endMetadata()
                                                     .build();
+        deployment.getObjects().add(secureService);
+
         Route secureRoute = new RouteBuilder().withNewMetadata()
                                                   .withName("secure-route")
                                               .endMetadata()
@@ -142,6 +139,8 @@ public class DeploymentTest extends AbstractCloudTest{
                                                   .endTls()
                                               .endSpec()
                                               .build();
+        deployment.getObjects().add(secureRoute);
+
         Container container = new ContainerBuilder().withEnv(new EnvVar("custom-variable-name", "custom-variable-value", null))
                                                     .build();
         DeploymentConfig deploymentConfig = new DeploymentConfigBuilder().withNewMetadata()
@@ -155,10 +154,14 @@ public class DeploymentTest extends AbstractCloudTest{
                                                                              .endTemplate()
                                                                          .endSpec()
                                                                          .build();
+        deployment.getObjects().add(deploymentConfig);
+
         PersistentVolumeClaim persistentVolumeClaim = new PersistentVolumeClaimBuilder().withNewMetadata()
                                                                                             .withName("my-persistent-volume-claim")
                                                                                         .endMetadata()
                                                                                         .build();
-        return new TemplateBuilder().withObjects(unsecureService, unsecureRoute, secureService, secureRoute, deploymentConfig, persistentVolumeClaim).build();
+        deployment.getObjects().add(persistentVolumeClaim);
+
+        return deployment;
     }
 }

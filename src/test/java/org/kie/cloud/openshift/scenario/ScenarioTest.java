@@ -16,17 +16,13 @@ import org.kie.cloud.openshift.AbstractCloudTest;
 import org.kie.cloud.openshift.deployment.Deployment;
 import org.kie.cloud.openshift.settings.builder.KieServerDeploymentBuilder;
 import org.kie.cloud.openshift.settings.builder.MySqlDeploymentBuilder;
-import org.kie.cloud.openshift.template.TemplateLoader;
 
 public class ScenarioTest extends AbstractCloudTest{
 
     @Test
     public void testGetScenarioAsYamlTemplate() {
-        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
-        Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
-
-        KieServerDeploymentBuilder kieServersettingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
-        MySqlDeploymentBuilder mySqlSettingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
+        KieServerDeploymentBuilder kieServersettingsBuilder = new KieServerDeploymentBuilder();
+        MySqlDeploymentBuilder mySqlSettingsBuilder = new MySqlDeploymentBuilder();
 
         Deployment kieServerDeployment = kieServersettingsBuilder.build();
         Deployment mySqlDeployment = mySqlSettingsBuilder.build();
@@ -55,10 +51,9 @@ public class ScenarioTest extends AbstractCloudTest{
         Parameter templateParameter = new ParameterBuilder().withName("custom-name").withValue("custom-value").build();
         Parameter duplicatedTemplateParameter = new ParameterBuilder().withName("custom-name").withValue("custom-value2").build();
 
-        Template customTemplate = new Template();
-        customTemplate.setParameters(Arrays.asList(templateParameter, duplicatedTemplateParameter));
+        Deployment customDeployment = new Deployment("custom");
+        customDeployment.getParameters().addAll(Arrays.asList(templateParameter, duplicatedTemplateParameter));
 
-        Deployment customDeployment = new Deployment(customTemplate, "custom");
         Scenario customScenario = new Scenario();
         customScenario.addDeployment(customDeployment);
 

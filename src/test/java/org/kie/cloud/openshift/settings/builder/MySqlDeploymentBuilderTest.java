@@ -8,31 +8,25 @@ import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.Volume;
 import io.fabric8.kubernetes.api.model.VolumeMount;
-import io.fabric8.openshift.api.model.Template;
 import org.junit.Test;
 import org.kie.cloud.openshift.AbstractCloudTest;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.deployment.Deployment;
-import org.kie.cloud.openshift.template.TemplateLoader;
 
 public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildMySqlDeployment() {
-        Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
-
-        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
         Deployment builtMySqlDeployment = settingsBuilder.build();
 
         assertThat(builtMySqlDeployment).isNotNull();
-        assertThat(builtMySqlDeployment.getTemplate().getMetadata().getName()).contains("-mysql");
+        assertThat(builtMySqlDeployment.getObjects()).size().isGreaterThan(0);
     }
 
     @Test
     public void testBuildMySqlDeploymentCustomDeploymentName() {
-        Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
-
-        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate, "custom-sql");
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder("custom-sql");
         Deployment builtMySqlDeployment = settingsBuilder.build();
 
         assertThat(builtMySqlDeployment).isNotNull();
@@ -41,9 +35,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildMySqlDeploymentDeploymentConfig() {
-        Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
-
-        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
         Deployment builtMySqlDeployment = settingsBuilder.build();
 
         assertThat(builtMySqlDeployment).isNotNull();
@@ -81,9 +73,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildMySqlDeploymentService() {
-        Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
-
-        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
         Deployment builtMySqlDeployment = settingsBuilder.build();
 
         assertThat(builtMySqlDeployment).isNotNull();
@@ -98,9 +88,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildMySqlDeploymentDefaultValues() {
-        Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
-
-        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
         Deployment builtMySqlDeployment = settingsBuilder.build();
 
         assertThat(builtMySqlDeployment).isNotNull();
@@ -117,9 +105,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildMySqlDeploymentLivenessProbe() {
-        Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
-
-        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
         Deployment builtMySqlDeployment = settingsBuilder.build();
         Probe livenessProbe = builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getLivenessProbe();
 
@@ -131,9 +117,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildMySqlDeploymentReadinessProbe() {
-        Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
-
-        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
         Deployment builtMySqlDeployment = settingsBuilder.build();
         Probe readinessProbe = builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getReadinessProbe();
 
@@ -145,9 +129,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildMySqlDeploymentWithMySqlUser() {
-        Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
-
-        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
         Deployment builtMySqlDeployment = settingsBuilder.withDatabaseUser("mySqlName", "mySqlPassword")
                                                          .build();
 
@@ -162,9 +144,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildMySqlDeploymentWithDbName() {
-        Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
-
-        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
         Deployment builtMySqlDeployment = settingsBuilder.withDatabaseName("custom-db")
                                                          .build();
 
@@ -176,9 +156,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildMySqlDeploymentWithPersistence() {
-        Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
-
-        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
         Deployment builtMySqlDeployment = settingsBuilder.makePersistent()
                                                          .build();
 

@@ -1,26 +1,32 @@
 package org.kie.cloud.openshift.deployment;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.openshift.api.model.DeploymentConfig;
+import io.fabric8.openshift.api.model.Parameter;
 import io.fabric8.openshift.api.model.Route;
-import io.fabric8.openshift.api.model.Template;
 
 public class Deployment {
 
-    private Template template;
+    private List<HasMetadata> objects = new ArrayList<>();
+    private List<Parameter> parameters = new ArrayList<>();
     private String deploymentName;
 
-    public Deployment(Template template, String deploymentName) {
-        this.template = template;
+    public Deployment(String deploymentName) {
         this.deploymentName = deploymentName;
     }
 
-    public Template getTemplate() {
-        return template;
+    public List<HasMetadata> getObjects() {
+        return objects;
+    }
+
+    public List<Parameter> getParameters() {
+        return parameters;
     }
 
     public String getDeploymentName() {
@@ -46,46 +52,41 @@ public class Deployment {
     }
 
     public List<Service> getServices() {
-        return template.getObjects()
-                       .stream()
-                       .filter(o -> o instanceof Service)
-                       .map(o -> (Service) o)
-                       .collect(Collectors.toList());
+        return objects.stream()
+                      .filter(o -> o instanceof Service)
+                      .map(o -> (Service) o)
+                      .collect(Collectors.toList());
     }
 
     public List<Route> getUnsecureRoutes() {
-        return template.getObjects()
-                       .stream()
-                       .filter(o -> o instanceof Route)
-                       .map(o -> (Route) o)
-                       .filter(r -> r.getSpec().getTls() == null)
-                       .collect(Collectors.toList());
+        return objects.stream()
+                      .filter(o -> o instanceof Route)
+                      .map(o -> (Route) o)
+                      .filter(r -> r.getSpec().getTls() == null)
+                      .collect(Collectors.toList());
     }
 
     public List<Route> getSecureRoutes() {
-        return template.getObjects()
-                       .stream()
-                       .filter(o -> o instanceof Route)
-                       .map(o -> (Route) o)
-                       .filter(r -> r.getSpec().getTls() != null)
-                       .collect(Collectors.toList());
+        return objects.stream()
+                      .filter(o -> o instanceof Route)
+                      .map(o -> (Route) o)
+                      .filter(r -> r.getSpec().getTls() != null)
+                      .collect(Collectors.toList());
     }
 
     public DeploymentConfig getDeploymentConfig() {
-        return template.getObjects()
-                       .stream()
-                       .filter(o -> o instanceof DeploymentConfig)
-                       .map(o -> (DeploymentConfig) o)
-                       .findAny()
-                       .orElseThrow(() -> new RuntimeException("No Deployment config found."));
+        return objects.stream()
+                      .filter(o -> o instanceof DeploymentConfig)
+                      .map(o -> (DeploymentConfig) o)
+                      .findAny()
+                      .orElseThrow(() -> new RuntimeException("No Deployment config found."));
     }
 
     public List<PersistentVolumeClaim> getPersistentVolumeClaims() {
-        return template.getObjects()
-                       .stream()
-                       .filter(o -> o instanceof PersistentVolumeClaim)
-                       .map(o -> (PersistentVolumeClaim) o)
-                       .collect(Collectors.toList());
+        return objects.stream()
+                      .filter(o -> o instanceof PersistentVolumeClaim)
+                      .map(o -> (PersistentVolumeClaim) o)
+                      .collect(Collectors.toList());
     }
 
     public String getEnvironmentVariableValue(String environmentVariableName) {

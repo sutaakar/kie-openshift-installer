@@ -8,31 +8,25 @@ import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.Volume;
 import io.fabric8.kubernetes.api.model.VolumeMount;
-import io.fabric8.openshift.api.model.Template;
 import org.junit.Test;
 import org.kie.cloud.openshift.AbstractCloudTest;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.deployment.Deployment;
-import org.kie.cloud.openshift.template.TemplateLoader;
 
 public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildKieServerDeployment() {
-        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
-
-        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.build();
 
         assertThat(builtKieServerDeployment).isNotNull();
-        assertThat(builtKieServerDeployment.getTemplate().getMetadata().getName()).contains("-kieserver");
+        assertThat(builtKieServerDeployment.getObjects()).size().isGreaterThan(0);
     }
 
     @Test
     public void testBuildKieServerDeploymentCustomDeploymentName() {
-        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
-
-        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate, "custom-server");
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder("custom-server");
         Deployment builtKieServerDeployment = settingsBuilder.build();
 
         assertThat(builtKieServerDeployment).isNotNull();
@@ -41,9 +35,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildKieServerDeploymentDeploymentConfig() {
-        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
-
-        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.build();
 
         assertThat(builtKieServerDeployment).isNotNull();
@@ -88,9 +80,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildKieServerDeploymentService() {
-        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
-
-        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.build();
 
         assertThat(builtKieServerDeployment).isNotNull();
@@ -108,9 +98,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildKieServerDeploymentRoute() {
-        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
-
-        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.build();
 
         assertThat(builtKieServerDeployment).isNotNull();
@@ -123,9 +111,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildKieServerDeploymentDefaultValues() {
-        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
-
-        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.build();
 
         assertThat(builtKieServerDeployment).isNotNull();
@@ -139,9 +125,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildKieServerDeploymentLivenessProbe() {
-        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
-
-        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.withKieServerUser("kieServerName", "kieServerPassword").build();
         Probe livenessProbe = builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getLivenessProbe();
 
@@ -155,9 +139,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildKieServerDeploymentReadinessProbe() {
-        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
-
-        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.withKieServerUser("kieServerName", "kieServerPassword").build();
         Probe readinessProbe = builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getReadinessProbe();
 
@@ -171,9 +153,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildKieServerDeploymentWithKieServerUser() {
-        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
-
-        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.withKieServerUser("kieServerName", "kieServerPassword")
                                                              .build();
 
@@ -188,9 +168,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildKieServerDeploymentWithHttps() {
-        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
-
-        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.withHttps("custom-secret", "custom-keystore", "custom-name", "custom-password")
                                                              .build();
 
@@ -254,15 +232,12 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildKieServerDeploymentWithMySqlDatabase() {
-        Template mySqlTemplate = new TemplateLoader(openShiftClient).loadMySqlTemplate();
-        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
-
-        MySqlDeploymentBuilder mySqlSettingsBuilder = new MySqlDeploymentBuilder(mySqlTemplate);
+        MySqlDeploymentBuilder mySqlSettingsBuilder = new MySqlDeploymentBuilder();
         Deployment builtMySqlDeployment = mySqlSettingsBuilder.withDatabaseName("custom-db")
                                                               .withDatabaseUser("mySqlName", "mySqlPassword")
                                                               .build();
 
-        KieServerDeploymentBuilder kieServerSettingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        KieServerDeploymentBuilder kieServerSettingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = kieServerSettingsBuilder.connectToMySqlDatabase(builtMySqlDeployment)
                                                                       .build();
 
@@ -310,15 +285,12 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildKieServerDeploymentWithPostgreSqlDatabase() {
-        Template postgreSqlTemplate = new TemplateLoader(openShiftClient).loadPostgreSqlTemplate();
-        Template kieServerTemplate = new TemplateLoader(openShiftClient).loadKieServerTemplate();
-
-        PostgreSqlDeploymentBuilder postgreSqlSettingsBuilder = new PostgreSqlDeploymentBuilder(postgreSqlTemplate);
+        PostgreSqlDeploymentBuilder postgreSqlSettingsBuilder = new PostgreSqlDeploymentBuilder();
         Deployment builtPostgreSqlDeployment = postgreSqlSettingsBuilder.withDatabaseName("custom-db")
                                                                         .withDatabaseUser("postgreSqlName", "postgreSqlPassword")
                                                                         .build();
 
-        KieServerDeploymentBuilder kieServerSettingsBuilder = new KieServerDeploymentBuilder(kieServerTemplate);
+        KieServerDeploymentBuilder kieServerSettingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = kieServerSettingsBuilder.connectToPostgreSqlDatabase(builtPostgreSqlDeployment)
                                                                       .build();
 

@@ -16,10 +16,8 @@
 package org.kie.cloud.openshift.settings.builder;
 
 import java.util.Collections;
-import java.util.List;
 
 import io.fabric8.kubernetes.api.model.Container;
-import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.kubernetes.api.model.ProbeBuilder;
 import io.fabric8.kubernetes.api.model.Service;
@@ -28,7 +26,6 @@ import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServicePortBuilder;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
-import io.fabric8.openshift.api.model.Template;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.configuration.ConfigurationLoader;
 import org.kie.cloud.openshift.util.NameGenerator;
@@ -41,12 +38,12 @@ import org.kie.cloud.openshift.util.NameGenerator;
  */
 public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
 
-    public MySqlDeploymentBuilder(Template mySqlTemplate) {
-        super(mySqlTemplate, NameGenerator.generateDeploymentName("mysql"));
+    public MySqlDeploymentBuilder() {
+        this(NameGenerator.generateDeploymentName("mysql"));
     }
 
-    public MySqlDeploymentBuilder(Template mySqlTemplate, String deploymentName) {
-        super(mySqlTemplate, deploymentName);
+    public MySqlDeploymentBuilder(String deploymentName) {
+        super(deploymentName);
     }
 
     @Override
@@ -108,9 +105,7 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
                                                                          .endSpec()
                                                                          .build();
 
-        List<HasMetadata> objects = getDeployment().getTemplate().getObjects();
-        objects.add(deploymentConfig);
-        getDeployment().getTemplate().setObjects(objects);
+        getDeployment().getObjects().add(deploymentConfig);
     }
 
     @Override
@@ -127,9 +122,7 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
                                                   .withSelector(Collections.singletonMap("deploymentConfig", getDeployment().getDeploymentName()))
                                               .endSpec()
                                               .build();
-        List<HasMetadata> objects = getDeployment().getTemplate().getObjects();
-        objects.add(service);
-        getDeployment().getTemplate().setObjects(objects);
+        getDeployment().getObjects().add(service);
     }
 
     @Override
