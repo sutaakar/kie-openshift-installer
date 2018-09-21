@@ -43,7 +43,7 @@ public class ConfigurationLoader {
         return properties.getProperty(KIE_SERVER_IMAGE_STREAM_NAME_PROPERTY);
     }
 
-    public static String getKieServerImageStreamTag() {
+    public static String getImageStreamTag() {
         return properties.getProperty(IMAGE_STREAM_TAG_PROPERTY);
     }
 

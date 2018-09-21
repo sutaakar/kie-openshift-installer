@@ -15,8 +15,8 @@ public class ConfigurationLoaderTest extends AbstractCloudTest {
 
     @Test
     public void testGetKieServerImageStreamTag() {
-        String kieServerImageStreamTag = ConfigurationLoader.getKieServerImageStreamTag();
-        assertThat(kieServerImageStreamTag).containsPattern("[0-9]\\.[0-9]*");
+        String imageStreamTag = ConfigurationLoader.getImageStreamTag();
+        assertThat(imageStreamTag).containsPattern("[0-9]\\.[0-9]*");
     }
 
     @Test
