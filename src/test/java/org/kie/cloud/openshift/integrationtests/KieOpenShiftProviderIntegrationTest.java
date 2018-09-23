@@ -22,7 +22,7 @@ public class KieOpenShiftProviderIntegrationTest extends AbstractCloudTest{
         final String projectName = "test-project-" + UUID.randomUUID().toString().substring(0, 4);
 
         try {
-            Scenario scenario = KieOpenShiftProvider.createScenario();
+            Scenario scenario = KieOpenShiftProvider.createScenarioBuilder().build();
             KieOpenShiftProvider.deployScenario(openShiftClient, scenario, projectName, Collections.emptyMap());
 
             Project project = openShiftClient.projects().withName(projectName).get();
@@ -37,7 +37,7 @@ public class KieOpenShiftProviderIntegrationTest extends AbstractCloudTest{
         final String projectName = "test-project-" + UUID.randomUUID().toString().substring(0, 4);
 
         try {
-            Scenario scenario = KieOpenShiftProvider.createScenario();
+            Scenario scenario = KieOpenShiftProvider.createScenarioBuilder().build();
             KieOpenShiftProvider.deployScenario(openShiftClient, scenario, projectName, Collections.emptyMap());
 
             waitUntilProjectExists(projectName);

@@ -10,6 +10,7 @@ import io.fabric8.openshift.api.model.ProjectRequest;
 import io.fabric8.openshift.api.model.ProjectRequestBuilder;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.kie.cloud.openshift.scenario.Scenario;
+import org.kie.cloud.openshift.scenario.builder.ScenarioBuilder;
 import org.kie.cloud.openshift.settings.builder.KieServerDeploymentBuilder;
 import org.kie.cloud.openshift.settings.builder.MySqlDeploymentBuilder;
 import org.kie.cloud.openshift.settings.builder.PostgreSqlDeploymentBuilder;
@@ -40,8 +41,8 @@ public class KieOpenShiftProvider {
         return new PostgreSqlDeploymentBuilder(deploymentName);
     }
 
-    public static Scenario createScenario() {
-        return new Scenario();
+    public static ScenarioBuilder createScenarioBuilder() {
+        return new ScenarioBuilder();
     }
 
     public static void deployScenario(OpenShiftClient openShiftClient, Scenario scenario, String projectName, Map<String, String> parameters) {

@@ -35,9 +35,10 @@ public class KieServerIntegrationTest extends AbstractCloudIntegrationTest {
                                                              .withKieServerUser(kieServerUsername, kieServerPassword)
                                                              .connectToMySqlDatabase(mySqlDeployment)
                                                              .build();
-        Scenario kieServerScenario = KieOpenShiftProvider.createScenario();
-        kieServerScenario.addDeployment(kieServerDeployment);
-        kieServerScenario.addDeployment(mySqlDeployment);
+        Scenario kieServerScenario = KieOpenShiftProvider.createScenarioBuilder()
+                                                         .withDeployment(kieServerDeployment)
+                                                         .withDeployment(mySqlDeployment)
+                                                         .build();
         KieOpenShiftProvider.deployScenario(openShiftClient, kieServerScenario, projectName, Collections.singletonMap(OpenShiftImageConstants.IMAGE_STREAM_NAMESPACE, projectName));
 
         // Wait until ready
@@ -69,9 +70,10 @@ public class KieServerIntegrationTest extends AbstractCloudIntegrationTest {
                                                              .withKieServerUser(kieServerUsername, kieServerPassword)
                                                              .connectToPostgreSqlDatabase(postgreSqlDeployment)
                                                              .build();
-        Scenario kieServerScenario = KieOpenShiftProvider.createScenario();
-        kieServerScenario.addDeployment(kieServerDeployment);
-        kieServerScenario.addDeployment(postgreSqlDeployment);
+        Scenario kieServerScenario = KieOpenShiftProvider.createScenarioBuilder()
+                                                         .withDeployment(kieServerDeployment)
+                                                         .withDeployment(postgreSqlDeployment)
+                                                         .build();
         KieOpenShiftProvider.deployScenario(openShiftClient, kieServerScenario, projectName, Collections.singletonMap(OpenShiftImageConstants.IMAGE_STREAM_NAMESPACE, projectName));
 
         // Wait until ready

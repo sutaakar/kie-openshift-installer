@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 import org.kie.cloud.openshift.scenario.Scenario;
+import org.kie.cloud.openshift.scenario.builder.ScenarioBuilder;
 import org.kie.cloud.openshift.settings.builder.KieServerDeploymentBuilder;
 import org.kie.cloud.openshift.settings.builder.MySqlDeploymentBuilder;
 import org.kie.cloud.openshift.settings.builder.PostgreSqlDeploymentBuilder;
@@ -51,7 +52,7 @@ public class KieOpenShiftProviderTest extends AbstractCloudTest{
 
     @Test
     public void testCreateScenario() {
-        Scenario scenario = KieOpenShiftProvider.createScenario();
-        assertThat(scenario).isNotNull();
+        ScenarioBuilder scenarioBuilder = KieOpenShiftProvider.createScenarioBuilder();
+        assertThat(scenarioBuilder).isNotNull();
     }
 }
