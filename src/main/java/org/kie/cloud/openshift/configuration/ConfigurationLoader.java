@@ -41,34 +41,39 @@ public class ConfigurationLoader {
     }
 
     public static String getKieServerImageStreamName() {
-        return properties.getProperty(KIE_SERVER_IMAGE_STREAM_NAME_PROPERTY);
+        return getConfigurationProperty(KIE_SERVER_IMAGE_STREAM_NAME_PROPERTY);
     }
 
     public static String getImageStreamTag() {
-        return properties.getProperty(IMAGE_STREAM_TAG_PROPERTY);
+        return getConfigurationProperty(IMAGE_STREAM_TAG_PROPERTY);
     }
 
     public static String getImageStreamNamespaceDefault() {
-        return properties.getProperty(IMAGE_STREAM_NAMESPACE_DEFAULT_PROPERTY);
+        return getConfigurationProperty(IMAGE_STREAM_NAMESPACE_DEFAULT_PROPERTY);
     }
 
     public static String getKieServerMemoryLimit() {
-        return properties.getProperty(KIE_SERVER_MEMORY_LIMIT_PROPERTY);
+        return getConfigurationProperty(KIE_SERVER_MEMORY_LIMIT_PROPERTY);
     }
 
     public static String getMySqlImageStreamName() {
-        return properties.getProperty(MYSQL_IMAGE_STREAM_NAME_PROPERTY);
+        return getConfigurationProperty(MYSQL_IMAGE_STREAM_NAME_PROPERTY);
     }
 
     public static String getMySqlImageStreamTag() {
-        return properties.getProperty(MYSQL_IMAGE_STREAM_TAG_PROPERTY);
+        return getConfigurationProperty(MYSQL_IMAGE_STREAM_TAG_PROPERTY);
     }
 
     public static String getPostgreSqlImageStreamName() {
-        return properties.getProperty(POSTGRESQL_IMAGE_STREAM_NAME_PROPERTY);
+        return getConfigurationProperty(POSTGRESQL_IMAGE_STREAM_NAME_PROPERTY);
     }
 
     public static String getPostgreSqlImageStreamTag() {
-        return properties.getProperty(POSTGRESQL_IMAGE_STREAM_TAG_PROPERTY);
+        return getConfigurationProperty(POSTGRESQL_IMAGE_STREAM_TAG_PROPERTY);
+    }
+
+    private static String getConfigurationProperty(String configurationPropertyname) {
+        String defaultPropertyValue = properties.getProperty(configurationPropertyname);
+        return System.getProperty(configurationPropertyname, defaultPropertyValue);
     }
 }

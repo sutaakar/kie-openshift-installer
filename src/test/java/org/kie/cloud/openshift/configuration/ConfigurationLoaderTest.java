@@ -8,6 +8,23 @@ import org.kie.cloud.openshift.AbstractCloudTest;
 public class ConfigurationLoaderTest extends AbstractCloudTest {
 
     @Test
+    public void testGetKieServerImageStreamNamespaceDefault() {
+        String imageStreamTag = ConfigurationLoader.getImageStreamNamespaceDefault();
+        assertThat(imageStreamTag).isEqualTo("openshift");
+    }
+
+    @Test
+    public void testGetKieServerImageStreamNamespaceFromSystemProperty() {
+        System.setProperty("image.stream.namespace.default", "custom-namespace");
+        try {
+            String imageStreamTag = ConfigurationLoader.getImageStreamNamespaceDefault();
+            assertThat(imageStreamTag).isEqualTo("custom-namespace");
+        } finally {
+            System.clearProperty("image.stream.namespace.default");
+        }
+    }
+
+    @Test
     public void testGetKieServerImageStreamName() {
         String kieServerImageStreamName = ConfigurationLoader.getKieServerImageStreamName();
         assertThat(kieServerImageStreamName).contains("kieserver-openshift");
@@ -17,12 +34,6 @@ public class ConfigurationLoaderTest extends AbstractCloudTest {
     public void testGetKieServerImageStreamTag() {
         String imageStreamTag = ConfigurationLoader.getImageStreamTag();
         assertThat(imageStreamTag).containsPattern("[0-9]\\.[0-9]*");
-    }
-
-    @Test
-    public void testGetKieServerImageStreamNamespaceDefault() {
-        String imageStreamTag = ConfigurationLoader.getImageStreamNamespaceDefault();
-        assertThat(imageStreamTag).isEqualTo("openshift");
     }
 
     @Test
