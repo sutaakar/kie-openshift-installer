@@ -231,6 +231,20 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildKieServerDeploymentWithCustomImageStreamNamespace() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withImageStreamNamespace("custom-namespace")
+                                                             .build();
+
+        assertThat(builtKieServerDeployment).isNotNull();
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ImageChange"))
+                    .hasOnlyOneElementSatisfying(e -> {
+                        assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("custom-namespace");
+                    });
+    }
+
+    @Test
     public void testBuildKieServerDeploymentWithMySqlDatabase() {
         MySqlDeploymentBuilder mySqlSettingsBuilder = new MySqlDeploymentBuilder();
         Deployment builtMySqlDeployment = mySqlSettingsBuilder.withDatabaseName("custom-db")

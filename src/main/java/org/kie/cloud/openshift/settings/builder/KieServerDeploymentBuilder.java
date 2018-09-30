@@ -289,6 +289,14 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
         return this;
     }
 
+    public KieServerDeploymentBuilder withImageStreamNamespace(String imageStreamNamespace) {
+        getDeployment().getDeploymentConfig().getSpec().getTriggers().stream()
+                                                                     .filter(t -> t.getType().equals("ImageChange"))
+                                                                     .findAny()
+                                                                     .ifPresent(t -> t.getImageChangeParams().getFrom().setNamespace(imageStreamNamespace));
+        return this;
+    }
+
     public KieServerDeploymentBuilder connectToMySqlDatabase(Deployment databaseDeployment) {
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DIALECT, "org.hibernate.dialect.MySQL5Dialect");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DS, "java:/jboss/datasources/kie");
