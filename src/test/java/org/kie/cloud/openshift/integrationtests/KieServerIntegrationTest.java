@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import org.junit.Test;
 import org.kie.cloud.openshift.KieOpenShiftProvider;
-import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.deployment.Deployment;
 import org.kie.cloud.openshift.scenario.Scenario;
 import org.kie.server.api.model.KieServerInfo;
@@ -32,6 +31,7 @@ public class KieServerIntegrationTest extends AbstractCloudIntegrationTest {
                                                          .withDatabaseName("mydb")
                                                          .build();
         Deployment kieServerDeployment = KieOpenShiftProvider.createKieServerDeploymentBuilder()
+                                                             .withImageStreamNamespace(projectName)
                                                              .withKieServerUser(kieServerUsername, kieServerPassword)
                                                              .connectToMySqlDatabase(mySqlDeployment)
                                                              .build();
@@ -39,7 +39,7 @@ public class KieServerIntegrationTest extends AbstractCloudIntegrationTest {
                                                          .withDeployment(kieServerDeployment)
                                                          .withDeployment(mySqlDeployment)
                                                          .build();
-        KieOpenShiftProvider.deployScenario(openShiftClient, kieServerScenario, projectName, Collections.singletonMap(OpenShiftImageConstants.IMAGE_STREAM_NAMESPACE, projectName));
+        KieOpenShiftProvider.deployScenario(openShiftClient, kieServerScenario, projectName, Collections.emptyMap());
 
         // Wait until ready
         List<DeploymentConfig> items = openShiftClient.deploymentConfigs().inNamespace(projectName).list().getItems();
@@ -67,6 +67,7 @@ public class KieServerIntegrationTest extends AbstractCloudIntegrationTest {
                                                               .withDatabaseName("mydb")
                                                               .build();
         Deployment kieServerDeployment = KieOpenShiftProvider.createKieServerDeploymentBuilder()
+                                                             .withImageStreamNamespace(projectName)
                                                              .withKieServerUser(kieServerUsername, kieServerPassword)
                                                              .connectToPostgreSqlDatabase(postgreSqlDeployment)
                                                              .build();
@@ -74,7 +75,7 @@ public class KieServerIntegrationTest extends AbstractCloudIntegrationTest {
                                                          .withDeployment(kieServerDeployment)
                                                          .withDeployment(postgreSqlDeployment)
                                                          .build();
-        KieOpenShiftProvider.deployScenario(openShiftClient, kieServerScenario, projectName, Collections.singletonMap(OpenShiftImageConstants.IMAGE_STREAM_NAMESPACE, projectName));
+        KieOpenShiftProvider.deployScenario(openShiftClient, kieServerScenario, projectName, Collections.emptyMap());
 
         // Wait until ready
         List<DeploymentConfig> items = openShiftClient.deploymentConfigs().inNamespace(projectName).list().getItems();
