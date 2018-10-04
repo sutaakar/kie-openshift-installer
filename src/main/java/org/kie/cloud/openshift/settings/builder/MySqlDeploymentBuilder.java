@@ -16,8 +16,10 @@
 package org.kie.cloud.openshift.settings.builder;
 
 import java.util.Collections;
+import java.util.HashMap;
 
 import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.IntOrString;
 import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.kubernetes.api.model.ProbeBuilder;
 import io.fabric8.kubernetes.api.model.Service;
@@ -110,15 +112,17 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
 
     @Override
     protected void configureService() {
-        ServicePort httpPort = new ServicePortBuilder().withPort(3306)
-                                                       .withNewTargetPort(3306)
-                                                       .build();
         Service service = new ServiceBuilder().withApiVersion("v1")
                                               .withNewMetadata()
                                                   .withName(getDeployment().getDeploymentName())
+                                                  .addToAnnotations("description", "The database server's port.")
+                                                  .addToLabels("service", getDeployment().getDeploymentName())
                                               .endMetadata()
                                               .withNewSpec()
-                                                  .withPorts(httpPort)
+                                                  .addNewPort()
+                                                      .withPort(3306)
+                                                      .withTargetPort(new IntOrString(3306, null, null, new HashMap<String, Object>()))
+                                                  .endPort()
                                                   .withSelector(Collections.singletonMap("deploymentConfig", getDeployment().getDeploymentName()))
                                               .endSpec()
                                               .build();

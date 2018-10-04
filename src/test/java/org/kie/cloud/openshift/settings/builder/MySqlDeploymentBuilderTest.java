@@ -84,6 +84,8 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtMySqlDeployment.getServices().get(0).getSpec().getPorts().get(0).getTargetPort().getIntVal()).isEqualTo(3306);
         assertThat(builtMySqlDeployment.getServices().get(0).getSpec().getSelector()).containsEntry("deploymentConfig", builtMySqlDeployment.getDeploymentName());
         assertThat(builtMySqlDeployment.getServices().get(0).getMetadata().getName()).isEqualTo(builtMySqlDeployment.getDeploymentName());
+        assertThat(builtMySqlDeployment.getServices().get(0).getMetadata().getAnnotations()).containsEntry("description", "The database server's port.");
+        assertThat(builtMySqlDeployment.getServices().get(0).getMetadata().getLabels()).containsEntry("service", builtMySqlDeployment.getDeploymentName());
     }
 
     @Test
