@@ -175,7 +175,8 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
                                                 .withName(getDeployment().getDeploymentName())
                                             .endTo()
                                             .withNewPort()
-                                                .withNewTargetPort("http")
+                                                .withNewTargetPortLike(new IntOrString(null, null, "http", new HashMap<String, Object>()))
+                                                .endTargetPort()
                                             .endPort()
                                         .endSpec()
                                         .build();
@@ -333,6 +334,14 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
         addOrReplaceEnvVar(OpenShiftImageConstants.JGROUPS_PING_PROTOCOL, "openshift.DNS_PING");
         addOrReplaceEnvVar(OpenShiftImageConstants.OPENSHIFT_DNS_PING_SERVICE_NAME, pingServiceName);
         addOrReplaceEnvVar(OpenShiftImageConstants.OPENSHIFT_DNS_PING_SERVICE_PORT, "" + pingPort);
+        return this;
+    }
+
+    public KieServerDeploymentBuilder withHttpHostname(String hostname) {
+        getDeployment().getUnsecureRoutes().stream()
+                                           .filter(r -> r.getSpec().getPort().getTargetPort().getStrVal().equals("http"))
+                                           .findAny()
+                                           .ifPresent(r -> r.getSpec().setHost(hostname));
         return this;
     }
 

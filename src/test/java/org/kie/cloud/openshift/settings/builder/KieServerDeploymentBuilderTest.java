@@ -248,6 +248,20 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildKieServerDeploymentWithCustomHttpHostname() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withHttpHostname("custom-hostname")
+                                                             .build();
+
+        assertThat(builtKieServerDeployment).isNotNull();
+        assertThat(builtKieServerDeployment.getUnsecureRoutes())
+                    .filteredOn(r -> r.getSpec().getPort().getTargetPort().getStrVal().equals("http"))
+                    .hasOnlyOneElementSatisfying(r -> {
+                        assertThat(r.getSpec().getHost()).isEqualTo("custom-hostname");
+                    });
+    }
+
+    @Test
     public void testBuildKieServerDeploymentWithClustering() {
         KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.withClustering()
