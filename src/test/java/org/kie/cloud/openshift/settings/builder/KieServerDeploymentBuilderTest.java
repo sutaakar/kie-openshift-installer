@@ -1,6 +1,7 @@
 package org.kie.cloud.openshift.settings.builder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 
@@ -259,6 +260,28 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtKieServerDeployment).isNotNull();
         assertThat(builtKieServerDeployment.getUnsecureRoutes())
                     .filteredOn(r -> r.getSpec().getPort().getTargetPort().getStrVal().equals("http"))
+                    .hasOnlyOneElementSatisfying(r -> {
+                        assertThat(r.getSpec().getHost()).isEqualTo("custom-hostname");
+                    });
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithCustomHttpsHostnameWithoutConfiguredHttps() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+
+        assertThatThrownBy(() -> settingsBuilder.withHttpsHostname("custom-hostname").build()).hasMessage("Cannot set HTTPS hostname, HTTPS route not found.");
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithCustomHttpsHostname() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withHttps("secret", "keystore", "name", "pwd")
+                                                             .withHttpsHostname("custom-hostname")
+                                                             .build();
+
+        assertThat(builtKieServerDeployment).isNotNull();
+        assertThat(builtKieServerDeployment.getSecureRoutes())
+                    .filteredOn(r -> r.getSpec().getPort().getTargetPort().getStrVal().equals("https"))
                     .hasOnlyOneElementSatisfying(r -> {
                         assertThat(r.getSpec().getHost()).isEqualTo("custom-hostname");
                     });

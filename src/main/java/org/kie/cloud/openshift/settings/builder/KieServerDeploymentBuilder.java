@@ -349,6 +349,15 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
         return this;
     }
 
+    public KieServerDeploymentBuilder withHttpsHostname(String hostname) {
+        Route httpsRoute = getDeployment().getSecureRoutes().stream()
+                                                            .filter(r -> r.getSpec().getPort().getTargetPort().getStrVal().equals("https"))
+                                                            .findAny()
+                                                            .orElseThrow(() -> new RuntimeException("Cannot set HTTPS hostname, HTTPS route not found."));
+        httpsRoute.getSpec().setHost(hostname);
+        return this;
+    }
+
     public KieServerDeploymentBuilder connectToMySqlDatabase(Deployment databaseDeployment) {
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DIALECT, "org.hibernate.dialect.MySQL5Dialect");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DS, "java:/jboss/datasources/kie");
