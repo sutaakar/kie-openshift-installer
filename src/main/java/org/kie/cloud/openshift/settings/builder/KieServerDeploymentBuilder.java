@@ -239,19 +239,23 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
         Route httpsRoute = new RouteBuilder().withApiVersion("v1")
                                              .withNewMetadata()
                                                  .withName("secure-" + getDeployment().getDeploymentName())
+                                                 .addToAnnotations("description", "Route for KIE server's https service.")
+                                                 .addToLabels("service", getDeployment().getDeploymentName())
                                              .endMetadata()
                                              .withNewSpec()
                                                  .withNewTo()
                                                      .withName(getDeployment().getDeploymentName())
                                                  .endTo()
                                                  .withNewPort()
-                                                     .withNewTargetPort("https")
+                                                     .withNewTargetPortLike(new IntOrString(null, null, "https", new HashMap<String, Object>()))
+                                                     .endTargetPort()
                                                  .endPort()
                                                  .withNewTls()
                                                      .withTermination("passthrough")
                                                  .endTls()
                                              .endSpec()
                                              .build();
+        httpsRoute.setAdditionalProperty("id", getDeployment().getDeploymentName() + "-https");
         getDeployment().getObjects().add(httpsRoute);
 
         // Adjust service ports
