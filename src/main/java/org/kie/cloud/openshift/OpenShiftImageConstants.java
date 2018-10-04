@@ -94,6 +94,10 @@ public class OpenShiftImageConstants {
     public static final String POSTGRESQL_DATABASE = "POSTGRESQL_DATABASE";
     public static final String POSTGRESQL_MAX_PREPARED_TRANSACTIONS = "POSTGRESQL_MAX_PREPARED_TRANSACTIONS";
 
+    public static final String JGROUPS_PING_PROTOCOL = "JGROUPS_PING_PROTOCOL";
+    public static final String OPENSHIFT_DNS_PING_SERVICE_NAME = "OPENSHIFT_DNS_PING_SERVICE_NAME";
+    public static final String OPENSHIFT_DNS_PING_SERVICE_PORT = "OPENSHIFT_DNS_PING_SERVICE_PORT";
+
     public static final String DATASOURCES = "DATASOURCES";
     public static final String DATASOURCES_KIE = "KIE";
     public static final String KIE_DATABASE = "KIE_DATABASE";

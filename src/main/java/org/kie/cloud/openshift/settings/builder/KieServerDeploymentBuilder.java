@@ -297,6 +297,42 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
         return this;
     }
 
+    public KieServerDeploymentBuilder withClustering() {
+        int pingPort = 8888;
+        String pingServiceName = getDeployment().getDeploymentName() + "-ping";
+        Service clusteringService = new ServiceBuilder().withApiVersion("v1")
+                                                        .withNewMetadata()
+                                                            .withName(pingServiceName)
+                                                            .addToAnnotations("description", "The JGroups ping port for clustering.")
+                                                            .addToAnnotations("service.alpha.kubernetes.io/tolerate-unready-endpoints", "true")
+                                                            .addToLabels("service", getDeployment().getDeploymentName())
+                                                        .endMetadata()
+                                                        .withNewSpec()
+                                                            .withClusterIP("None")
+                                                            .addNewPort()
+                                                                .withName("ping")
+                                                                .withPort(pingPort)
+                                                                .withNewTargetPortLike(new IntOrString(pingPort, null, null, new HashMap<String, Object>()))
+                                                                .endTargetPort()
+                                                            .endPort()
+                                                            .withSelector(Collections.singletonMap("deploymentConfig", getDeployment().getDeploymentName()))
+                                                        .endSpec()
+                                                        .build();
+        getDeployment().getObjects().add(clusteringService);
+
+        // Set container port
+        ContainerPort pingContainerPort = new ContainerPortBuilder().withName("ping")
+                                                                    .withContainerPort(pingPort)
+                                                                    .withProtocol("TCP")
+                                                                    .build();
+        getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getPorts().add(pingContainerPort);
+
+        addOrReplaceEnvVar(OpenShiftImageConstants.JGROUPS_PING_PROTOCOL, "openshift.DNS_PING");
+        addOrReplaceEnvVar(OpenShiftImageConstants.OPENSHIFT_DNS_PING_SERVICE_NAME, pingServiceName);
+        addOrReplaceEnvVar(OpenShiftImageConstants.OPENSHIFT_DNS_PING_SERVICE_PORT, "" + pingPort);
+        return this;
+    }
+
     public KieServerDeploymentBuilder connectToMySqlDatabase(Deployment databaseDeployment) {
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DIALECT, "org.hibernate.dialect.MySQL5Dialect");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DS, "java:/jboss/datasources/kie");

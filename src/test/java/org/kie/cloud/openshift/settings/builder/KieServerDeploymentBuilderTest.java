@@ -245,6 +245,47 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildKieServerDeploymentWithClustering() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withClustering()
+                                                             .build();
+
+        assertThat(builtKieServerDeployment).isNotNull();
+        assertThat(builtKieServerDeployment.getServices())
+                    .filteredOn(s -> s.getSpec().getClusterIP() != null && s.getSpec().getClusterIP().equals("None"))
+                    .hasOnlyOneElementSatisfying(s -> {
+                        assertThat(s.getApiVersion()).isEqualTo("v1");
+                        assertThat(s.getSpec().getClusterIP()).isEqualTo("None");
+                        assertThat(s.getSpec().getPorts()).hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getName()).isEqualTo("ping");
+                            assertThat(p.getPort()).isEqualTo(8888);
+                            assertThat(p.getTargetPort().getIntVal()).isEqualTo(8888);
+                        });
+                        assertThat(s.getSpec().getSelector()).containsEntry("deploymentConfig", builtKieServerDeployment.getDeploymentName());
+                        assertThat(s.getMetadata().getName()).isEqualTo(builtKieServerDeployment.getDeploymentName() + "-ping");
+                        assertThat(s.getMetadata().getLabels()).containsEntry("service", builtKieServerDeployment.getDeploymentName());
+                        assertThat(s.getMetadata().getAnnotations()).containsEntry("service.alpha.kubernetes.io/tolerate-unready-endpoints", "true");
+                        assertThat(s.getMetadata().getAnnotations()).containsEntry("description", "The JGroups ping port for clustering.");
+                    });
+        // Check ping port
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getPorts())
+                        .anySatisfy(p -> {
+                            assertThat(p.getName()).isEqualTo("ping");
+                            assertThat(p.getContainerPort()).isEqualTo(8888);
+                            assertThat(p.getProtocol()).isEqualTo("TCP");
+                        });
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.JGROUPS_PING_PROTOCOL.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("openshift.DNS_PING"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.OPENSHIFT_DNS_PING_SERVICE_NAME.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo(builtKieServerDeployment.getDeploymentName() + "-ping"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.OPENSHIFT_DNS_PING_SERVICE_PORT.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("8888"));
+    }
+
+    @Test
     public void testBuildKieServerDeploymentWithMySqlDatabase() {
         MySqlDeploymentBuilder mySqlSettingsBuilder = new MySqlDeploymentBuilder();
         Deployment builtMySqlDeployment = mySqlSettingsBuilder.withDatabaseName("custom-db")
