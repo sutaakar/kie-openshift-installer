@@ -107,6 +107,9 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtKieServerDeployment.getUnsecureRoutes().get(0).getMetadata().getName()).isEqualTo(builtKieServerDeployment.getDeploymentName());
         assertThat(builtKieServerDeployment.getUnsecureRoutes().get(0).getSpec().getTo().getName()).isEqualTo(builtKieServerDeployment.getServices().get(0).getMetadata().getName());
         assertThat(builtKieServerDeployment.getUnsecureRoutes().get(0).getSpec().getPort().getTargetPort().getStrVal()).isEqualTo("http");
+        assertThat(builtKieServerDeployment.getUnsecureRoutes().get(0).getMetadata().getAnnotations()).containsEntry("description", "Route for KIE server's http service.");
+        assertThat(builtKieServerDeployment.getUnsecureRoutes().get(0).getMetadata().getLabels()).containsEntry("service", builtKieServerDeployment.getDeploymentName());
+        assertThat(builtKieServerDeployment.getUnsecureRoutes().get(0).getAdditionalProperties()).containsEntry("id", builtKieServerDeployment.getDeploymentName() + "-http");
     }
 
     @Test

@@ -167,6 +167,8 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
         Route route = new RouteBuilder().withApiVersion("v1")
                                         .withNewMetadata()
                                             .withName(getDeployment().getDeploymentName())
+                                            .addToAnnotations("description", "Route for KIE server's http service.")
+                                            .addToLabels("service", getDeployment().getDeploymentName())
                                         .endMetadata()
                                         .withNewSpec()
                                             .withNewTo()
@@ -177,6 +179,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
                                             .endPort()
                                         .endSpec()
                                         .build();
+        route.setAdditionalProperty("id", getDeployment().getDeploymentName() + "-http");
         getDeployment().getObjects().add(route);
     }
 
