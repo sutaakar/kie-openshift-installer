@@ -64,6 +64,8 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder {
         DeploymentConfig deploymentConfig = new DeploymentConfigBuilder().withApiVersion("v1")
                                                                          .withNewMetadata()
                                                                              .withName(getDeployment().getDeploymentName())
+                                                                             .addToAnnotations("template.alpha.openshift.io/wait-for-ready", "true")
+                                                                             .addToLabels("service", getDeployment().getDeploymentName())
                                                                          .endMetadata()
                                                                          .withNewSpec()
                                                                              .withNewStrategy()

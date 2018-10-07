@@ -69,6 +69,8 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
                         assertThat(c.getPorts().get(0).getContainerPort()).isEqualTo(3306);
                         assertThat(c.getPorts().get(0).getProtocol()).isEqualTo("TCP");
                     });
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getMetadata().getAnnotations()).containsEntry("template.alpha.openshift.io/wait-for-ready", "true");
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getMetadata().getLabels()).containsEntry("service", builtMySqlDeployment.getDeploymentName());
     }
 
     @Test
