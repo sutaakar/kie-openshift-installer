@@ -77,6 +77,8 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
                         assertThat(c.getPorts().get(1).getContainerPort()).isEqualTo(8080);
                         assertThat(c.getPorts().get(1).getProtocol()).isEqualTo("TCP");
                     });
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getMetadata().getAnnotations()).containsEntry("template.alpha.openshift.io/wait-for-ready", "true");
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getMetadata().getLabels()).containsEntry("service", builtKieServerDeployment.getDeploymentName());
     }
 
     @Test
