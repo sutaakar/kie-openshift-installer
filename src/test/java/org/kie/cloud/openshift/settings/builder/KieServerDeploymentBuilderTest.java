@@ -254,6 +254,34 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildKieServerDeploymentWithCustomImageStreamName() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withImageStreamName("custom-name")
+                                                             .build();
+
+        assertThat(builtKieServerDeployment).isNotNull();
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ImageChange"))
+                    .hasOnlyOneElementSatisfying(e -> {
+                        assertThat(e.getImageChangeParams().getFrom().getName()).startsWith("custom-name:");
+                    });
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithCustomImageStreamTag() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withImageStreamTag("123")
+                                                             .build();
+
+        assertThat(builtKieServerDeployment).isNotNull();
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ImageChange"))
+                    .hasOnlyOneElementSatisfying(e -> {
+                        assertThat(e.getImageChangeParams().getFrom().getName()).endsWith(":123");
+                    });
+    }
+
+    @Test
     public void testBuildKieServerDeploymentWithCustomHttpHostname() {
         KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.withHttpHostname("custom-hostname")
