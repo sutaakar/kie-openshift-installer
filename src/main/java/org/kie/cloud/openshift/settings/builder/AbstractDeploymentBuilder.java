@@ -107,6 +107,7 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
     protected abstract void configureReadinessProbe();
 
     // ***** Shared functionality *****
+    @SuppressWarnings("unchecked")
     public T withImageStreamNamespace(String imageStreamNamespace) {
         getDeployment().getDeploymentConfig().getSpec().getTriggers().stream()
                                                                      .filter(t -> t.getType().equals("ImageChange"))
@@ -115,6 +116,7 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
         return (T) this;
     }
 
+    @SuppressWarnings("unchecked")
     public T withImageStreamName(String imageStreamName) {
         DeploymentTriggerPolicy deploymentTriggerPolicy = getDeployment().getDeploymentConfig().getSpec().getTriggers().stream()
                                                                                                                        .filter(t -> t.getType().equals("ImageChange"))
@@ -125,6 +127,7 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
         return (T) this;
     }
 
+    @SuppressWarnings("unchecked")
     public T withImageStreamTag(String imageStreamTag) {
         DeploymentTriggerPolicy deploymentTriggerPolicy = getDeployment().getDeploymentConfig().getSpec().getTriggers().stream()
                                                                                                                        .filter(t -> t.getType().equals("ImageChange"))
