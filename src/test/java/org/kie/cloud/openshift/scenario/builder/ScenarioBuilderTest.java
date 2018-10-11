@@ -2,6 +2,7 @@ package org.kie.cloud.openshift.scenario.builder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.fabric8.openshift.api.model.DeploymentConfig;
 import org.junit.Test;
 import org.kie.cloud.openshift.AbstractCloudTest;
 import org.kie.cloud.openshift.deployment.Deployment;
@@ -52,5 +53,11 @@ public class ScenarioBuilderTest extends AbstractCloudTest {
                                                                               return o.getMetadata().getLabels().containsKey("application") && 
                                                                                      o.getMetadata().getLabels().get("application").equals("custom-app");
                                                                           }));
+        assertThat(scenario.getDeployments()).flatExtracting(d -> d.getObjects())
+                                             .filteredOn(d -> d instanceof DeploymentConfig)
+                                             .allMatch(o -> {
+                                                 return ((DeploymentConfig)o).getSpec().getTemplate().getMetadata().getLabels().containsKey("application") &&
+                                                        ((DeploymentConfig)o).getSpec().getTemplate().getMetadata().getLabels().get("application").equals("custom-app");
+                                             });
     }
 }
