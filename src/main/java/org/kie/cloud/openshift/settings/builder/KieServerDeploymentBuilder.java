@@ -38,7 +38,6 @@ import io.fabric8.kubernetes.api.model.VolumeMount;
 import io.fabric8.kubernetes.api.model.VolumeMountBuilder;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
-import io.fabric8.openshift.api.model.DeploymentTriggerPolicy;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.api.model.RouteBuilder;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
@@ -52,7 +51,7 @@ import org.kie.cloud.openshift.util.NameGenerator;
  * If any environment variable isn't configured by SettingsBuilder, then default
  * value from application template is used.
  */
-public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
+public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieServerDeploymentBuilder> {
 
     public KieServerDeploymentBuilder() {
         this(NameGenerator.generateDeploymentName("kieserver"));
@@ -297,34 +296,6 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder {
         addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_KEYSTORE, keystore);
         addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_NAME, name);
         addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_PASSWORD, password);
-        return this;
-    }
-
-    public KieServerDeploymentBuilder withImageStreamNamespace(String imageStreamNamespace) {
-        getDeployment().getDeploymentConfig().getSpec().getTriggers().stream()
-                                                                     .filter(t -> t.getType().equals("ImageChange"))
-                                                                     .findAny()
-                                                                     .ifPresent(t -> t.getImageChangeParams().getFrom().setNamespace(imageStreamNamespace));
-        return this;
-    }
-
-    public KieServerDeploymentBuilder withImageStreamName(String imageStreamName) {
-        DeploymentTriggerPolicy deploymentTriggerPolicy = getDeployment().getDeploymentConfig().getSpec().getTriggers().stream()
-                                                                                                                       .filter(t -> t.getType().equals("ImageChange"))
-                                                                                                                       .findAny()
-                                                                                                                       .orElseThrow(() -> new RuntimeException("No ImageChange trigger policy found, cannot set image name."));
-        String newName = deploymentTriggerPolicy.getImageChangeParams().getFrom().getName().replaceFirst(".*:", imageStreamName + ":");
-        deploymentTriggerPolicy.getImageChangeParams().getFrom().setName(newName);
-        return this;
-    }
-
-    public KieServerDeploymentBuilder withImageStreamTag(String imageStreamTag) {
-        DeploymentTriggerPolicy deploymentTriggerPolicy = getDeployment().getDeploymentConfig().getSpec().getTriggers().stream()
-                                                                                                                       .filter(t -> t.getType().equals("ImageChange"))
-                                                                                                                       .findAny()
-                                                                                                                       .orElseThrow(() -> new RuntimeException("No ImageChange trigger policy found, cannot set image name."));
-        String newName = deploymentTriggerPolicy.getImageChangeParams().getFrom().getName().replaceFirst(":.*", ":" + imageStreamTag);
-        deploymentTriggerPolicy.getImageChangeParams().getFrom().setName(newName);
         return this;
     }
 

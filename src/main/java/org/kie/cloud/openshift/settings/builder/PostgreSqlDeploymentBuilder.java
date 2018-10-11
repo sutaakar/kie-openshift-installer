@@ -36,7 +36,7 @@ import org.kie.cloud.openshift.util.NameGenerator;
  * If any environment variable isn't configured by SettingsBuilder, then default
  * value from application template is used.
  */
-public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder {
+public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder<PostgreSqlDeploymentBuilder> {
 
     public PostgreSqlDeploymentBuilder() {
         this(NameGenerator.generateDeploymentName("postgresql"));

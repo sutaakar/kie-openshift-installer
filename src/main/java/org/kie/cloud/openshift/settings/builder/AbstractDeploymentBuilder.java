@@ -13,9 +13,10 @@ import io.fabric8.kubernetes.api.model.Volume;
 import io.fabric8.kubernetes.api.model.VolumeBuilder;
 import io.fabric8.kubernetes.api.model.VolumeMount;
 import io.fabric8.kubernetes.api.model.VolumeMountBuilder;
+import io.fabric8.openshift.api.model.DeploymentTriggerPolicy;
 import org.kie.cloud.openshift.deployment.Deployment;
 
-public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
+public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> implements DeploymentBuilder {
 
     private Deployment deployment;
 
@@ -104,4 +105,33 @@ public abstract class AbstractDeploymentBuilder implements DeploymentBuilder {
     protected abstract void configureLivenessProbe();
 
     protected abstract void configureReadinessProbe();
+
+    // ***** Shared functionality *****
+    public T withImageStreamNamespace(String imageStreamNamespace) {
+        getDeployment().getDeploymentConfig().getSpec().getTriggers().stream()
+                                                                     .filter(t -> t.getType().equals("ImageChange"))
+                                                                     .findAny()
+                                                                     .ifPresent(t -> t.getImageChangeParams().getFrom().setNamespace(imageStreamNamespace));
+        return (T) this;
+    }
+
+    public T withImageStreamName(String imageStreamName) {
+        DeploymentTriggerPolicy deploymentTriggerPolicy = getDeployment().getDeploymentConfig().getSpec().getTriggers().stream()
+                                                                                                                       .filter(t -> t.getType().equals("ImageChange"))
+                                                                                                                       .findAny()
+                                                                                                                       .orElseThrow(() -> new RuntimeException("No ImageChange trigger policy found, cannot set image name."));
+        String newName = deploymentTriggerPolicy.getImageChangeParams().getFrom().getName().replaceFirst(".*:", imageStreamName + ":");
+        deploymentTriggerPolicy.getImageChangeParams().getFrom().setName(newName);
+        return (T) this;
+    }
+
+    public T withImageStreamTag(String imageStreamTag) {
+        DeploymentTriggerPolicy deploymentTriggerPolicy = getDeployment().getDeploymentConfig().getSpec().getTriggers().stream()
+                                                                                                                       .filter(t -> t.getType().equals("ImageChange"))
+                                                                                                                       .findAny()
+                                                                                                                       .orElseThrow(() -> new RuntimeException("No ImageChange trigger policy found, cannot set image name."));
+        String newName = deploymentTriggerPolicy.getImageChangeParams().getFrom().getName().replaceFirst(":.*", ":" + imageStreamTag);
+        deploymentTriggerPolicy.getImageChangeParams().getFrom().setName(newName);
+        return (T) this;
+    }
 }
