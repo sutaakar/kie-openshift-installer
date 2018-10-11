@@ -59,6 +59,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getSelector()).containsEntry("deploymentConfig", builtMySqlDeployment.getDeploymentName());
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getName()).isEqualTo(builtMySqlDeployment.getDeploymentName());
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getLabels()).containsEntry("deploymentConfig", builtMySqlDeployment.getDeploymentName());
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getMetadata().getLabels()).containsEntry("service", builtMySqlDeployment.getDeploymentName());
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getTerminationGracePeriodSeconds()).isEqualTo(60L);
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers())
                     .hasOnlyOneElementSatisfying(c -> {
