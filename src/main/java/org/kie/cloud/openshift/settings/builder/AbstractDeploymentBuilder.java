@@ -124,6 +124,9 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
                                                                                                                        .orElseThrow(() -> new RuntimeException("No ImageChange trigger policy found, cannot set image name."));
         String newName = deploymentTriggerPolicy.getImageChangeParams().getFrom().getName().replaceFirst(".*:", imageStreamName + ":");
         deploymentTriggerPolicy.getImageChangeParams().getFrom().setName(newName);
+
+        getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).setImage(imageStreamName);
+
         return (T) this;
     }
 

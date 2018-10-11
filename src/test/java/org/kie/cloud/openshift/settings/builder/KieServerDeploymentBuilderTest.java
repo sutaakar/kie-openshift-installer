@@ -266,6 +266,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
                     .hasOnlyOneElementSatisfying(e -> {
                         assertThat(e.getImageChangeParams().getFrom().getName()).startsWith("custom-name:");
                     });
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getImage()).isEqualTo("custom-name");
     }
 
     @Test
