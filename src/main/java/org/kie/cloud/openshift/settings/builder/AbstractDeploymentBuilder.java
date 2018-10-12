@@ -2,6 +2,7 @@ package org.kie.cloud.openshift.settings.builder;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
@@ -122,7 +123,9 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
                                                                                                                        .filter(t -> t.getType().equals("ImageChange"))
                                                                                                                        .findAny()
                                                                                                                        .orElseThrow(() -> new RuntimeException("No ImageChange trigger policy found, cannot set image name."));
-        String newName = deploymentTriggerPolicy.getImageChangeParams().getFrom().getName().replaceFirst(".*:", imageStreamName + ":");
+        String name = deploymentTriggerPolicy.getImageChangeParams().getFrom().getName();
+        String sanitizedImageStreamName = Matcher.quoteReplacement(imageStreamName);
+        String newName = name.replaceFirst(".*:", sanitizedImageStreamName + ":");
         deploymentTriggerPolicy.getImageChangeParams().getFrom().setName(newName);
 
         getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).setImage(imageStreamName);
@@ -136,8 +139,11 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
                                                                                                                        .filter(t -> t.getType().equals("ImageChange"))
                                                                                                                        .findAny()
                                                                                                                        .orElseThrow(() -> new RuntimeException("No ImageChange trigger policy found, cannot set image name."));
-        String newName = deploymentTriggerPolicy.getImageChangeParams().getFrom().getName().replaceFirst(":.*", ":" + imageStreamTag);
+        String name = deploymentTriggerPolicy.getImageChangeParams().getFrom().getName();
+        String sanitizedImageStreamTag = Matcher.quoteReplacement(imageStreamTag);
+        String newName = name.replaceFirst(":.*", ":" + sanitizedImageStreamTag);
         deploymentTriggerPolicy.getImageChangeParams().getFrom().setName(newName);
+
         return (T) this;
     }
 }
