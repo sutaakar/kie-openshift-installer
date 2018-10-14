@@ -32,6 +32,8 @@ import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.ResourceRequirements;
 import io.fabric8.kubernetes.api.model.ResourceRequirementsBuilder;
 import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.kubernetes.api.model.ServiceAccount;
+import io.fabric8.kubernetes.api.model.ServiceAccountBuilder;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServicePortBuilder;
@@ -145,6 +147,13 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
                                         .build();
         route.setAdditionalProperty("id", getDeployment().getDeploymentName() + "-http");
         getDeployment().getObjects().add(route);
+
+        ServiceAccount serviceAccount = new ServiceAccountBuilder().withApiVersion("v1")
+                                                                   .withNewMetadata()
+                                                                       .withName(getDeployment().getDeploymentName())
+                                                                   .endMetadata()
+                                                                   .build();
+        getDeployment().getObjects().add(serviceAccount);
     }
 
     @Override
