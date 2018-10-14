@@ -19,13 +19,13 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.ContainerPort;
+import io.fabric8.kubernetes.api.model.ContainerPortBuilder;
 import io.fabric8.kubernetes.api.model.IntOrString;
 import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.kubernetes.api.model.ProbeBuilder;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
-import io.fabric8.openshift.api.model.DeploymentConfig;
-import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.configuration.ConfigurationLoader;
 import org.kie.cloud.openshift.util.NameGenerator;
@@ -55,60 +55,27 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder<MySqlDeplo
 
     @Override
     protected void configureDeploymentConfig() {
-        String imageStreamNamespace = ConfigurationLoader.getImageStreamNamespaceDefault();
-        String mySqlImageStreamName = ConfigurationLoader.getMySqlImageStreamName();
-        String mySqlImageStreamTag = ConfigurationLoader.getMySqlImageStreamTag();
+        super.configureDeploymentConfig();
 
-        DeploymentConfig deploymentConfig = new DeploymentConfigBuilder().withApiVersion("v1")
-                                                                         .withNewMetadata()
-                                                                             .withName(getDeployment().getDeploymentName())
-                                                                             .addToAnnotations("template.alpha.openshift.io/wait-for-ready", "true")
-                                                                             .addToLabels("service", getDeployment().getDeploymentName())
-                                                                         .endMetadata()
-                                                                         .withNewSpec()
-                                                                             .withNewStrategy()
-                                                                                 .withType("Recreate")
-                                                                             .endStrategy()
-                                                                             .addNewTrigger()
-                                                                                 .withType("ImageChange")
-                                                                                 .withNewImageChangeParams()
-                                                                                     .withAutomatic(true)
-                                                                                     .withContainerNames(getDeployment().getDeploymentName())
-                                                                                     .withNewFrom()
-                                                                                         .withKind("ImageStreamTag")
-                                                                                         .withNamespace(imageStreamNamespace)
-                                                                                         .withName(mySqlImageStreamName + ":" + mySqlImageStreamTag)
-                                                                                     .endFrom()
-                                                                                 .endImageChangeParams()
-                                                                             .endTrigger()
-                                                                             .addNewTrigger()
-                                                                                 .withType("ConfigChange")
-                                                                             .endTrigger()
-                                                                             .withReplicas(1)
-                                                                             .withSelector(Collections.singletonMap("deploymentConfig", getDeployment().getDeploymentName()))
-                                                                             .withNewTemplate()
-                                                                                 .withNewMetadata()
-                                                                                     .withName(getDeployment().getDeploymentName())
-                                                                                     .addToLabels("deploymentConfig", getDeployment().getDeploymentName())
-                                                                                     .addToLabels("service", getDeployment().getDeploymentName())
-                                                                                 .endMetadata()
-                                                                                 .withNewSpec()
-                                                                                     .withTerminationGracePeriodSeconds(60L)
-                                                                                     .addNewContainer()
-                                                                                         .withName(getDeployment().getDeploymentName())
-                                                                                         .withImage(mySqlImageStreamName)
-                                                                                         .withImagePullPolicy("Always")
-                                                                                         .addNewPort()
-                                                                                             .withContainerPort(3306)
-                                                                                             .withProtocol("TCP")
-                                                                                         .endPort()
-                                                                                     .endContainer()
-                                                                                 .endSpec()
-                                                                             .endTemplate()
-                                                                         .endSpec()
-                                                                         .build();
+        ContainerPort mysqlPort = new ContainerPortBuilder().withContainerPort(3306)
+                                                            .withProtocol("TCP")
+                                                            .build();
+        getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getPorts().add(mysqlPort);
+    }
 
-        getDeployment().getObjects().add(deploymentConfig);
+    @Override
+    protected String getDefaultImageStreamName() {
+        return ConfigurationLoader.getMySqlImageStreamName();
+    }
+
+    @Override
+    protected String getDefaultImageStreamNamespace() {
+        return ConfigurationLoader.getImageStreamNamespaceDefault();
+    }
+
+    @Override
+    protected String getDefaultImageStreamTag() {
+        return ConfigurationLoader.getMySqlImageStreamTag();
     }
 
     @Override

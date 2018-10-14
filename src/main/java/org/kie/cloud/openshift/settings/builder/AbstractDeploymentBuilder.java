@@ -14,6 +14,8 @@ import io.fabric8.kubernetes.api.model.Volume;
 import io.fabric8.kubernetes.api.model.VolumeBuilder;
 import io.fabric8.kubernetes.api.model.VolumeMount;
 import io.fabric8.kubernetes.api.model.VolumeMountBuilder;
+import io.fabric8.openshift.api.model.DeploymentConfig;
+import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.api.model.DeploymentTriggerPolicy;
 import org.kie.cloud.openshift.deployment.Deployment;
 
@@ -42,7 +44,58 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
 
     protected abstract void initDefaultValues();
 
-    protected abstract void configureDeploymentConfig();
+    protected void configureDeploymentConfig() {
+        DeploymentConfig deploymentConfig = new DeploymentConfigBuilder().withApiVersion("v1")
+                                                                         .withNewMetadata()
+                                                                             .withName(getDeployment().getDeploymentName())
+                                                                             .addToAnnotations("template.alpha.openshift.io/wait-for-ready", "true")
+                                                                             .addToLabels("service", getDeployment().getDeploymentName())
+                                                                         .endMetadata()
+                                                                         .withNewSpec()
+                                                                             .withNewStrategy()
+                                                                                 .withType("Recreate")
+                                                                             .endStrategy()
+                                                                             .addNewTrigger()
+                                                                                 .withType("ImageChange")
+                                                                                 .withNewImageChangeParams()
+                                                                                     .withAutomatic(true)
+                                                                                     .withContainerNames(getDeployment().getDeploymentName())
+                                                                                     .withNewFrom()
+                                                                                         .withKind("ImageStreamTag")
+                                                                                         .withNamespace(getDefaultImageStreamNamespace())
+                                                                                         .withName(getDefaultImageStreamName() + ":" + getDefaultImageStreamTag())
+                                                                                     .endFrom()
+                                                                                 .endImageChangeParams()
+                                                                             .endTrigger()
+                                                                             .addNewTrigger()
+                                                                                 .withType("ConfigChange")
+                                                                             .endTrigger()
+                                                                             .withReplicas(1)
+                                                                             .withSelector(Collections.singletonMap("deploymentConfig", getDeployment().getDeploymentName()))
+                                                                             .withNewTemplate()
+                                                                                 .withNewMetadata()
+                                                                                     .withName(getDeployment().getDeploymentName())
+                                                                                     .addToLabels("deploymentConfig", getDeployment().getDeploymentName())
+                                                                                     .addToLabels("service", getDeployment().getDeploymentName())
+                                                                                 .endMetadata()
+                                                                                 .withNewSpec()
+                                                                                     .withTerminationGracePeriodSeconds(60L)
+                                                                                     .addNewContainer()
+                                                                                         .withName(getDeployment().getDeploymentName())
+                                                                                         .withImage(getDefaultImageStreamName())
+                                                                                         .withImagePullPolicy("Always")
+                                                                                     .endContainer()
+                                                                                 .endSpec()
+                                                                             .endTemplate()
+                                                                         .endSpec()
+                                                                         .build();
+
+        getDeployment().getObjects().add(deploymentConfig);
+    }
+
+    protected abstract String getDefaultImageStreamNamespace();
+    protected abstract String getDefaultImageStreamName();
+    protected abstract String getDefaultImageStreamTag();
 
     protected abstract void configureService();
 

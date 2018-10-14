@@ -15,6 +15,7 @@
  */
 package org.kie.cloud.openshift.settings.builder;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -28,6 +29,8 @@ import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.kubernetes.api.model.ProbeBuilder;
 import io.fabric8.kubernetes.api.model.Quantity;
+import io.fabric8.kubernetes.api.model.ResourceRequirements;
+import io.fabric8.kubernetes.api.model.ResourceRequirementsBuilder;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.api.model.ServicePort;
@@ -36,8 +39,6 @@ import io.fabric8.kubernetes.api.model.Volume;
 import io.fabric8.kubernetes.api.model.VolumeBuilder;
 import io.fabric8.kubernetes.api.model.VolumeMount;
 import io.fabric8.kubernetes.api.model.VolumeMountBuilder;
-import io.fabric8.openshift.api.model.DeploymentConfig;
-import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.api.model.RouteBuilder;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
@@ -78,70 +79,36 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
 
     @Override
     protected void configureDeploymentConfig() {
-        String kieServerImageStreamName = ConfigurationLoader.getKieServerImageStreamName();
-        String imageStreamTag = ConfigurationLoader.getImageStreamTag();
-        String imageStreamNamespace = ConfigurationLoader.getImageStreamNamespaceDefault();
+        super.configureDeploymentConfig();
+
         String kieServerMemoryLimit = ConfigurationLoader.getKieServerMemoryLimit();
+        ResourceRequirements resources = new ResourceRequirementsBuilder().withLimits(Collections.singletonMap("memory", new Quantity(kieServerMemoryLimit))).build();
+        getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).setResources(resources);
 
-        DeploymentConfig deploymentConfig = new DeploymentConfigBuilder().withApiVersion("v1")
-                                                                         .withNewMetadata()
-                                                                             .withName(getDeployment().getDeploymentName())
-                                                                             .addToAnnotations("template.alpha.openshift.io/wait-for-ready", "true")
-                                                                             .addToLabels("service", getDeployment().getDeploymentName())
-                                                                         .endMetadata()
-                                                                         .withNewSpec()
-                                                                             .withNewStrategy()
-                                                                                 .withType("Recreate")
-                                                                             .endStrategy()
-                                                                             .addNewTrigger()
-                                                                                 .withType("ImageChange")
-                                                                                 .withNewImageChangeParams()
-                                                                                     .withAutomatic(true)
-                                                                                     .withContainerNames(getDeployment().getDeploymentName())
-                                                                                     .withNewFrom()
-                                                                                         .withKind("ImageStreamTag")
-                                                                                         .withNamespace(imageStreamNamespace)
-                                                                                         .withName(kieServerImageStreamName + ":" + imageStreamTag)
-                                                                                     .endFrom()
-                                                                                 .endImageChangeParams()
-                                                                             .endTrigger()
-                                                                             .addNewTrigger()
-                                                                                 .withType("ConfigChange")
-                                                                             .endTrigger()
-                                                                             .withReplicas(1)
-                                                                             .withSelector(Collections.singletonMap("deploymentConfig", getDeployment().getDeploymentName()))
-                                                                             .withNewTemplate()
-                                                                                 .withNewMetadata()
-                                                                                     .withName(getDeployment().getDeploymentName())
-                                                                                     .addToLabels("deploymentConfig", getDeployment().getDeploymentName())
-                                                                                     .addToLabels("service", getDeployment().getDeploymentName())
-                                                                                 .endMetadata()
-                                                                                 .withNewSpec()
-                                                                                     .withTerminationGracePeriodSeconds(60L)
-                                                                                     .addNewContainer()
-                                                                                         .withName(getDeployment().getDeploymentName())
-                                                                                         .withImage(kieServerImageStreamName)
-                                                                                         .withImagePullPolicy("Always")
-                                                                                         .withNewResources()
-                                                                                             .withLimits(Collections.singletonMap("memory", new Quantity(kieServerMemoryLimit)))
-                                                                                         .endResources()
-                                                                                         .addNewPort()
-                                                                                             .withName("jolokia")
-                                                                                             .withContainerPort(8778)
-                                                                                             .withProtocol("TCP")
-                                                                                         .endPort()
-                                                                                         .addNewPort()
-                                                                                             .withName("http")
-                                                                                             .withContainerPort(8080)
-                                                                                             .withProtocol("TCP")
-                                                                                         .endPort()
-                                                                                     .endContainer()
-                                                                                 .endSpec()
-                                                                             .endTemplate()
-                                                                         .endSpec()
-                                                                         .build();
+        ContainerPort jolokiaPort = new ContainerPortBuilder().withName("jolokia")
+                                                              .withContainerPort(8778)
+                                                              .withProtocol("TCP")
+                                                              .build();
+        ContainerPort httpPort = new ContainerPortBuilder().withName("http")
+                                                           .withContainerPort(8080)
+                                                           .withProtocol("TCP")
+                                                           .build();
+        getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getPorts().addAll(Arrays.asList(jolokiaPort, httpPort));
+    }
 
-        getDeployment().getObjects().add(deploymentConfig);
+    @Override
+    protected String getDefaultImageStreamName() {
+        return ConfigurationLoader.getKieServerImageStreamName();
+    }
+
+    @Override
+    protected String getDefaultImageStreamNamespace() {
+        return ConfigurationLoader.getImageStreamNamespaceDefault();
+    }
+
+    @Override
+    protected String getDefaultImageStreamTag() {
+        return ConfigurationLoader.getImageStreamTag();
     }
 
     @Override
