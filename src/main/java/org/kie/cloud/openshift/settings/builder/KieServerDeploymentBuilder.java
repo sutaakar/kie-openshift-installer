@@ -113,23 +113,16 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
 
     @Override
     protected void configureService() {
+        super.configureService();
+
         ServicePort httpPort = new ServicePortBuilder().withName("http")
                                                        .withPort(8080)
                                                        .withNewTargetPortLike(new IntOrString(8080, null, null, new HashMap<String, Object>()))
                                                        .endTargetPort()
                                                        .build();
-        Service service = new ServiceBuilder().withApiVersion("v1")
-                                              .withNewMetadata()
-                                                  .withName(getDeployment().getDeploymentName())
-                                                  .addToAnnotations("description", "All the KIE server web server's ports.")
-                                                  .addToLabels("service", getDeployment().getDeploymentName())
-                                              .endMetadata()
-                                              .withNewSpec()
-                                                  .withPorts(httpPort)
-                                                  .withSelector(Collections.singletonMap("deploymentConfig", getDeployment().getDeploymentName()))
-                                              .endSpec()
-                                              .build();
-        getDeployment().getObjects().add(service);
+        Service service = getDeployment().getServices().get(0);
+        service.getMetadata().getAnnotations().put("description", "All the KIE server web server's ports.");
+        service.getSpec().getPorts().add(httpPort);
     }
 
     @Override

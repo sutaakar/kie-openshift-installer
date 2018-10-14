@@ -15,7 +15,6 @@
  */
 package org.kie.cloud.openshift.settings.builder;
 
-import java.util.Collections;
 import java.util.HashMap;
 
 import io.fabric8.kubernetes.api.model.Container;
@@ -25,7 +24,8 @@ import io.fabric8.kubernetes.api.model.IntOrString;
 import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.kubernetes.api.model.ProbeBuilder;
 import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.kubernetes.api.model.ServiceBuilder;
+import io.fabric8.kubernetes.api.model.ServicePort;
+import io.fabric8.kubernetes.api.model.ServicePortBuilder;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.configuration.ConfigurationLoader;
 import org.kie.cloud.openshift.util.NameGenerator;
@@ -80,21 +80,15 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder<MySqlDeplo
 
     @Override
     protected void configureService() {
-        Service service = new ServiceBuilder().withApiVersion("v1")
-                                              .withNewMetadata()
-                                                  .withName(getDeployment().getDeploymentName())
-                                                  .addToAnnotations("description", "The database server's port.")
-                                                  .addToLabels("service", getDeployment().getDeploymentName())
-                                              .endMetadata()
-                                              .withNewSpec()
-                                                  .addNewPort()
-                                                      .withPort(3306)
-                                                      .withTargetPort(new IntOrString(3306, null, null, new HashMap<String, Object>()))
-                                                  .endPort()
-                                                  .withSelector(Collections.singletonMap("deploymentConfig", getDeployment().getDeploymentName()))
-                                              .endSpec()
-                                              .build();
-        getDeployment().getObjects().add(service);
+        super.configureService();
+
+        ServicePort mysqlPort = new ServicePortBuilder().withPort(3306)
+                                                        .withNewTargetPortLike(new IntOrString(3306, null, null, new HashMap<String, Object>()))
+                                                        .endTargetPort()
+                                                        .build();
+        Service service = getDeployment().getServices().get(0);
+        service.getMetadata().getAnnotations().put("description", "The database server's port.");
+        service.getSpec().getPorts().add(mysqlPort);
     }
 
     @Override

@@ -10,6 +10,8 @@ import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaimBuilder;
 import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.api.model.Quantity;
+import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.api.model.Volume;
 import io.fabric8.kubernetes.api.model.VolumeBuilder;
 import io.fabric8.kubernetes.api.model.VolumeMount;
@@ -97,7 +99,18 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
     protected abstract String getDefaultImageStreamName();
     protected abstract String getDefaultImageStreamTag();
 
-    protected abstract void configureService();
+    protected void configureService() {
+        Service service = new ServiceBuilder().withApiVersion("v1")
+                                              .withNewMetadata()
+                                                  .withName(getDeployment().getDeploymentName())
+                                                  .addToLabels("service", getDeployment().getDeploymentName())
+                                              .endMetadata()
+                                              .withNewSpec()
+                                                  .withSelector(Collections.singletonMap("deploymentConfig", getDeployment().getDeploymentName()))
+                                              .endSpec()
+                                              .build();
+        getDeployment().getObjects().add(service);
+    }
 
     // Routes are not mandatory
     protected void configureRoute() {};

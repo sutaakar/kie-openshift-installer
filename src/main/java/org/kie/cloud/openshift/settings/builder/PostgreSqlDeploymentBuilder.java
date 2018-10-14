@@ -15,15 +15,15 @@
  */
 package org.kie.cloud.openshift.settings.builder;
 
-import java.util.Collections;
+import java.util.HashMap;
 
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerPort;
 import io.fabric8.kubernetes.api.model.ContainerPortBuilder;
+import io.fabric8.kubernetes.api.model.IntOrString;
 import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.kubernetes.api.model.ProbeBuilder;
 import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServicePortBuilder;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
@@ -81,19 +81,15 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder<Postg
 
     @Override
     protected void configureService() {
-        ServicePort httpPort = new ServicePortBuilder().withPort(5432)
-                                                       .withNewTargetPort(5432)
-                                                       .build();
-        Service service = new ServiceBuilder().withApiVersion("v1")
-                                              .withNewMetadata()
-                                                  .withName(getDeployment().getDeploymentName())
-                                              .endMetadata()
-                                              .withNewSpec()
-                                                  .withPorts(httpPort)
-                                                  .withSelector(Collections.singletonMap("deploymentConfig", getDeployment().getDeploymentName()))
-                                              .endSpec()
-                                              .build();
-        getDeployment().getObjects().add(service);
+        super.configureService();
+
+        ServicePort postgresqlPort = new ServicePortBuilder().withPort(5432)
+                                                        .withNewTargetPortLike(new IntOrString(5432, null, null, new HashMap<String, Object>()))
+                                                        .endTargetPort()
+                                                        .build();
+        Service service = getDeployment().getServices().get(0);
+        service.getMetadata().getAnnotations().put("description", "The database server's port.");
+        service.getSpec().getPorts().add(postgresqlPort);
     }
 
     @Override
