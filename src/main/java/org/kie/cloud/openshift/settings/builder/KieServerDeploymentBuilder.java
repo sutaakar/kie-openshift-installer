@@ -126,7 +126,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
     }
 
     @Override
-    protected void configureRoute() {
+    protected void configureAdditionalObjects() {
         Route route = new RouteBuilder().withApiVersion("v1")
                                         .withNewMetadata()
                                             .withName(getDeployment().getDeploymentName())

@@ -29,7 +29,7 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
         deployment = new Deployment(deploymentName);
         configureDeploymentConfig();
         configureService();
-        configureRoute();
+        configureAdditionalObjects();
         initDefaultValues();
     }
 
@@ -112,8 +112,7 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
         getDeployment().getObjects().add(service);
     }
 
-    // Routes are not mandatory
-    protected void configureRoute() {};
+    protected void configureAdditionalObjects() {};
 
     protected abstract void configureLivenessProbe();
 
