@@ -40,6 +40,62 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
         return deployment;
     }
 
+    protected abstract void initDefaultValues();
+
+    protected abstract void configureDeploymentConfig();
+
+    protected abstract void configureService();
+
+    // Routes are not mandatory
+    protected void configureRoute() {};
+
+    protected abstract void configureLivenessProbe();
+
+    protected abstract void configureReadinessProbe();
+
+    // ***** Shared functionality *****
+
+    @SuppressWarnings("unchecked")
+    public T withImageStreamNamespace(String imageStreamNamespace) {
+        getDeployment().getDeploymentConfig().getSpec().getTriggers().stream()
+                                                                     .filter(t -> t.getType().equals("ImageChange"))
+                                                                     .findAny()
+                                                                     .ifPresent(t -> t.getImageChangeParams().getFrom().setNamespace(imageStreamNamespace));
+        return (T) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T withImageStreamName(String imageStreamName) {
+        DeploymentTriggerPolicy deploymentTriggerPolicy = getDeployment().getDeploymentConfig().getSpec().getTriggers().stream()
+                                                                                                                       .filter(t -> t.getType().equals("ImageChange"))
+                                                                                                                       .findAny()
+                                                                                                                       .orElseThrow(() -> new RuntimeException("No ImageChange trigger policy found, cannot set image name."));
+        String name = deploymentTriggerPolicy.getImageChangeParams().getFrom().getName();
+        String sanitizedImageStreamName = Matcher.quoteReplacement(imageStreamName);
+        String newName = name.replaceFirst(".*:", sanitizedImageStreamName + ":");
+        deploymentTriggerPolicy.getImageChangeParams().getFrom().setName(newName);
+
+        getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).setImage(imageStreamName);
+
+        return (T) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T withImageStreamTag(String imageStreamTag) {
+        DeploymentTriggerPolicy deploymentTriggerPolicy = getDeployment().getDeploymentConfig().getSpec().getTriggers().stream()
+                                                                                                                       .filter(t -> t.getType().equals("ImageChange"))
+                                                                                                                       .findAny()
+                                                                                                                       .orElseThrow(() -> new RuntimeException("No ImageChange trigger policy found, cannot set image name."));
+        String name = deploymentTriggerPolicy.getImageChangeParams().getFrom().getName();
+        String sanitizedImageStreamTag = Matcher.quoteReplacement(imageStreamTag);
+        String newName = name.replaceFirst(":.*", ":" + sanitizedImageStreamTag);
+        deploymentTriggerPolicy.getImageChangeParams().getFrom().setName(newName);
+
+        return (T) this;
+    }
+
+    // ***** Helper methods *****
+
     protected void addOrReplaceEnvVar(String environmentVariableName, String environmentVariableValue) {
         EnvVar envVar = new EnvVar(environmentVariableName, environmentVariableValue, null);
         addOrReplaceEnvVar(envVar);
@@ -92,58 +148,5 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
                                                                                              .endSpec()
                                                                                              .build();
         getDeployment().getObjects().add(persistentVolumeClaim);
-    }
-
-    protected abstract void initDefaultValues();
-
-    protected abstract void configureDeploymentConfig();
-
-    protected abstract void configureService();
-
-    // Routes are not mandatory
-    protected void configureRoute() {};
-
-    protected abstract void configureLivenessProbe();
-
-    protected abstract void configureReadinessProbe();
-
-    // ***** Shared functionality *****
-    @SuppressWarnings("unchecked")
-    public T withImageStreamNamespace(String imageStreamNamespace) {
-        getDeployment().getDeploymentConfig().getSpec().getTriggers().stream()
-                                                                     .filter(t -> t.getType().equals("ImageChange"))
-                                                                     .findAny()
-                                                                     .ifPresent(t -> t.getImageChangeParams().getFrom().setNamespace(imageStreamNamespace));
-        return (T) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public T withImageStreamName(String imageStreamName) {
-        DeploymentTriggerPolicy deploymentTriggerPolicy = getDeployment().getDeploymentConfig().getSpec().getTriggers().stream()
-                                                                                                                       .filter(t -> t.getType().equals("ImageChange"))
-                                                                                                                       .findAny()
-                                                                                                                       .orElseThrow(() -> new RuntimeException("No ImageChange trigger policy found, cannot set image name."));
-        String name = deploymentTriggerPolicy.getImageChangeParams().getFrom().getName();
-        String sanitizedImageStreamName = Matcher.quoteReplacement(imageStreamName);
-        String newName = name.replaceFirst(".*:", sanitizedImageStreamName + ":");
-        deploymentTriggerPolicy.getImageChangeParams().getFrom().setName(newName);
-
-        getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).setImage(imageStreamName);
-
-        return (T) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public T withImageStreamTag(String imageStreamTag) {
-        DeploymentTriggerPolicy deploymentTriggerPolicy = getDeployment().getDeploymentConfig().getSpec().getTriggers().stream()
-                                                                                                                       .filter(t -> t.getType().equals("ImageChange"))
-                                                                                                                       .findAny()
-                                                                                                                       .orElseThrow(() -> new RuntimeException("No ImageChange trigger policy found, cannot set image name."));
-        String name = deploymentTriggerPolicy.getImageChangeParams().getFrom().getName();
-        String sanitizedImageStreamTag = Matcher.quoteReplacement(imageStreamTag);
-        String newName = name.replaceFirst(":.*", ":" + sanitizedImageStreamTag);
-        deploymentTriggerPolicy.getImageChangeParams().getFrom().setName(newName);
-
-        return (T) this;
     }
 }
