@@ -41,6 +41,8 @@ import io.fabric8.kubernetes.api.model.Volume;
 import io.fabric8.kubernetes.api.model.VolumeBuilder;
 import io.fabric8.kubernetes.api.model.VolumeMount;
 import io.fabric8.kubernetes.api.model.VolumeMountBuilder;
+import io.fabric8.openshift.api.model.RoleBinding;
+import io.fabric8.openshift.api.model.RoleBindingBuilder;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.api.model.RouteBuilder;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
@@ -154,6 +156,20 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
                                                                    .endMetadata()
                                                                    .build();
         getDeployment().getObjects().add(serviceAccount);
+
+        RoleBinding roleBinding = new RoleBindingBuilder().withApiVersion("v1")
+                                                          .withNewMetadata()
+                                                              .withName(getDeployment().getDeploymentName() + "-view")
+                                                          .endMetadata()
+                                                          .addNewSubject()
+                                                              .withKind("ServiceAccount")
+                                                              .withName(serviceAccount.getMetadata().getName())
+                                                          .endSubject()
+                                                          .withNewRoleRef()
+                                                              .withName("view")
+                                                          .endRoleRef()
+                                                          .build();
+        getDeployment().getObjects().add(roleBinding);
     }
 
     @Override
