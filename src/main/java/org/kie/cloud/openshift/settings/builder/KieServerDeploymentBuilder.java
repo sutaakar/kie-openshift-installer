@@ -170,6 +170,8 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
                                                           .endRoleRef()
                                                           .build();
         getDeployment().getObjects().add(roleBinding);
+
+        getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec().setServiceAccountName(serviceAccount.getMetadata().getName());
     }
 
     @Override

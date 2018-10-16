@@ -1,18 +1,20 @@
 package org.kie.cloud.openshift.settings.builder;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import java.util.List;
 
 import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.kubernetes.api.model.Quantity;
+import io.fabric8.kubernetes.api.model.ServiceAccount;
 import io.fabric8.kubernetes.api.model.Volume;
 import io.fabric8.kubernetes.api.model.VolumeMount;
+import io.fabric8.openshift.api.model.RoleBinding;
 import org.junit.Test;
 import org.kie.cloud.openshift.AbstractCloudTest;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.deployment.Deployment;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
@@ -114,6 +116,35 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtKieServerDeployment.getUnsecureRoutes().get(0).getMetadata().getAnnotations()).containsEntry("description", "Route for KIE server's http service.");
         assertThat(builtKieServerDeployment.getUnsecureRoutes().get(0).getMetadata().getLabels()).containsEntry("service", builtKieServerDeployment.getDeploymentName());
         assertThat(builtKieServerDeployment.getUnsecureRoutes().get(0).getAdditionalProperties()).containsEntry("id", builtKieServerDeployment.getDeploymentName() + "-http");
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentServiceAccount() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.build();
+        assertThat(builtKieServerDeployment).isNotNull();
+
+        ServiceAccount serviceAccount = builtKieServerDeployment.getObjects().stream()
+                                                                .filter(o -> o instanceof ServiceAccount)
+                                                                .map(o -> (ServiceAccount) o)
+                                                                .findAny()
+                                                                .get();
+        RoleBinding roleBinding = builtKieServerDeployment.getObjects().stream()
+                                                          .filter(o -> o instanceof RoleBinding)
+                                                          .map(o -> (RoleBinding) o)
+                                                          .findAny()
+                                                          .get();
+
+        assertThat(serviceAccount.getApiVersion()).isEqualTo("v1");
+        assertThat(serviceAccount.getMetadata().getName()).isEqualTo(builtKieServerDeployment.getDeploymentName());
+        assertThat(roleBinding.getApiVersion()).isEqualTo("v1");
+        assertThat(roleBinding.getMetadata().getName()).isEqualTo(builtKieServerDeployment.getDeploymentName() + "-view");
+        assertThat(roleBinding.getSubjects()).hasOnlyOneElementSatisfying(s -> {
+            assertThat(s.getKind()).isEqualTo("ServiceAccount");
+            assertThat(s.getName()).isEqualTo(serviceAccount.getMetadata().getName());
+        });
+        assertThat(roleBinding.getRoleRef().getName()).isEqualTo("view");
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getServiceAccountName()).isEqualTo(serviceAccount.getMetadata().getName());
     }
 
     @Test
