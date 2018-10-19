@@ -16,15 +16,15 @@ public class AbstractCloudIntegrationTest extends AbstractCloudTest{
     @Before
     public void createProjectWithImageStreams() {
         try {
-            URL imageStreamsUrl = new URL("https://raw.githubusercontent.com/jboss-container-images/rhpam-7-openshift-image/rhpam71-dev/rhpam71-image-streams.yaml");
+            URL imageStreamsUrl = new URL("https://raw.githubusercontent.com/jboss-container-images/rhpam-7-openshift-image/7.1.x/rhpam71-image-streams.yaml");
             openShiftClient.projectrequests().createNew().withNewMetadata().withName(projectName).endMetadata().done();
-            KubernetesList resourceList = openShiftClient.templates().inNamespace(projectName).load(imageStreamsUrl).process();
+            KubernetesList resourceList = openShiftClient.lists().inNamespace(projectName).load(imageStreamsUrl).get();
             openShiftClient.lists().inNamespace(projectName).create(resourceList);
             imageStreamsUrl = new URL("https://raw.githubusercontent.com/openshift/library/master/community/mysql/imagestreams/mysql-centos7.json");
-            resourceList = openShiftClient.templates().inNamespace(projectName).load(imageStreamsUrl).process();
+            resourceList = openShiftClient.lists().inNamespace(projectName).load(imageStreamsUrl).get();
             openShiftClient.lists().inNamespace(projectName).create(resourceList);
             imageStreamsUrl = new URL("https://raw.githubusercontent.com/openshift/library/master/community/postgresql/imagestreams/postgresql-centos7.json");
-            resourceList = openShiftClient.templates().inNamespace(projectName).load(imageStreamsUrl).process();
+            resourceList = openShiftClient.lists().inNamespace(projectName).load(imageStreamsUrl).get();
             openShiftClient.lists().inNamespace(projectName).create(resourceList);
         } catch (MalformedURLException e) {
             throw new RuntimeException("Error while parsing image stream URL.", e);
