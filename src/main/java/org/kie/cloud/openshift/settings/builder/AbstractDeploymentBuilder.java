@@ -204,6 +204,7 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
         PersistentVolumeClaim persistentVolumeClaim = new PersistentVolumeClaimBuilder().withKind("PersistentVolumeClaim")
                                                                                              .withNewMetadata()
                                                                                                  .withName(volumeClaimName)
+                                                                                                 .addToLabels("service", getDeployment().getDeploymentName())
                                                                                              .endMetadata()
                                                                                              .withNewSpec()
                                                                                                  .withAccessModes(accessMode)

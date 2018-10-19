@@ -180,6 +180,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtMySqlDeployment.getPersistentVolumeClaims())
                         .hasOnlyOneElementSatisfying(p -> {
                             assertThat(p.getMetadata().getName()).isEqualTo(volumes.get(0).getPersistentVolumeClaim().getClaimName());
+                            assertThat(p.getMetadata().getLabels()).containsEntry("service", builtMySqlDeployment.getDeploymentName());
                             assertThat(p.getSpec().getAccessModes()).containsOnlyOnce("ReadWriteOnce");
                             assertThat(p.getSpec().getResources().getRequests().get("storage")).isEqualTo(new Quantity("1Gi"));
                         });
