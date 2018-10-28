@@ -68,15 +68,6 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
 
     @Override
     protected void initDefaultValues() {
-        EnvVar kieServerHost = new EnvVarBuilder().withName(OpenShiftImageConstants.KIE_SERVER_HOST)
-                                                  .withNewValueFrom()
-                                                      .withNewFieldRef()
-                                                          .withFieldPath("status.podIP")
-                                                      .endFieldRef()
-                                                  .endValueFrom()
-                                                  .build();
-        // TODO this should be deleted
-        addOrReplaceEnvVar(kieServerHost);
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_USER, "executionUser");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PWD, "executionUser1!");
     }
