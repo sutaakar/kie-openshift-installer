@@ -64,6 +64,8 @@ public class OpenShiftImageConstants {
 
     public static final String IMAGE_STREAM_NAMESPACE = "IMAGE_STREAM_NAMESPACE";
 
+    public static final String KIE_SERVER_IMAGE_STREAM_NAME = "KIE_SERVER_IMAGE_STREAM_NAME";
+
     public static final String DBE_SERVICE_HOST = "DBE_SERVICE_HOST";
     public static final String DBE_SERVICE_PORT = "DBE_SERVICE_PORT";
     public static final String DBE_DRIVER = "DBE_DRIVER";

@@ -201,9 +201,17 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
         addOrReplaceProperty("ImageStream Namespace", "Namespace in which the ImageStreams for Red Hat Middleware images are" +
                 " installed. These ImageStreams are normally installed in the openshift namespace." +
                 " You should only need to modify this if you've installed the ImageStreams in a" +
-                " different namespace/project.", OpenShiftImageConstants.IMAGE_STREAM_NAMESPACE, "openshift", true);
+                " different namespace/project.", OpenShiftImageConstants.IMAGE_STREAM_NAMESPACE, getDefaultImageStreamNamespace(), true);
 
         withImageStreamNamespace("${" + OpenShiftImageConstants.IMAGE_STREAM_NAMESPACE + "}");
+        return this;
+    }
+
+    public KieServerDeploymentBuilder withImageStreamNameFromProperties() {
+        String defaultImageStreamName = getDefaultImageStreamName();
+        addOrReplaceProperty("KIE Server ImageStream Name", "The name of the image stream to use for KIE server. Default is \"" + defaultImageStreamName + "\".", OpenShiftImageConstants.KIE_SERVER_IMAGE_STREAM_NAME, defaultImageStreamName, true);
+
+        withImageStreamName("${" + OpenShiftImageConstants.KIE_SERVER_IMAGE_STREAM_NAME + "}");
         return this;
     }
 
