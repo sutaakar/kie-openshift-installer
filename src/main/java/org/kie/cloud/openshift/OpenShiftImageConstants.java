@@ -46,6 +46,11 @@ public class OpenShiftImageConstants {
 
     public static final String KIE_SERVER_BYPASS_AUTH_USER = "KIE_SERVER_BYPASS_AUTH_USER";
 
+    public static final String KIE_SERVER_HTTPS_SECRET = "KIE_SERVER_HTTPS_SECRET";
+    public static final String KIE_SERVER_HTTPS_KEYSTORE = "KIE_SERVER_HTTPS_KEYSTORE";
+    public static final String KIE_SERVER_HTTPS_NAME = "KIE_SERVER_HTTPS_NAME";
+    public static final String KIE_SERVER_HTTPS_PASSWORD = "KIE_SERVER_HTTPS_PASSWORD";
+
     public static final String HTTPS_KEYSTORE_DIR = "HTTPS_KEYSTORE_DIR";
     public static final String HTTPS_KEYSTORE = "HTTPS_KEYSTORE";
     public static final String HTTPS_NAME = "HTTPS_NAME";

@@ -22,8 +22,6 @@ import java.util.HashMap;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerPort;
 import io.fabric8.kubernetes.api.model.ContainerPortBuilder;
-import io.fabric8.kubernetes.api.model.EnvVar;
-import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.fabric8.kubernetes.api.model.IntOrString;
 import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.api.model.Probe;
@@ -224,6 +222,23 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
     }
 
     public KieServerDeploymentBuilder withHttps(String secretName, String keystore, String name, String password) {
+        createHttps(secretName);
+        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_KEYSTORE, keystore);
+        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_NAME, name);
+        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_PASSWORD, password);
+        return this;
+    }
+
+    public KieServerDeploymentBuilder withHttpsFromProperties() {
+        createHttps("${" + OpenShiftImageConstants.KIE_SERVER_HTTPS_SECRET + "}");
+        addOrReplacePropertyWithExample("KIE Server Keystore Secret Name", "The name of the secret containing the keystore file", OpenShiftImageConstants.KIE_SERVER_HTTPS_SECRET, "kieserver-app-secret", true);
+        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_KEYSTORE, "KIE Server Keystore Filename", "The name of the keystore file within the secret", OpenShiftImageConstants.KIE_SERVER_HTTPS_KEYSTORE, "keystore.jks", false);
+        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_NAME, "KIE Server Certificate Name", "The name associated with the server certificate", OpenShiftImageConstants.KIE_SERVER_HTTPS_NAME, "jboss", false);
+        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_PASSWORD, "KIE Server Keystore Password", "The password for the keystore and certificate", OpenShiftImageConstants.KIE_SERVER_HTTPS_PASSWORD, "mykeystorepass", false);
+        return this;
+    }
+
+    private KieServerDeploymentBuilder createHttps(String secretName) {
         String volumeName = "kieserver-keystore-volume";
         String volumeDir = "/etc/kieserver-secret-volume";
 
@@ -283,9 +298,6 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
 
         // Configure environment variables
         addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_KEYSTORE_DIR, volumeDir);
-        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_KEYSTORE, keystore);
-        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_NAME, name);
-        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_PASSWORD, password);
         return this;
     }
 

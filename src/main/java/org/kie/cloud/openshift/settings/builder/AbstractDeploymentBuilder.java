@@ -181,6 +181,19 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
         deployment.getParameters().add(parameter);
     }
 
+    protected void addOrReplaceEnvVarWithExample(String environmentVariableName, String propertyDisplayName, String propertyDescription, String propertyName, String propertyExample, boolean required) {
+        EnvVar envVar = new EnvVar(environmentVariableName, "${" + propertyName + "}", null);
+        addOrReplaceEnvVar(envVar);
+
+        Parameter parameter = new ParameterBuilder().withDisplayName(propertyDisplayName)
+                                                    .withDescription(propertyDescription)
+                                                    .withName(propertyName)
+                                                    .withRequired(required)
+                                                    .build();
+        parameter.setAdditionalProperty("example", propertyExample);
+        deployment.getParameters().add(parameter);
+    }
+
     protected void addOrReplaceEnvVar(String environmentVariableName, String propertyDisplayName, String propertyDescription, String propertyName, String propertyFrom, String propertyGenerate, boolean required) {
         EnvVar envVar = new EnvVar(environmentVariableName, "${" + propertyName + "}", null);
         addOrReplaceEnvVar(envVar);
@@ -205,6 +218,26 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
             container.getEnv().removeIf(n -> n.getName().equals(envVar.getName()));
             container.getEnv().add(envVar);
         }
+    }
+
+    protected void addOrReplaceProperty(String propertyDisplayName, String propertyDescription, String propertyName, String propertyValue, boolean required) {
+        Parameter parameter = new ParameterBuilder().withDisplayName(propertyDisplayName)
+                                                    .withDescription(propertyDescription)
+                                                    .withName(propertyName)
+                                                    .withValue(propertyValue)
+                                                    .withRequired(required)
+                                                    .build();
+        deployment.getParameters().add(parameter);
+    }
+
+    protected void addOrReplacePropertyWithExample(String propertyDisplayName, String propertyDescription, String propertyName, String propertyExample, boolean required) {
+        Parameter parameter = new ParameterBuilder().withDisplayName(propertyDisplayName)
+                                                    .withDescription(propertyDescription)
+                                                    .withName(propertyName)
+                                                    .withRequired(required)
+                                                    .build();
+        parameter.setAdditionalProperty("example", propertyExample);
+        deployment.getParameters().add(parameter);
     }
 
     protected void addPersistence(String deploymentName, String mountPath, String accessMode, String persistentVolumeStorageSize) {
