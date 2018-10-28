@@ -215,6 +215,14 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
         return this;
     }
 
+    public KieServerDeploymentBuilder withImageStreamTagFromProperties() {
+        String defaultImageStreamTag = getDefaultImageStreamTag();
+        addOrReplaceProperty("ImageStream Tag", "A named pointer to an image in an image stream. Default is \"" + defaultImageStreamTag + "\".", OpenShiftImageConstants.IMAGE_STREAM_TAG, defaultImageStreamTag, true);
+
+        withImageStreamTag("${" + OpenShiftImageConstants.IMAGE_STREAM_TAG + "}");
+        return this;
+    }
+
     /**
      * Return configured builder with Kie Server user.
      *

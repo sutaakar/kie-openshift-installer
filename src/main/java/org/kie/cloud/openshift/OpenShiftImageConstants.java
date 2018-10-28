@@ -63,6 +63,7 @@ public class OpenShiftImageConstants {
     public static final String MAVEN_REPO_PASSWORD = "MAVEN_REPO_PASSWORD";
 
     public static final String IMAGE_STREAM_NAMESPACE = "IMAGE_STREAM_NAMESPACE";
+    public static final String IMAGE_STREAM_TAG = "IMAGE_STREAM_TAG";
 
     public static final String KIE_SERVER_IMAGE_STREAM_NAME = "KIE_SERVER_IMAGE_STREAM_NAME";
 
