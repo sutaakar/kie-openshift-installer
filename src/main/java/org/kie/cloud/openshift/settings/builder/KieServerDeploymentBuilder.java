@@ -212,6 +212,17 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
         return this;
     }
 
+    /**
+     * Return configured builder with Kie Server user from template properties.
+     *
+     * @return Builder
+     */
+    public KieServerDeploymentBuilder withKieServerUserFromProperties() {
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_USER, "KIE Server User", "KIE server username (Sets the org.kie.server.user system property)", OpenShiftImageConstants.KIE_SERVER_USER, "executionUser", false);
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PWD, "KIE Server Password", "KIE server password (Sets the org.kie.server.pwd system property)", OpenShiftImageConstants.KIE_SERVER_PWD, "[a-zA-Z]{6}[0-9]{1}!", "expression", false);
+        return this;
+    }
+
     public KieServerDeploymentBuilder withHttps(String secretName, String keystore, String name, String password) {
         String volumeName = "kieserver-keystore-volume";
         String volumeDir = "/etc/kieserver-secret-volume";

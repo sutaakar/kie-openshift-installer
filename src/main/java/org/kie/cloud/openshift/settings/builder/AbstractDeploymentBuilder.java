@@ -19,6 +19,8 @@ import io.fabric8.kubernetes.api.model.VolumeMountBuilder;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.api.model.DeploymentConfigBuilder;
 import io.fabric8.openshift.api.model.DeploymentTriggerPolicy;
+import io.fabric8.openshift.api.model.Parameter;
+import io.fabric8.openshift.api.model.ParameterBuilder;
 import org.kie.cloud.openshift.deployment.Deployment;
 
 public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> implements DeploymentBuilder {
@@ -164,6 +166,33 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
     protected void addOrReplaceEnvVar(String environmentVariableName, String environmentVariableValue) {
         EnvVar envVar = new EnvVar(environmentVariableName, environmentVariableValue, null);
         addOrReplaceEnvVar(envVar);
+    }
+
+    protected void addOrReplaceEnvVar(String environmentVariableName, String propertyDisplayName, String propertyDescription, String propertyName, String propertyValue, boolean required) {
+        EnvVar envVar = new EnvVar(environmentVariableName, "${" + propertyName + "}", null);
+        addOrReplaceEnvVar(envVar);
+
+        Parameter parameter = new ParameterBuilder().withDisplayName(propertyDisplayName)
+                                                    .withDescription(propertyDescription)
+                                                    .withName(propertyName)
+                                                    .withValue(propertyValue)
+                                                    .withRequired(required)
+                                                    .build();
+        deployment.getParameters().add(parameter);
+    }
+
+    protected void addOrReplaceEnvVar(String environmentVariableName, String propertyDisplayName, String propertyDescription, String propertyName, String propertyFrom, String propertyGenerate, boolean required) {
+        EnvVar envVar = new EnvVar(environmentVariableName, "${" + propertyName + "}", null);
+        addOrReplaceEnvVar(envVar);
+
+        Parameter parameter = new ParameterBuilder().withDisplayName(propertyDisplayName)
+                                                    .withDescription(propertyDescription)
+                                                    .withName(propertyName)
+                                                    .withFrom(propertyFrom)
+                                                    .withGenerate(propertyGenerate)
+                                                    .withRequired(required)
+                                                    .build();
+        deployment.getParameters().add(parameter);
     }
 
     protected void addOrReplaceEnvVar(EnvVar envVar) {
