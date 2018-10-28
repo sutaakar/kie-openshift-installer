@@ -125,8 +125,9 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder<MySqlDeplo
     }
 
     public MySqlDeploymentBuilder withDatabaseUserFromProperties() {
-        addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_USER, "KIE Server MySQL Database User", "KIE server MySQL database username", OpenShiftImageConstants.KIE_SERVER_MYSQL_USER, "rhpam", false);
-        addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_PASSWORD, "KIE Server MySQL Database Password", "KIE server MySQL database password", OpenShiftImageConstants.KIE_SERVER_MYSQL_PWD, "[a-zA-Z]{6}[0-9]{1}!", "expression", false);
+        addOrReplaceProperty("KIE Server MySQL Database User", "KIE server MySQL database username", OpenShiftImageConstants.KIE_SERVER_MYSQL_USER, "rhpam", false);
+        addOrReplaceProperty("KIE Server MySQL Database Password", "KIE server MySQL database password", OpenShiftImageConstants.KIE_SERVER_MYSQL_PWD, "[a-zA-Z]{6}[0-9]{1}!", "expression", false);
+        withDatabaseUser("${" + OpenShiftImageConstants.KIE_SERVER_MYSQL_USER + "}", "${" + OpenShiftImageConstants.KIE_SERVER_MYSQL_PWD + "}");
         return this;
     }
 
@@ -136,7 +137,8 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder<MySqlDeplo
     }
 
     public MySqlDeploymentBuilder withDatabaseNameFromProperties() {
-        addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_DATABASE, "KIE Server MySQL Database Name", "KIE server MySQL database name", OpenShiftImageConstants.KIE_SERVER_MYSQL_DB, "rhpam7", false);
+        addOrReplaceProperty("KIE Server MySQL Database Name", "KIE server MySQL database name", OpenShiftImageConstants.KIE_SERVER_MYSQL_DB, "rhpam7", false);
+        withDatabaseName("${" + OpenShiftImageConstants.KIE_SERVER_MYSQL_DB + "}");
         return this;
     }
 

@@ -203,8 +203,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
                 " You should only need to modify this if you've installed the ImageStreams in a" +
                 " different namespace/project.", OpenShiftImageConstants.IMAGE_STREAM_NAMESPACE, "openshift", true);
 
-        String imageStreamNamespaceReplaceTag = "${" + OpenShiftImageConstants.IMAGE_STREAM_NAMESPACE + "}";
-        super.withImageStreamNamespace(imageStreamNamespaceReplaceTag);
+        withImageStreamNamespace("${" + OpenShiftImageConstants.IMAGE_STREAM_NAMESPACE + "}");
         return this;
     }
 
@@ -227,29 +226,22 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
      * @return Builder
      */
     public KieServerDeploymentBuilder withKieServerUserFromProperties() {
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_USER, "KIE Server User", "KIE server username (Sets the org.kie.server.user system property)", OpenShiftImageConstants.KIE_SERVER_USER, "executionUser", false);
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PWD, "KIE Server Password", "KIE server password (Sets the org.kie.server.pwd system property)", OpenShiftImageConstants.KIE_SERVER_PWD, "[a-zA-Z]{6}[0-9]{1}!", "expression", false);
-        return this;
-    }
-
-    public KieServerDeploymentBuilder withHttps(String secretName, String keystore, String name, String password) {
-        createHttps(secretName);
-        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_KEYSTORE, keystore);
-        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_NAME, name);
-        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_PASSWORD, password);
+        addOrReplaceProperty("KIE Server User", "KIE server username (Sets the org.kie.server.user system property)", OpenShiftImageConstants.KIE_SERVER_USER, "executionUser", false);
+        addOrReplaceProperty("KIE Server Password", "KIE server password (Sets the org.kie.server.pwd system property)", OpenShiftImageConstants.KIE_SERVER_PWD, "[a-zA-Z]{6}[0-9]{1}!", "expression", false);
+        withKieServerUser("${" + OpenShiftImageConstants.KIE_SERVER_USER + "}", "${" + OpenShiftImageConstants.KIE_SERVER_PWD + "}");
         return this;
     }
 
     public KieServerDeploymentBuilder withHttpsFromProperties() {
-        createHttps("${" + OpenShiftImageConstants.KIE_SERVER_HTTPS_SECRET + "}");
         addOrReplacePropertyWithExample("KIE Server Keystore Secret Name", "The name of the secret containing the keystore file", OpenShiftImageConstants.KIE_SERVER_HTTPS_SECRET, "kieserver-app-secret", true);
-        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_KEYSTORE, "KIE Server Keystore Filename", "The name of the keystore file within the secret", OpenShiftImageConstants.KIE_SERVER_HTTPS_KEYSTORE, "keystore.jks", false);
-        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_NAME, "KIE Server Certificate Name", "The name associated with the server certificate", OpenShiftImageConstants.KIE_SERVER_HTTPS_NAME, "jboss", false);
-        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_PASSWORD, "KIE Server Keystore Password", "The password for the keystore and certificate", OpenShiftImageConstants.KIE_SERVER_HTTPS_PASSWORD, "mykeystorepass", false);
+        addOrReplaceProperty("KIE Server Keystore Filename", "The name of the keystore file within the secret", OpenShiftImageConstants.KIE_SERVER_HTTPS_KEYSTORE, "keystore.jks", false);
+        addOrReplaceProperty("KIE Server Certificate Name", "The name associated with the server certificate", OpenShiftImageConstants.KIE_SERVER_HTTPS_NAME, "jboss", false);
+        addOrReplaceProperty("KIE Server Keystore Password", "The password for the keystore and certificate", OpenShiftImageConstants.KIE_SERVER_HTTPS_PASSWORD, "mykeystorepass", false);
+        withHttps("${" + OpenShiftImageConstants.KIE_SERVER_HTTPS_SECRET + "}", "${" + OpenShiftImageConstants.KIE_SERVER_HTTPS_KEYSTORE + "}", "${" + OpenShiftImageConstants.KIE_SERVER_HTTPS_NAME + "}", "${" + OpenShiftImageConstants.KIE_SERVER_HTTPS_PASSWORD + "}");
         return this;
     }
 
-    private KieServerDeploymentBuilder createHttps(String secretName) {
+    public KieServerDeploymentBuilder withHttps(String secretName, String keystore, String name, String password) {
         String volumeName = "kieserver-keystore-volume";
         String volumeDir = "/etc/kieserver-secret-volume";
 
@@ -309,6 +301,9 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
 
         // Configure environment variables
         addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_KEYSTORE_DIR, volumeDir);
+        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_KEYSTORE, keystore);
+        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_NAME, name);
+        addOrReplaceEnvVar(OpenShiftImageConstants.HTTPS_PASSWORD, password);
         return this;
     }
 

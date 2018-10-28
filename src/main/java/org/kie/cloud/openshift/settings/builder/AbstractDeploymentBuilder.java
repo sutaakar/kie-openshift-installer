@@ -168,46 +168,6 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
         addOrReplaceEnvVar(envVar);
     }
 
-    protected void addOrReplaceEnvVar(String environmentVariableName, String propertyDisplayName, String propertyDescription, String propertyName, String propertyValue, boolean required) {
-        EnvVar envVar = new EnvVar(environmentVariableName, "${" + propertyName + "}", null);
-        addOrReplaceEnvVar(envVar);
-
-        Parameter parameter = new ParameterBuilder().withDisplayName(propertyDisplayName)
-                                                    .withDescription(propertyDescription)
-                                                    .withName(propertyName)
-                                                    .withValue(propertyValue)
-                                                    .withRequired(required)
-                                                    .build();
-        deployment.getParameters().add(parameter);
-    }
-
-    protected void addOrReplaceEnvVarWithExample(String environmentVariableName, String propertyDisplayName, String propertyDescription, String propertyName, String propertyExample, boolean required) {
-        EnvVar envVar = new EnvVar(environmentVariableName, "${" + propertyName + "}", null);
-        addOrReplaceEnvVar(envVar);
-
-        Parameter parameter = new ParameterBuilder().withDisplayName(propertyDisplayName)
-                                                    .withDescription(propertyDescription)
-                                                    .withName(propertyName)
-                                                    .withRequired(required)
-                                                    .build();
-        parameter.setAdditionalProperty("example", propertyExample);
-        deployment.getParameters().add(parameter);
-    }
-
-    protected void addOrReplaceEnvVar(String environmentVariableName, String propertyDisplayName, String propertyDescription, String propertyName, String propertyFrom, String propertyGenerate, boolean required) {
-        EnvVar envVar = new EnvVar(environmentVariableName, "${" + propertyName + "}", null);
-        addOrReplaceEnvVar(envVar);
-
-        Parameter parameter = new ParameterBuilder().withDisplayName(propertyDisplayName)
-                                                    .withDescription(propertyDescription)
-                                                    .withName(propertyName)
-                                                    .withFrom(propertyFrom)
-                                                    .withGenerate(propertyGenerate)
-                                                    .withRequired(required)
-                                                    .build();
-        deployment.getParameters().add(parameter);
-    }
-
     protected void addOrReplaceEnvVar(EnvVar envVar) {
         List<Container> containers = deployment.getDeploymentConfig()
                                                .getSpec()
@@ -227,6 +187,19 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
                                                     .withValue(propertyValue)
                                                     .withRequired(required)
                                                     .build();
+        deployment.getParameters().removeIf(p -> p.getName().equals(propertyName));
+        deployment.getParameters().add(parameter);
+    }
+
+    protected void addOrReplaceProperty(String propertyDisplayName, String propertyDescription, String propertyName, String propertyFrom, String propertyGenerate, boolean required) {
+        Parameter parameter = new ParameterBuilder().withDisplayName(propertyDisplayName)
+                                                    .withDescription(propertyDescription)
+                                                    .withName(propertyName)
+                                                    .withFrom(propertyFrom)
+                                                    .withGenerate(propertyGenerate)
+                                                    .withRequired(required)
+                                                    .build();
+        deployment.getParameters().removeIf(p -> p.getName().equals(propertyName));
         deployment.getParameters().add(parameter);
     }
 
@@ -237,6 +210,7 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
                                                     .withRequired(required)
                                                     .build();
         parameter.setAdditionalProperty("example", propertyExample);
+        deployment.getParameters().removeIf(p -> p.getName().equals(propertyName));
         deployment.getParameters().add(parameter);
     }
 
