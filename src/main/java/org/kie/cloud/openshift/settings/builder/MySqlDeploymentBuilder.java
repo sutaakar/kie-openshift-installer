@@ -124,8 +124,19 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder<MySqlDeplo
         return this;
     }
 
+    public MySqlDeploymentBuilder withDatabaseUserFromProperties() {
+        addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_USER, "KIE Server MySQL Database User", "KIE server MySQL database username", OpenShiftImageConstants.KIE_SERVER_MYSQL_USER, "rhpam", false);
+        addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_PASSWORD, "KIE Server MySQL Database Password", "KIE server MySQL database password", OpenShiftImageConstants.KIE_SERVER_MYSQL_PWD, "[a-zA-Z]{6}[0-9]{1}!", "expression", false);
+        return this;
+    }
+
     public MySqlDeploymentBuilder withDatabaseName(String dbName) {
         addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_DATABASE, dbName);
+        return this;
+    }
+
+    public MySqlDeploymentBuilder withDatabaseNameFromProperties() {
+        addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_DATABASE, "KIE Server MySQL Database Name", "KIE server MySQL database name", OpenShiftImageConstants.KIE_SERVER_MYSQL_DB, "rhpam7", false);
         return this;
     }
 
