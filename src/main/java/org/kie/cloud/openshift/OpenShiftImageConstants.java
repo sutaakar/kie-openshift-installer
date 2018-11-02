@@ -44,6 +44,8 @@ public class OpenShiftImageConstants {
     public static final String KIE_SERVER_ROUTER_SERVICE = "KIE_SERVER_ROUTER_SERVICE";
     public static final String KIE_SERVER_ROUTER_URL_EXTERNAL = "KIE_SERVER_ROUTER_URL_EXTERNAL";
 
+    public static final String KIE_SERVER_MEMORY_LIMIT = "KIE_SERVER_MEMORY_LIMIT";
+
     public static final String KIE_SERVER_BYPASS_AUTH_USER = "KIE_SERVER_BYPASS_AUTH_USER";
 
     public static final String KIE_SERVER_HOSTNAME_HTTP = "KIE_SERVER_HOSTNAME_HTTP";

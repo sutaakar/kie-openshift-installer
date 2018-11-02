@@ -388,6 +388,17 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
         return this;
     }
 
+    public KieServerDeploymentBuilder withContainerMemoryLimitFromProperties() {
+        addOrReplaceProperty("KIE Server Container Memory Limit", "KIE server Container memory limit", OpenShiftImageConstants.KIE_SERVER_MEMORY_LIMIT, "1Gi", false);
+        withContainerMemoryLimit("${" + OpenShiftImageConstants.KIE_SERVER_MEMORY_LIMIT + "}");
+        return this;
+    }
+
+    public KieServerDeploymentBuilder withContainerMemoryLimit(String kieServerMemoryLimit) {
+        getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getResources().getLimits().put("memory", new Quantity(kieServerMemoryLimit));
+        return this;
+    }
+
     public KieServerDeploymentBuilder connectToMySqlDatabase(Deployment databaseDeployment) {
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DIALECT, "org.hibernate.dialect.MySQL5Dialect");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DS, "java:/jboss/datasources/kie");

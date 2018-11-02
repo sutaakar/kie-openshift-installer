@@ -579,6 +579,33 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildKieServerDeploymentWithemoryLimitFromProperties() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withContainerMemoryLimitFromProperties()
+                                                             .build();
+
+        assertThat(builtKieServerDeployment).isNotNull();
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getResources().getLimits()).containsEntry("memory", new Quantity("${KIE_SERVER_MEMORY_LIMIT}"));
+        assertThat(builtKieServerDeployment.getParameters())
+        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_MEMORY_LIMIT.equals(p.getName()))
+        .hasOnlyOneElementSatisfying(p -> {
+            assertThat(p.getDisplayName()).isEqualTo("KIE Server Container Memory Limit");
+            assertThat(p.getValue()).isEqualTo("1Gi");
+            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+        });
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithCustomMemoryLimit() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withContainerMemoryLimit("64Mi")
+                                                             .build();
+
+        assertThat(builtKieServerDeployment).isNotNull();
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getResources().getLimits()).containsEntry("memory", new Quantity("64Mi"));
+    }
+
+    @Test
     public void testBuildKieServerDeploymentWithClustering() {
         KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.withClustering()
