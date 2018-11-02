@@ -500,6 +500,27 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildKieServerDeploymentWithHttpHostnameFromProperties() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withHttpHostnameFromProperties()
+                                                             .build();
+
+        assertThat(builtKieServerDeployment).isNotNull();
+        assertThat(builtKieServerDeployment.getUnsecureRoutes())
+                    .filteredOn(r -> r.getSpec().getPort().getTargetPort().getStrVal().equals("http"))
+                    .hasOnlyOneElementSatisfying(r -> {
+                        assertThat(r.getSpec().getHost()).isEqualTo("${KIE_SERVER_HOSTNAME_HTTP}");
+                    });
+        assertThat(builtKieServerDeployment.getParameters())
+                    .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_HOSTNAME_HTTP.equals(p.getName()))
+                    .hasOnlyOneElementSatisfying(p -> {
+                        assertThat(p.getDisplayName()).isEqualTo("KIE Server Custom http Route Hostname");
+                        assertThat(p.getValue()).isEqualTo("");
+                        assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                    });
+    }
+
+    @Test
     public void testBuildKieServerDeploymentWithCustomHttpHostname() {
         KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.withHttpHostname("custom-hostname")
