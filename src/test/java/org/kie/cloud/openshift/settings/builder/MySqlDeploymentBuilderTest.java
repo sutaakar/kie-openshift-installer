@@ -133,6 +133,36 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildMySqlDeploymentWithMySqlUserFromProperties() {
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
+        Deployment builtMySqlDeployment = settingsBuilder.withDatabaseUserFromProperties()
+                                                         .build();
+
+        assertThat(builtMySqlDeployment).isNotNull();
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.MYSQL_USER.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${KIE_SERVER_MYSQL_USER}"));
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.MYSQL_PASSWORD.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${KIE_SERVER_MYSQL_PWD}"));
+        assertThat(builtMySqlDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_MYSQL_USER.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("KIE Server MySQL Database User");
+                            assertThat(p.getValue()).isEqualTo("rhpam");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
+        assertThat(builtMySqlDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_MYSQL_PWD.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("KIE Server MySQL Database Password");
+                            assertThat(p.getGenerate()).isEqualTo("expression");
+                            assertThat(p.getFrom()).isEqualTo("[a-zA-Z]{6}[0-9]{1}!");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
+    }
+
+    @Test
     public void testBuildMySqlDeploymentWithMySqlUser() {
         MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
         Deployment builtMySqlDeployment = settingsBuilder.withDatabaseUser("mySqlName", "mySqlPassword")
@@ -145,6 +175,25 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.MYSQL_PASSWORD.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("mySqlPassword"));
+    }
+
+    @Test
+    public void testBuildMySqlDeploymentWithDbNameFromProperties() {
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
+        Deployment builtMySqlDeployment = settingsBuilder.withDatabaseNameFromProperties()
+                                                         .build();
+
+        assertThat(builtMySqlDeployment).isNotNull();
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.MYSQL_DATABASE.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${KIE_SERVER_MYSQL_DB}"));
+        assertThat(builtMySqlDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_MYSQL_DB.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("KIE Server MySQL Database Name");
+                            assertThat(p.getValue()).isEqualTo("rhpam7");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
     }
 
     @Test

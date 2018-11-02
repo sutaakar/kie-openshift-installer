@@ -190,6 +190,36 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildKieServerDeploymentWithKieServerUserFromProperties() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withKieServerUserFromProperties()
+                                                             .build();
+
+        assertThat(builtKieServerDeployment).isNotNull();
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_USER.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${KIE_SERVER_USER}"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_PWD.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${KIE_SERVER_PWD}"));
+        assertThat(builtKieServerDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_USER.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("KIE Server User");
+                            assertThat(p.getValue()).isEqualTo("executionUser");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
+        assertThat(builtKieServerDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_PWD.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("KIE Server Password");
+                            assertThat(p.getGenerate()).isEqualTo("expression");
+                            assertThat(p.getFrom()).isEqualTo("[a-zA-Z]{6}[0-9]{1}!");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
+    }
+
+    @Test
     public void testBuildKieServerDeploymentWithKieServerUser() {
         KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.withKieServerUser("kieServerName", "kieServerPassword")
@@ -202,6 +232,101 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_PWD.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("kieServerPassword"));
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithHttpsFromProperties() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withHttpsFromProperties()
+                                                             .build();
+
+        assertThat(builtKieServerDeployment).isNotNull();
+
+        // Check route
+        assertThat(builtKieServerDeployment.getSecureRoutes()).hasSize(1);
+        assertThat(builtKieServerDeployment.getSecureRoutes().get(0).getApiVersion()).isEqualTo("v1");
+        assertThat(builtKieServerDeployment.getSecureRoutes().get(0).getMetadata().getName()).isEqualTo("secure-" + builtKieServerDeployment.getDeploymentName());
+        assertThat(builtKieServerDeployment.getSecureRoutes().get(0).getSpec().getTo().getName()).isEqualTo(builtKieServerDeployment.getServices().get(0).getMetadata().getName());
+        assertThat(builtKieServerDeployment.getSecureRoutes().get(0).getSpec().getPort().getTargetPort().getStrVal()).isEqualTo("https");
+        assertThat(builtKieServerDeployment.getSecureRoutes().get(0).getSpec().getTls().getTermination()).isEqualTo("passthrough");
+        assertThat(builtKieServerDeployment.getSecureRoutes().get(0).getMetadata().getAnnotations()).containsEntry("description", "Route for KIE server's https service.");
+        assertThat(builtKieServerDeployment.getSecureRoutes().get(0).getMetadata().getLabels()).containsEntry("service", builtKieServerDeployment.getDeploymentName());
+        assertThat(builtKieServerDeployment.getSecureRoutes().get(0).getAdditionalProperties()).containsEntry("id", builtKieServerDeployment.getDeploymentName() + "-https");
+
+        // Check service
+        assertThat(builtKieServerDeployment.getServices()).hasSize(1);
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts()).hasSize(2);
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(0).getName()).isEqualTo("http");
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(0).getPort()).isEqualTo(8080);
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(0).getTargetPort().getIntVal()).isEqualTo(8080);
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(1).getName()).isEqualTo("https");
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(1).getPort()).isEqualTo(8443);
+        assertThat(builtKieServerDeployment.getServices().get(0).getSpec().getPorts().get(1).getTargetPort().getIntVal()).isEqualTo(8443);
+
+        // Check volume
+        List<VolumeMount> volumeMounts = builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getVolumeMounts();
+        List<Volume> volumes = builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getVolumes();
+        assertThat(volumeMounts)
+                        .hasOnlyOneElementSatisfying(m -> {
+                            assertThat(m.getName()).isEqualTo("kieserver-keystore-volume");
+                            assertThat(m.getMountPath()).isEqualTo("/etc/kieserver-secret-volume");
+                            assertThat(m.getReadOnly()).isTrue();
+                        });
+        assertThat(volumes)
+                        .hasOnlyOneElementSatisfying(v -> {
+                            assertThat(v.getName()).isEqualTo(volumeMounts.get(0).getName());
+                            assertThat(v.getSecret().getSecretName()).isEqualTo("${KIE_SERVER_HTTPS_SECRET}");
+                        });
+
+        // Check HTTPS ports
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getPorts())
+                        .anySatisfy(p -> {
+                            assertThat(p.getName()).isEqualTo("https");
+                            assertThat(p.getContainerPort()).isEqualTo(8443);
+                            assertThat(p.getProtocol()).isEqualTo("TCP");
+                        });
+
+        // Check environment variables
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.HTTPS_KEYSTORE_DIR.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("/etc/kieserver-secret-volume"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.HTTPS_KEYSTORE.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${KIE_SERVER_HTTPS_KEYSTORE}"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.HTTPS_NAME.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${KIE_SERVER_HTTPS_NAME}"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.HTTPS_PASSWORD.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${KIE_SERVER_HTTPS_PASSWORD}"));
+        assertThat(builtKieServerDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_HTTPS_SECRET.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("KIE Server Keystore Secret Name");
+                            assertThat(p.getAdditionalProperties()).containsEntry("example", "kieserver-app-secret");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.TRUE);
+                        });
+        assertThat(builtKieServerDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_HTTPS_KEYSTORE.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("KIE Server Keystore Filename");
+                            assertThat(p.getValue()).isEqualTo("keystore.jks");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
+        assertThat(builtKieServerDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_HTTPS_NAME.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("KIE Server Certificate Name");
+                            assertThat(p.getValue()).isEqualTo("jboss");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
+        assertThat(builtKieServerDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_HTTPS_PASSWORD.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("KIE Server Keystore Password");
+                            assertThat(p.getValue()).isEqualTo("mykeystorepass");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
     }
 
     @Test
@@ -272,6 +397,26 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildKieServerDeploymentWithImageStreamNamespaceFromProperties() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withImageStreamNamespaceFromProperties()
+                                                             .build();
+
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ImageChange"))
+                    .hasOnlyOneElementSatisfying(e -> {
+                        assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("${IMAGE_STREAM_NAMESPACE}");
+                    });
+        assertThat(builtKieServerDeployment.getParameters())
+                    .filteredOn(p -> OpenShiftImageConstants.IMAGE_STREAM_NAMESPACE.equals(p.getName()))
+                    .hasOnlyOneElementSatisfying(p -> {
+                        assertThat(p.getDisplayName()).isEqualTo("ImageStream Namespace");
+                        assertThat(p.getValue()).isEqualTo("openshift");
+                        assertThat(p.getRequired()).isEqualTo(Boolean.TRUE);
+                    });
+    }
+
+    @Test
     public void testBuildKieServerDeploymentWithCustomImageStreamNamespace() {
         KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.withImageStreamNamespace("custom-namespace")
@@ -282,6 +427,26 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
                     .filteredOn(t -> t.getType().equals("ImageChange"))
                     .hasOnlyOneElementSatisfying(e -> {
                         assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("custom-namespace");
+                    });
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithImageStreamNameFromProperties() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withImageStreamNameFromProperties()
+                                                             .build();
+
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ImageChange"))
+                    .hasOnlyOneElementSatisfying(e -> {
+                        assertThat(e.getImageChangeParams().getFrom().getName()).startsWith("${KIE_SERVER_IMAGE_STREAM_NAME}:");
+                    });
+        assertThat(builtKieServerDeployment.getParameters())
+                    .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_IMAGE_STREAM_NAME.equals(p.getName()))
+                    .hasOnlyOneElementSatisfying(p -> {
+                        assertThat(p.getDisplayName()).isEqualTo("KIE Server ImageStream Name");
+                        assertThat(p.getValue()).isEqualTo("rhpam72-kieserver-openshift");
+                        assertThat(p.getRequired()).isEqualTo(Boolean.TRUE);
                     });
     }
 
@@ -298,6 +463,26 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
                         assertThat(e.getImageChangeParams().getFrom().getName()).startsWith("custom-name:");
                     });
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getImage()).isEqualTo("custom-name");
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithImageStreamTagFromProperties() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withImageStreamTagFromProperties()
+                                                             .build();
+
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ImageChange"))
+                    .hasOnlyOneElementSatisfying(e -> {
+                        assertThat(e.getImageChangeParams().getFrom().getName()).endsWith(":${IMAGE_STREAM_TAG}");
+                    });
+        assertThat(builtKieServerDeployment.getParameters())
+                    .filteredOn(p -> OpenShiftImageConstants.IMAGE_STREAM_TAG.equals(p.getName()))
+                    .hasOnlyOneElementSatisfying(p -> {
+                        assertThat(p.getDisplayName()).isEqualTo("ImageStream Tag");
+                        assertThat(p.getValue()).isEqualTo("1.0");
+                        assertThat(p.getRequired()).isEqualTo(Boolean.TRUE);
+                    });
     }
 
     @Test
