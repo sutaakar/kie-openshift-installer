@@ -302,4 +302,65 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
                             assertThat(p.getSpec().getResources().getRequests().get("storage")).isEqualTo(new Quantity("1Gi"));
                         });
     }
+
+    @Test
+    public void testBuildMySqlDeploymentWithCustomPersistence() {
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
+        Deployment builtMySqlDeployment = settingsBuilder.makePersistent("64Mi")
+                                                         .build();
+
+        List<VolumeMount> volumeMounts = builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getVolumeMounts();
+        List<Volume> volumes = builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getVolumes();
+        assertThat(volumeMounts)
+                        .hasOnlyOneElementSatisfying(m -> {
+                            assertThat(m.getName()).isEqualTo(builtMySqlDeployment.getDeploymentName() + "-pvol");
+                            assertThat(m.getMountPath()).isEqualTo("/var/lib/mysql/data");
+                        });
+        assertThat(volumes)
+                        .hasOnlyOneElementSatisfying(v -> {
+                            assertThat(v.getName()).isEqualTo(volumeMounts.get(0).getName());
+                            assertThat(v.getPersistentVolumeClaim().getClaimName()).isEqualTo(builtMySqlDeployment.getDeploymentName() + "-claim");
+                        });
+        assertThat(builtMySqlDeployment.getPersistentVolumeClaims())
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getMetadata().getName()).isEqualTo(volumes.get(0).getPersistentVolumeClaim().getClaimName());
+                            assertThat(p.getMetadata().getLabels()).containsEntry("service", builtMySqlDeployment.getDeploymentName());
+                            assertThat(p.getSpec().getAccessModes()).containsOnlyOnce("ReadWriteOnce");
+                            assertThat(p.getSpec().getResources().getRequests().get("storage")).isEqualTo(new Quantity("64Mi"));
+                        });
+    }
+
+    @Test
+    public void testBuildMySqlDeploymentWithPersistenceFromProperties() {
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
+        Deployment builtMySqlDeployment = settingsBuilder.makePersistentFromProperties()
+                                                         .build();
+
+        List<VolumeMount> volumeMounts = builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getVolumeMounts();
+        List<Volume> volumes = builtMySqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getVolumes();
+        assertThat(volumeMounts)
+                        .hasOnlyOneElementSatisfying(m -> {
+                            assertThat(m.getName()).isEqualTo(builtMySqlDeployment.getDeploymentName() + "-pvol");
+                            assertThat(m.getMountPath()).isEqualTo("/var/lib/mysql/data");
+                        });
+        assertThat(volumes)
+                        .hasOnlyOneElementSatisfying(v -> {
+                            assertThat(v.getName()).isEqualTo(volumeMounts.get(0).getName());
+                            assertThat(v.getPersistentVolumeClaim().getClaimName()).isEqualTo(builtMySqlDeployment.getDeploymentName() + "-claim");
+                        });
+        assertThat(builtMySqlDeployment.getPersistentVolumeClaims())
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getMetadata().getName()).isEqualTo(volumes.get(0).getPersistentVolumeClaim().getClaimName());
+                            assertThat(p.getMetadata().getLabels()).containsEntry("service", builtMySqlDeployment.getDeploymentName());
+                            assertThat(p.getSpec().getAccessModes()).containsOnlyOnce("ReadWriteOnce");
+                            assertThat(p.getSpec().getResources().getRequests().get("storage")).isEqualTo(new Quantity("${DB_VOLUME_CAPACITY}"));
+                        });
+        assertThat(builtMySqlDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.DB_VOLUME_CAPACITY.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("Database Volume Capacity");
+                            assertThat(p.getValue()).isEqualTo("1Gi");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.TRUE);
+                        });
+    }
 }

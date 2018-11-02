@@ -103,6 +103,8 @@ public class OpenShiftImageConstants {
     public static final String MYSQL_PASSWORD = "MYSQL_PASSWORD";
     public static final String MYSQL_DATABASE = "MYSQL_DATABASE";
 
+    public static final String DB_VOLUME_CAPACITY = "DB_VOLUME_CAPACITY";
+
     public static final String KIE_SERVER_MYSQL_USER = "KIE_SERVER_MYSQL_USER";
     public static final String KIE_SERVER_MYSQL_PWD = "KIE_SERVER_MYSQL_PWD";
     public static final String KIE_SERVER_MYSQL_DB = "KIE_SERVER_MYSQL_DB";
