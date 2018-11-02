@@ -542,6 +542,28 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildKieServerDeploymentWithHttpsHostnameFromProperties() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withHttpsFromProperties()
+                                                             .withHttpsHostnameFromProperties()
+                                                             .build();
+
+        assertThat(builtKieServerDeployment).isNotNull();
+        assertThat(builtKieServerDeployment.getSecureRoutes())
+                    .filteredOn(r -> r.getSpec().getPort().getTargetPort().getStrVal().equals("https"))
+                    .hasOnlyOneElementSatisfying(r -> {
+                        assertThat(r.getSpec().getHost()).isEqualTo("${KIE_SERVER_HOSTNAME_HTTPS}");
+                    });
+        assertThat(builtKieServerDeployment.getParameters())
+                    .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_HOSTNAME_HTTPS.equals(p.getName()))
+                    .hasOnlyOneElementSatisfying(p -> {
+                        assertThat(p.getDisplayName()).isEqualTo("KIE Server Custom https Route Hostname");
+                        assertThat(p.getValue()).isEqualTo("");
+                        assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                    });
+    }
+
+    @Test
     public void testBuildKieServerDeploymentWithCustomHttpsHostname() {
         KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.withHttps("secret", "keystore", "name", "pwd")

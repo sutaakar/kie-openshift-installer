@@ -373,6 +373,12 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
         return this;
     }
 
+    public KieServerDeploymentBuilder withHttpsHostnameFromProperties() {
+        addOrReplaceProperty("KIE Server Custom https Route Hostname", "Custom hostname for https service route.  Leave blank for default hostname, e.g.: secure-<application-name>-kieserver-<project>.<default-domain-suffix>", OpenShiftImageConstants.KIE_SERVER_HOSTNAME_HTTPS, "", false);
+        withHttpsHostname("${" + OpenShiftImageConstants.KIE_SERVER_HOSTNAME_HTTPS + "}");
+        return this;
+    }
+
     public KieServerDeploymentBuilder withHttpsHostname(String hostname) {
         Route httpsRoute = getDeployment().getSecureRoutes().stream()
                                                             .filter(r -> r.getSpec().getPort().getTargetPort().getStrVal().equals("https"))
