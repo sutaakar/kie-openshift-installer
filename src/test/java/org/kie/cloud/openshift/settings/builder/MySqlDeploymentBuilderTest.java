@@ -133,6 +133,74 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildMySqlDeploymentWithImageStreamNamespaceFromProperties() {
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
+        Deployment builtMySqlDeployment = settingsBuilder.withImageStreamNamespaceFromProperties()
+                                                         .build();
+
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ImageChange"))
+                    .hasOnlyOneElementSatisfying(e -> {
+                        assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("${MYSQL_IMAGE_STREAM_NAMESPACE}");
+                    });
+        assertThat(builtMySqlDeployment.getParameters())
+                    .filteredOn(p -> OpenShiftImageConstants.MYSQL_IMAGE_STREAM_NAMESPACE.equals(p.getName()))
+                    .hasOnlyOneElementSatisfying(p -> {
+                        assertThat(p.getDisplayName()).isEqualTo("MySQL ImageStream Namespace");
+                        assertThat(p.getValue()).isEqualTo("openshift");
+                        assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                    });
+    }
+
+    @Test
+    public void testBuildMySqlDeploymentWithCustomImageStreamNamespace() {
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
+        Deployment builtMySqlDeployment = settingsBuilder.withImageStreamNamespace("custom-namespace")
+                                                         .build();
+
+        assertThat(builtMySqlDeployment).isNotNull();
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ImageChange"))
+                    .hasOnlyOneElementSatisfying(e -> {
+                        assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("custom-namespace");
+                    });
+    }
+
+    @Test
+    public void testBuildMySqlDeploymentWithImageStreamTagFromProperties() {
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
+        Deployment builtMySqlDeployment = settingsBuilder.withImageStreamTagFromProperties()
+                                                             .build();
+
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ImageChange"))
+                    .hasOnlyOneElementSatisfying(e -> {
+                        assertThat(e.getImageChangeParams().getFrom().getName()).endsWith(":${MYSQL_IMAGE_STREAM_TAG}");
+                    });
+        assertThat(builtMySqlDeployment.getParameters())
+                    .filteredOn(p -> OpenShiftImageConstants.MYSQL_IMAGE_STREAM_TAG.equals(p.getName()))
+                    .hasOnlyOneElementSatisfying(p -> {
+                        assertThat(p.getDisplayName()).isEqualTo("MySQL ImageStream Tag");
+                        assertThat(p.getValue()).isEqualTo("5.7");
+                        assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                    });
+    }
+
+    @Test
+    public void testBuildMySqlDeploymentWithCustomImageStreamTag() {
+        MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
+        Deployment builtMySqlDeployment = settingsBuilder.withImageStreamTag("123")
+                                                             .build();
+
+        assertThat(builtMySqlDeployment).isNotNull();
+        assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ImageChange"))
+                    .hasOnlyOneElementSatisfying(e -> {
+                        assertThat(e.getImageChangeParams().getFrom().getName()).endsWith(":123");
+                    });
+    }
+
+    @Test
     public void testBuildMySqlDeploymentWithMySqlUserFromProperties() {
         MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
         Deployment builtMySqlDeployment = settingsBuilder.withDatabaseUserFromProperties()

@@ -118,6 +118,24 @@ public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder<MySqlDeplo
         container.setReadinessProbe(readinessProbe);
     }
 
+    public MySqlDeploymentBuilder withImageStreamNamespaceFromProperties() {
+        addOrReplaceProperty("MySQL ImageStream Namespace", "Namespace in which the ImageStream for the MySQL image is" +
+                " installed. The ImageStream is already installed in the openshift namespace." +
+                " You should only need to modify this if you've installed the ImageStream in a" +
+                " different namespace/project. Default is \"openshift\".", OpenShiftImageConstants.MYSQL_IMAGE_STREAM_NAMESPACE, getDefaultImageStreamNamespace(), false);
+
+        withImageStreamNamespace("${" + OpenShiftImageConstants.MYSQL_IMAGE_STREAM_NAMESPACE + "}");
+        return this;
+    }
+
+    public MySqlDeploymentBuilder withImageStreamTagFromProperties() {
+        String defaultImageStreamTag = getDefaultImageStreamTag();
+        addOrReplaceProperty("MySQL ImageStream Tag", "The MySQL image version, which is intended to correspond to the MySQL version. Default is \"" + defaultImageStreamTag + "\".", OpenShiftImageConstants.MYSQL_IMAGE_STREAM_TAG, defaultImageStreamTag, false);
+
+        withImageStreamTag("${" + OpenShiftImageConstants.MYSQL_IMAGE_STREAM_TAG + "}");
+        return this;
+    }
+
     public MySqlDeploymentBuilder withDatabaseUser(String mySqlUser, String mySqlPwd) {
         addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_USER, mySqlUser);
         addOrReplaceEnvVar(OpenShiftImageConstants.MYSQL_PASSWORD, mySqlPwd);
