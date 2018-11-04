@@ -401,12 +401,23 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
 
     public KieServerDeploymentBuilder withKieMbeansFromProperties() {
         addOrReplaceProperty("KIE MBeans", "KIE server mbeans enabled/disabled (Sets the kie.mbeans and kie.scanner.mbeans system properties)", OpenShiftImageConstants.KIE_MBEANS, "enabled", false);
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_MBEANS, "${" + OpenShiftImageConstants.KIE_MBEANS + "}");
+        withKieMbeans("${" + OpenShiftImageConstants.KIE_MBEANS + "}");
         return this;
     }
 
     public KieServerDeploymentBuilder withKieMbeans(String kieMbeans) {
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_MBEANS, kieMbeans);
+        return this;
+    }
+
+    public KieServerDeploymentBuilder withKieServerBypassAuthUserFromProperties() {
+        addOrReplaceProperty("KIE Server Bypass Auth User", "KIE server bypass auth user (Sets the org.kie.server.bypass.auth.user system property)", OpenShiftImageConstants.KIE_SERVER_BYPASS_AUTH_USER, "false", false);
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_BYPASS_AUTH_USER, "${" + OpenShiftImageConstants.KIE_SERVER_BYPASS_AUTH_USER + "}");
+        return this;
+    }
+
+    public KieServerDeploymentBuilder withKieServerBypassAuthUser(boolean kieServerBypassAuthUser) {
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_BYPASS_AUTH_USER, Boolean.valueOf(kieServerBypassAuthUser).toString());
         return this;
     }
 

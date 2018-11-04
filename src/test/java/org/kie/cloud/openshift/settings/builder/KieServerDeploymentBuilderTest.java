@@ -635,6 +635,35 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildKieServerDeploymentWithKieServerBypassAuthUserFromProperties() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withKieServerBypassAuthUserFromProperties()
+                                                             .build();
+
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_BYPASS_AUTH_USER.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${KIE_SERVER_BYPASS_AUTH_USER}"));
+        assertThat(builtKieServerDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_BYPASS_AUTH_USER.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("KIE Server Bypass Auth User");
+                            assertThat(p.getValue()).isEqualTo("false");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithKieServerBypassAuthUser() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withKieServerBypassAuthUser(true)
+                                                             .build();
+
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_BYPASS_AUTH_USER.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("true"));
+    }
+
+    @Test
     public void testBuildKieServerDeploymentWithKieServerClassFilteringFromProperties() {
         KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.withKieServerClassFilteringFromProperties()
