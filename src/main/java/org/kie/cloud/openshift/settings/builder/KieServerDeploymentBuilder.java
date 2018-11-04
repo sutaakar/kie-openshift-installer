@@ -399,6 +399,17 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
         return this;
     }
 
+    public KieServerDeploymentBuilder withKieMbeansFromProperties() {
+        addOrReplaceProperty("KIE MBeans", "KIE server mbeans enabled/disabled (Sets the kie.mbeans and kie.scanner.mbeans system properties)", OpenShiftImageConstants.KIE_MBEANS, "enabled", false);
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_MBEANS, "${" + OpenShiftImageConstants.KIE_MBEANS + "}");
+        return this;
+    }
+
+    public KieServerDeploymentBuilder withKieMbeans(String kieMbeans) {
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_MBEANS, kieMbeans);
+        return this;
+    }
+
     public KieServerDeploymentBuilder withKieServerClassFilteringFromProperties() {
         addOrReplaceProperty("Drools Server Filter Classes", "KIE server class filtering (Sets the org.drools.server.filter.classes system property)", OpenShiftImageConstants.DROOLS_SERVER_FILTER_CLASSES, "true", false);
         addOrReplaceEnvVar(OpenShiftImageConstants.DROOLS_SERVER_FILTER_CLASSES, "${" + OpenShiftImageConstants.DROOLS_SERVER_FILTER_CLASSES + "}");
