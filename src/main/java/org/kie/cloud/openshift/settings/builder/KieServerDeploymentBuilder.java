@@ -248,6 +248,24 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
         return this;
     }
 
+    public KieServerDeploymentBuilder withKieServerControllerConnectionFromProperties() {
+        addOrReplaceProperty("KIE Server Controller User", "KIE server controller username (Sets the org.kie.server.controller.user system property)", OpenShiftImageConstants.KIE_SERVER_CONTROLLER_USER, "controllerUser", false);
+        // TODO: Bug - missing value
+        addOrReplaceProperty("KIE Server Controller Password", "KIE server controller password (Sets the org.kie.server.controller.pwd system property)", OpenShiftImageConstants.KIE_SERVER_CONTROLLER_PWD, false);
+        addOrReplaceProperty("KIE Server Controller Token", "KIE server controller token for bearer authentication (Sets the org.kie.server.controller.token system property)", OpenShiftImageConstants.KIE_SERVER_CONTROLLER_TOKEN, false);
+        addOrReplaceProperty("KIE Server Controller Service", "The service name for the optional business central monitor, where it can be reached to allow service lookup, and registered with to allow monitoring console functionality (If set, will be used to discover host and port)", OpenShiftImageConstants.KIE_SERVER_CONTROLLER_SERVICE, false);
+        addOrReplacePropertyWithExample("KIE Server Controller host", "KIE server controller host (Used to set the org.kie.server.controller system property)", OpenShiftImageConstants.KIE_SERVER_CONTROLLER_HOST, "my-app-controller-ocpuser.os.example.com", false);
+        addOrReplacePropertyWithExample("KIE Server Controller port", "KIE server controller port (Used to set the org.kie.server.controller system property)", OpenShiftImageConstants.KIE_SERVER_CONTROLLER_PORT, "8080", false);
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_CONTROLLER_USER, "${" + OpenShiftImageConstants.KIE_SERVER_CONTROLLER_USER + "}");
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_CONTROLLER_PWD, "${" + OpenShiftImageConstants.KIE_SERVER_CONTROLLER_PWD + "}");
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_CONTROLLER_TOKEN, "${" + OpenShiftImageConstants.KIE_SERVER_CONTROLLER_TOKEN + "}");
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_CONTROLLER_SERVICE, "${" + OpenShiftImageConstants.KIE_SERVER_CONTROLLER_SERVICE + "}");
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_CONTROLLER_PROTOCOL, "ws");
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_CONTROLLER_HOST, "${" + OpenShiftImageConstants.KIE_SERVER_CONTROLLER_HOST + "}");
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_CONTROLLER_PORT, "${" + OpenShiftImageConstants.KIE_SERVER_CONTROLLER_PORT + "}");
+        return this;
+    }
+
     public KieServerDeploymentBuilder withHttpsFromProperties() {
         addOrReplacePropertyWithExample("KIE Server Keystore Secret Name", "The name of the secret containing the keystore file", OpenShiftImageConstants.KIE_SERVER_HTTPS_SECRET, "kieserver-app-secret", true);
         addOrReplaceProperty("KIE Server Keystore Filename", "The name of the keystore file within the secret", OpenShiftImageConstants.KIE_SERVER_HTTPS_KEYSTORE, "keystore.jks", false);

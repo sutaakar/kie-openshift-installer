@@ -191,6 +191,16 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
         deployment.getParameters().add(parameter);
     }
 
+    protected void addOrReplaceProperty(String propertyDisplayName, String propertyDescription, String propertyName, boolean required) {
+        Parameter parameter = new ParameterBuilder().withDisplayName(propertyDisplayName)
+                                                    .withDescription(propertyDescription)
+                                                    .withName(propertyName)
+                                                    .withRequired(required)
+                                                    .build();
+        deployment.getParameters().removeIf(p -> p.getName().equals(propertyName));
+        deployment.getParameters().add(parameter);
+    }
+
     protected void addOrReplaceProperty(String propertyDisplayName, String propertyDescription, String propertyName, String propertyFrom, String propertyGenerate, boolean required) {
         Parameter parameter = new ParameterBuilder().withDisplayName(propertyDisplayName)
                                                     .withDescription(propertyDescription)

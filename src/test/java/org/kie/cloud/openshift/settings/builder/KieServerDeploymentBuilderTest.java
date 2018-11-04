@@ -235,6 +235,75 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildKieServerDeploymentWithKieServerControllerConnectionFromProperties() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withKieServerControllerConnectionFromProperties()
+                                                             .build();
+
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_CONTROLLER_USER.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${KIE_SERVER_CONTROLLER_USER}"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_CONTROLLER_PWD.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${KIE_SERVER_CONTROLLER_PWD}"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_CONTROLLER_TOKEN.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${KIE_SERVER_CONTROLLER_TOKEN}"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_CONTROLLER_SERVICE.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${KIE_SERVER_CONTROLLER_SERVICE}"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_CONTROLLER_PROTOCOL.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("ws"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_CONTROLLER_HOST.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${KIE_SERVER_CONTROLLER_HOST}"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_CONTROLLER_PORT.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${KIE_SERVER_CONTROLLER_PORT}"));
+        assertThat(builtKieServerDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_CONTROLLER_USER.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("KIE Server Controller User");
+                            assertThat(p.getValue()).isEqualTo("controllerUser");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
+        assertThat(builtKieServerDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_CONTROLLER_PWD.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("KIE Server Controller Password");
+                            // TODO: Bug?
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
+        assertThat(builtKieServerDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_CONTROLLER_TOKEN.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("KIE Server Controller Token");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
+        assertThat(builtKieServerDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_CONTROLLER_SERVICE.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("KIE Server Controller Service");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
+        assertThat(builtKieServerDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_CONTROLLER_HOST.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("KIE Server Controller host");
+                            assertThat(p.getAdditionalProperties()).containsEntry("example", "my-app-controller-ocpuser.os.example.com");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
+        assertThat(builtKieServerDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_CONTROLLER_PORT.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("KIE Server Controller port");
+                            assertThat(p.getAdditionalProperties()).containsEntry("example", "8080");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
+    }
+
+    @Test
     public void testBuildKieServerDeploymentWithHttpsFromProperties() {
         KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.withHttpsFromProperties()

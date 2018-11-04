@@ -35,6 +35,7 @@ public class OpenShiftImageConstants {
     public static final String KIE_SERVER_CONTROLLER_PORT = "KIE_SERVER_CONTROLLER_PORT";
     public static final String KIE_SERVER_CONTROLLER_USER = "KIE_SERVER_CONTROLLER_USER";
     public static final String KIE_SERVER_CONTROLLER_PWD = "KIE_SERVER_CONTROLLER_PWD";
+    public static final String KIE_SERVER_CONTROLLER_TOKEN = "KIE_SERVER_CONTROLLER_TOKEN";
     public static final String KIE_SERVER_CONTROLLER_SERVICE = "KIE_SERVER_CONTROLLER_SERVICE";
 
     public static final String KIE_SERVER_ROUTER_ID = "KIE_SERVER_ROUTER_ID";
