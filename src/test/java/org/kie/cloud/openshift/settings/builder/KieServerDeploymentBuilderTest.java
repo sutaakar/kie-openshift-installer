@@ -579,7 +579,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
-    public void testBuildKieServerDeploymentWithemoryLimitFromProperties() {
+    public void testBuildKieServerDeploymentWithMemoryLimitFromProperties() {
         KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
         Deployment builtKieServerDeployment = settingsBuilder.withContainerMemoryLimitFromProperties()
                                                              .build();
@@ -603,6 +603,35 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
         assertThat(builtKieServerDeployment).isNotNull();
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getResources().getLimits()).containsEntry("memory", new Quantity("64Mi"));
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithKieServerClassFilteringFromProperties() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withKieServerClassFilteringFromProperties()
+                                                             .build();
+
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.DROOLS_SERVER_FILTER_CLASSES.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${DROOLS_SERVER_FILTER_CLASSES}"));
+        assertThat(builtKieServerDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.DROOLS_SERVER_FILTER_CLASSES.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("Drools Server Filter Classes");
+                            assertThat(p.getValue()).isEqualTo("true");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithKieServerClassFiltering() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withKieServerClassFiltering(false)
+                                                             .build();
+
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.DROOLS_SERVER_FILTER_CLASSES.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("false"));
     }
 
     @Test

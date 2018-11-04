@@ -399,6 +399,17 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
         return this;
     }
 
+    public KieServerDeploymentBuilder withKieServerClassFilteringFromProperties() {
+        addOrReplaceProperty("Drools Server Filter Classes", "KIE server class filtering (Sets the org.drools.server.filter.classes system property)", OpenShiftImageConstants.DROOLS_SERVER_FILTER_CLASSES, "true", false);
+        addOrReplaceEnvVar(OpenShiftImageConstants.DROOLS_SERVER_FILTER_CLASSES, "${" + OpenShiftImageConstants.DROOLS_SERVER_FILTER_CLASSES + "}");
+        return this;
+    }
+
+    public KieServerDeploymentBuilder withKieServerClassFiltering(boolean kieServerClassFiltering) {
+        addOrReplaceEnvVar(OpenShiftImageConstants.DROOLS_SERVER_FILTER_CLASSES, Boolean.valueOf(kieServerClassFiltering).toString());
+        return this;
+    }
+
     public KieServerDeploymentBuilder connectToMySqlDatabase(Deployment databaseDeployment) {
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DIALECT, "org.hibernate.dialect.MySQL5Dialect");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DS, "java:/jboss/datasources/kie");
