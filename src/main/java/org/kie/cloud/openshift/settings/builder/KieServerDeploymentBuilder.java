@@ -87,6 +87,9 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
                                                            .withProtocol("TCP")
                                                            .build();
         getDeployment().getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getPorts().addAll(Arrays.asList(jolokiaPort, httpPort));
+
+        // Cross reference, implication is that route name has same value as deployment name
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_ROUTE_NAME, getDeployment().getDeploymentName());
     }
 
     @Override

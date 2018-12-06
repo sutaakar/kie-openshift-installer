@@ -82,6 +82,9 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
                     });
         assertThat(builtKieServerDeployment.getDeploymentConfig().getMetadata().getAnnotations()).containsEntry("template.alpha.openshift.io/wait-for-ready", "true");
         assertThat(builtKieServerDeployment.getDeploymentConfig().getMetadata().getLabels()).containsEntry("service", builtKieServerDeployment.getDeploymentName());
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_ROUTE_NAME.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo(builtKieServerDeployment.getDeploymentName()));
     }
 
     @Test
