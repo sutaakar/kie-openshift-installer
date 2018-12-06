@@ -223,6 +223,11 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
         return this;
     }
 
+    public KieServerDeploymentBuilder withKieServerId(String kieServerId) {
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_ID, kieServerId);
+        return this;
+    }
+
     /**
      * Return configured builder with Kie Server user.
      *
