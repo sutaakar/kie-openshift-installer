@@ -2,6 +2,7 @@ package org.kie.cloud.openshift.settings.builder;
 
 import java.util.List;
 
+import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.Probe;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.ServiceAccount;
@@ -814,6 +815,154 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.OPENSHIFT_DNS_PING_SERVICE_PORT.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("8888"));
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithMavenRepoService() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withMavenRepo()
+                                                                 .withService("maven-service", "/maven/path")
+                                                             .endMavenRepo()
+                                                             .build();
+
+        EnvVar mavenRepoEnvVar = builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv().stream()
+                        .filter(e -> OpenShiftImageConstants.MAVEN_REPOS.equals(e.getName()))
+                        .findAny()
+                        .orElseThrow(() -> new RuntimeException("MAVEN_REPOS environment variable not found."));
+
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.MAVEN_REPOS.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isNotEmpty());
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> e.getName().equals(mavenRepoEnvVar.getValue() + "_" + OpenShiftImageConstants.MAVEN_REPO_SERVICE))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("maven-service"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> e.getName().equals(mavenRepoEnvVar.getValue() + "_" + OpenShiftImageConstants.MAVEN_REPO_PATH))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("/maven/path"));
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithPrefixedMavenRepoUrl() {
+        String mavenRepoUrl = "http://some-nexus.xyz:8081/nexus";
+
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withMavenRepo("KIE")
+                                                                 .withUrl(mavenRepoUrl)
+                                                             .endMavenRepo()
+                                                             .build();
+
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.MAVEN_REPOS.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("KIE"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> e.getName().equals("KIE_" + OpenShiftImageConstants.MAVEN_REPO_URL))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo(mavenRepoUrl));
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithPrefixedMavenRepoService() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withMavenRepo("KIE")
+                                                                 .withService("maven-service", "/maven/path")
+                                                             .endMavenRepo()
+                                                             .build();
+
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.MAVEN_REPOS.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("KIE"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> e.getName().equals("KIE_" + OpenShiftImageConstants.MAVEN_REPO_SERVICE))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("maven-service"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> e.getName().equals("KIE_" + OpenShiftImageConstants.MAVEN_REPO_PATH))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("/maven/path"));
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithPrefixedMavenRepoServiceWithId() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withMavenRepo("KIE")
+                                                                 .withId("repo-id")
+                                                                 .withService("maven-service", "/maven/path")
+                                                             .endMavenRepo()
+                                                             .build();
+
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.MAVEN_REPOS.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("KIE"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> e.getName().equals("KIE_" + OpenShiftImageConstants.MAVEN_REPO_ID))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("repo-id"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> e.getName().equals("KIE_" + OpenShiftImageConstants.MAVEN_REPO_SERVICE))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("maven-service"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> e.getName().equals("KIE_" + OpenShiftImageConstants.MAVEN_REPO_PATH))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("/maven/path"));
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithPrefixedMavenRepoServiceWithAuthentication() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withMavenRepo("KIE")
+                                                                 .withService("maven-service", "/maven/path")
+                                                                 .withAuthentication("mavenUser", "mavenPassword")
+                                                             .endMavenRepo()
+                                                             .build();
+
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.MAVEN_REPOS.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("KIE"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> e.getName().equals("KIE_" + OpenShiftImageConstants.MAVEN_REPO_SERVICE))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("maven-service"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> e.getName().equals("KIE_" + OpenShiftImageConstants.MAVEN_REPO_PATH))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("/maven/path"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> e.getName().equals("KIE_" + OpenShiftImageConstants.MAVEN_REPO_USERNAME))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("mavenUser"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> e.getName().equals("KIE_" + OpenShiftImageConstants.MAVEN_REPO_PASSWORD))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("mavenPassword"));
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithMultiplePrefixedMavenRepoService() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withMavenRepo("KIE")
+                                                                 .withService("maven-service", "/maven/path")
+                                                             .endMavenRepo()
+                                                             .withMavenRepo("SECOND_KIE")
+                                                                 .withService("maven-second-service", "/maven/path/second")
+                                                             .endMavenRepo()
+                                                             .build();
+
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.MAVEN_REPOS.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("KIE,SECOND_KIE"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> e.getName().equals("KIE_" + OpenShiftImageConstants.MAVEN_REPO_SERVICE))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("maven-service"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> e.getName().equals("KIE_" + OpenShiftImageConstants.MAVEN_REPO_PATH))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("/maven/path"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> e.getName().equals("SECOND_KIE_" + OpenShiftImageConstants.MAVEN_REPO_SERVICE))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("maven-second-service"));
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> e.getName().equals("SECOND_KIE_" + OpenShiftImageConstants.MAVEN_REPO_PATH))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("/maven/path/second"));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testBuildKieServerDeploymentWithPrefixedMavenRepoServiceAndUrl() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        settingsBuilder.withMavenRepo("KIE")
+                           .withService("maven-service", "/maven/path")
+                           .withUrl("someURL")
+                       .endMavenRepo()
+                       .build();
     }
 
     @Test

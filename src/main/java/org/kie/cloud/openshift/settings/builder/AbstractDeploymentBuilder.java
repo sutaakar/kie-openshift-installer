@@ -2,6 +2,7 @@ package org.kie.cloud.openshift.settings.builder;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 
 import io.fabric8.kubernetes.api.model.Container;
@@ -178,6 +179,14 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
             container.getEnv().removeIf(n -> n.getName().equals(envVar.getName()));
             container.getEnv().add(envVar);
         }
+    }
+
+    protected void addOrAppendEnvVar(String environmentVariableName, String environmentVariableValue) {
+        Optional<String> availableVariableValue = deployment.getOptionalEnvironmentVariableValue(environmentVariableName);
+
+        EnvVar updatedEnvVar = availableVariableValue.map(e -> new EnvVar(environmentVariableName, e + "," + environmentVariableValue, null))
+                                                     .orElse(new EnvVar(environmentVariableName, environmentVariableValue, null));
+        addOrReplaceEnvVar(updatedEnvVar);
     }
 
     protected void addOrReplaceProperty(String propertyDisplayName, String propertyDescription, String propertyName, String propertyValue, boolean required) {

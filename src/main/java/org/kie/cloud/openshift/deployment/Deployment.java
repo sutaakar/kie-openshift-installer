@@ -2,8 +2,10 @@ package org.kie.cloud.openshift.deployment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.Service;
@@ -90,11 +92,14 @@ public class Deployment {
     }
 
     public String getEnvironmentVariableValue(String environmentVariableName) {
+        return getOptionalEnvironmentVariableValue(environmentVariableName).orElseThrow(() -> new RuntimeException("Environment variable with name " + environmentVariableName + " not found."));
+    }
+
+    public Optional<String> getOptionalEnvironmentVariableValue(String environmentVariableName) {
         return getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().stream()
                                      .flatMap(c -> c.getEnv().stream())
                                      .filter(e -> e.getName().equals(environmentVariableName))
-                                     .map(e -> e.getValue())
-                                     .findFirst()
-                                     .orElseThrow(() -> new RuntimeException("Environment variable with name " + environmentVariableName + " not found."));
+                                     .map(EnvVar::getValue)
+                                     .findAny();
     }
 }

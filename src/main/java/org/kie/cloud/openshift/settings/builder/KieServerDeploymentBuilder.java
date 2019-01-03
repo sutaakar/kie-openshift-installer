@@ -18,6 +18,7 @@ package org.kie.cloud.openshift.settings.builder;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Optional;
 
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerPort;
@@ -456,6 +457,57 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
     public KieServerDeploymentBuilder withKieServerClassFiltering(boolean kieServerClassFiltering) {
         addOrReplaceEnvVar(OpenShiftImageConstants.DROOLS_SERVER_FILTER_CLASSES, Boolean.valueOf(kieServerClassFiltering).toString());
         return this;
+    }
+
+    public MavenRepoBuilder withMavenRepo() {
+        return withMavenRepo(NameGenerator.generateRandomNameUpperCase());
+    }
+
+    public MavenRepoBuilder withMavenRepo(String mavenRepoPrefix) {
+        return new MavenRepoBuilder(mavenRepoPrefix);
+    }
+
+    public class MavenRepoBuilder {
+
+        private String mavenRepoPrefix;
+
+        public MavenRepoBuilder(String mavenRepoPrefix) {
+            this.mavenRepoPrefix = mavenRepoPrefix;
+            addOrAppendEnvVar(OpenShiftImageConstants.MAVEN_REPOS, mavenRepoPrefix);
+        }
+
+        public MavenRepoBuilder withId(String mavenRepoId) {
+            addOrReplaceEnvVar(mavenRepoPrefix + "_" + OpenShiftImageConstants.MAVEN_REPO_ID, mavenRepoId);
+            return this;
+        }
+
+        public MavenRepoBuilder withService(String mavenRepoService, String mavenRepoPath) {
+            addOrReplaceEnvVar(mavenRepoPrefix + "_" + OpenShiftImageConstants.MAVEN_REPO_SERVICE, mavenRepoService);
+            addOrReplaceEnvVar(mavenRepoPrefix + "_" + OpenShiftImageConstants.MAVEN_REPO_PATH, mavenRepoPath);
+            return this;
+        }
+
+        public MavenRepoBuilder withUrl(String mavenRepoUrl) {
+            addOrReplaceEnvVar(mavenRepoPrefix + "_" + OpenShiftImageConstants.MAVEN_REPO_URL, mavenRepoUrl);
+            return this;
+        }
+
+        public MavenRepoBuilder withAuthentication(String mavenRepoUsername, String mavenRepoPassword) {
+            addOrReplaceEnvVar(mavenRepoPrefix + "_" + OpenShiftImageConstants.MAVEN_REPO_USERNAME, mavenRepoUsername);
+            addOrReplaceEnvVar(mavenRepoPrefix + "_" + OpenShiftImageConstants.MAVEN_REPO_PASSWORD, mavenRepoPassword);
+            return this;
+        }
+
+        public KieServerDeploymentBuilder endMavenRepo() {
+            Optional<String> repoUrl = getDeployment().getOptionalEnvironmentVariableValue(mavenRepoPrefix + "_" + OpenShiftImageConstants.MAVEN_REPO_URL);
+            Optional<String> repoService = getDeployment().getOptionalEnvironmentVariableValue(mavenRepoPrefix + "_" + OpenShiftImageConstants.MAVEN_REPO_SERVICE);
+
+            if (repoUrl.isPresent() && repoService.isPresent()) {
+                throw new RuntimeException("Maven repo URL and Maven repo service cannot be defined in the same time.");
+            }
+
+            return KieServerDeploymentBuilder.this;
+        }
     }
 
     public KieServerDeploymentBuilder connectToMySqlDatabase(Deployment databaseDeployment) {

@@ -64,6 +64,8 @@ public class OpenShiftImageConstants {
     public static final String HTTPS_NAME = "HTTPS_NAME";
     public static final String HTTPS_PASSWORD = "HTTPS_PASSWORD";
 
+    public static final String MAVEN_REPOS = "MAVEN_REPOS";
+    public static final String MAVEN_REPO_ID = "MAVEN_REPO_ID";
     public static final String MAVEN_REPO_URL = "MAVEN_REPO_URL";
     public static final String MAVEN_REPO_SERVICE = "MAVEN_REPO_SERVICE";
     public static final String MAVEN_REPO_PATH = "MAVEN_REPO_PATH";

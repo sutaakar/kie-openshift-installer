@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
+import java.util.Optional;
 
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
@@ -88,6 +89,16 @@ public class DeploymentTest extends AbstractCloudTest{
 
         assertThatThrownBy(() -> deployment.getEnvironmentVariableValue("not-existing-variable-name")).isInstanceOf(RuntimeException.class)
                                                                                                       .hasMessageContaining("Environment variable with name not-existing-variable-name not found.");
+    }
+
+    @Test
+    public void testGetOptionalEnvironmentVariableValue() {
+        Deployment deployment = getDeploymentWithServiceAndRouteCombinations("custom");
+        Optional<String> environmentVariableValue = deployment.getOptionalEnvironmentVariableValue("custom-variable-name");
+        Optional<String> notExistingVariableValue = deployment.getOptionalEnvironmentVariableValue("not-existing-variable-name");
+
+        assertThat(environmentVariableValue).contains("custom-variable-value");
+        assertThat(notExistingVariableValue).isEmpty();
     }
 
     @Test
