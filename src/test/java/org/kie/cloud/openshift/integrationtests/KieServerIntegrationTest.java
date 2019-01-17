@@ -10,6 +10,8 @@ import io.fabric8.openshift.api.model.DeploymentConfig;
 import org.junit.Test;
 import org.kie.cloud.openshift.KieOpenShiftProvider;
 import org.kie.cloud.openshift.deployment.Deployment;
+import org.kie.cloud.openshift.deployment.MySqlDeployment;
+import org.kie.cloud.openshift.deployment.PostgreSqlDeployment;
 import org.kie.cloud.openshift.scenario.Scenario;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.KieServiceResponse.ResponseType;
@@ -26,14 +28,14 @@ public class KieServerIntegrationTest extends AbstractCloudIntegrationTest {
         final String mySqlUsername = "mysqluser";
         final String mySqlPassword = "mysqlpass";
 
-        Deployment mySqlDeployment = KieOpenShiftProvider.createMySqlDeploymentBuilder()
-                                                         .withDatabaseUser(mySqlUsername, mySqlPassword)
-                                                         .withDatabaseName("mydb")
-                                                         .build();
+        MySqlDeployment mySqlDeployment = KieOpenShiftProvider.createMySqlDeploymentBuilder()
+                                                              .withDatabaseUser(mySqlUsername, mySqlPassword)
+                                                              .withDatabaseName("mydb")
+                                                              .build();
         Deployment kieServerDeployment = KieOpenShiftProvider.createKieServerDeploymentBuilder()
                                                              .withImageStreamNamespace(projectName)
                                                              .withKieServerUser(kieServerUsername, kieServerPassword)
-                                                             .connectToMySqlDatabase(mySqlDeployment)
+                                                             .connectToDatabase(mySqlDeployment)
                                                              .build();
         Scenario kieServerScenario = KieOpenShiftProvider.createScenarioBuilder()
                                                          .withDeployment(kieServerDeployment)
@@ -62,14 +64,14 @@ public class KieServerIntegrationTest extends AbstractCloudIntegrationTest {
         final String mySqlUsername = "postgresqluser";
         final String mySqlPassword = "postgresqlpass";
 
-        Deployment postgreSqlDeployment = KieOpenShiftProvider.createPostgreSqlDeploymentBuilder()
-                                                              .withDatabaseUser(mySqlUsername, mySqlPassword)
-                                                              .withDatabaseName("mydb")
-                                                              .build();
+        PostgreSqlDeployment postgreSqlDeployment = KieOpenShiftProvider.createPostgreSqlDeploymentBuilder()
+                                                                        .withDatabaseUser(mySqlUsername, mySqlPassword)
+                                                                        .withDatabaseName("mydb")
+                                                                        .build();
         Deployment kieServerDeployment = KieOpenShiftProvider.createKieServerDeploymentBuilder()
                                                              .withImageStreamNamespace(projectName)
                                                              .withKieServerUser(kieServerUsername, kieServerPassword)
-                                                             .connectToPostgreSqlDatabase(postgreSqlDeployment)
+                                                             .connectToDatabase(postgreSqlDeployment)
                                                              .build();
         Scenario kieServerScenario = KieOpenShiftProvider.createScenarioBuilder()
                                                          .withDeployment(kieServerDeployment)

@@ -14,6 +14,8 @@ import org.kie.cloud.openshift.AbstractCloudTest;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.configuration.ConfigurationLoader;
 import org.kie.cloud.openshift.deployment.Deployment;
+import org.kie.cloud.openshift.deployment.MySqlDeployment;
+import org.kie.cloud.openshift.deployment.PostgreSqlDeployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -978,12 +980,12 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     public void testBuildKieServerDeploymentWithMySqlDatabase() {
         String datasourcePrefix = ConfigurationLoader.getKieServerDatasourcePrefix();
         MySqlDeploymentBuilder mySqlSettingsBuilder = new MySqlDeploymentBuilder();
-        Deployment builtMySqlDeployment = mySqlSettingsBuilder.withDatabaseName("custom-db")
-                                                              .withDatabaseUser("mySqlName", "mySqlPassword")
-                                                              .build();
+        MySqlDeployment builtMySqlDeployment = mySqlSettingsBuilder.withDatabaseName("custom-db")
+                                                                   .withDatabaseUser("mySqlName", "mySqlPassword")
+                                                                   .build();
 
         KieServerDeploymentBuilder kieServerSettingsBuilder = new KieServerDeploymentBuilder();
-        Deployment builtKieServerDeployment = kieServerSettingsBuilder.connectToMySqlDatabase(builtMySqlDeployment)
+        Deployment builtKieServerDeployment = kieServerSettingsBuilder.connectToDatabase(builtMySqlDeployment)
                                                                       .build();
 
         assertThat(builtKieServerDeployment).isNotNull();
@@ -1032,12 +1034,12 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
     public void testBuildKieServerDeploymentWithPostgreSqlDatabase() {
         String datasourcePrefix = ConfigurationLoader.getKieServerDatasourcePrefix();
         PostgreSqlDeploymentBuilder postgreSqlSettingsBuilder = new PostgreSqlDeploymentBuilder();
-        Deployment builtPostgreSqlDeployment = postgreSqlSettingsBuilder.withDatabaseName("custom-db")
-                                                                        .withDatabaseUser("postgreSqlName", "postgreSqlPassword")
-                                                                        .build();
+        PostgreSqlDeployment builtPostgreSqlDeployment = postgreSqlSettingsBuilder.withDatabaseName("custom-db")
+                                                                                  .withDatabaseUser("postgreSqlName", "postgreSqlPassword")
+                                                                                  .build();
 
         KieServerDeploymentBuilder kieServerSettingsBuilder = new KieServerDeploymentBuilder();
-        Deployment builtKieServerDeployment = kieServerSettingsBuilder.connectToPostgreSqlDatabase(builtPostgreSqlDeployment)
+        Deployment builtKieServerDeployment = kieServerSettingsBuilder.connectToDatabase(builtPostgreSqlDeployment)
                                                                       .build();
 
         assertThat(builtKieServerDeployment).isNotNull();
