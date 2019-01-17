@@ -28,7 +28,7 @@ import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServicePortBuilder;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.configuration.ConfigurationLoader;
-import org.kie.cloud.openshift.deployment.Deployment;
+import org.kie.cloud.openshift.deployment.PostgreSqlDeployment;
 import org.kie.cloud.openshift.util.NameGenerator;
 
 /**
@@ -37,14 +37,14 @@ import org.kie.cloud.openshift.util.NameGenerator;
  * If any environment variable isn't configured by SettingsBuilder, then default
  * value from application template is used.
  */
-public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder<PostgreSqlDeploymentBuilder, Deployment> {
+public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder<PostgreSqlDeploymentBuilder, PostgreSqlDeployment> {
 
     public PostgreSqlDeploymentBuilder() {
         this(NameGenerator.generateDeploymentName("postgresql"));
     }
 
     public PostgreSqlDeploymentBuilder(String deploymentName) {
-        super(new Deployment(deploymentName));
+        super(new PostgreSqlDeployment(deploymentName));
     }
 
     @Override
