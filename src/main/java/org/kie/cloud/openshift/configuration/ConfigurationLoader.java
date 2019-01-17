@@ -19,6 +19,8 @@ public class ConfigurationLoader {
     private static final String POSTGRESQL_IMAGE_STREAM_NAME_PROPERTY = "postgresql.image.stream.name";
     private static final String POSTGRESQL_IMAGE_STREAM_TAG_PROPERTY = "postgresql.image.stream.tag";
 
+    private static final String KIE_SERVER_DATASOURCE_JNDI_PROPERTY = "kie.server.datasource.jndi";
+
     private static Properties properties = new Properties();
 
     static {
@@ -70,6 +72,10 @@ public class ConfigurationLoader {
 
     public static String getPostgreSqlImageStreamTag() {
         return getConfigurationProperty(POSTGRESQL_IMAGE_STREAM_TAG_PROPERTY);
+    }
+
+    public static String getKieServerDatasourceJndi() {
+        return getConfigurationProperty(KIE_SERVER_DATASOURCE_JNDI_PROPERTY);
     }
 
     private static String getConfigurationProperty(String configurationPropertyname) {

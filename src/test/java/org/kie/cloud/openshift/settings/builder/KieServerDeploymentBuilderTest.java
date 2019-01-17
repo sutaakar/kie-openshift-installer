@@ -993,7 +993,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("custom-db"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.KIE_JNDI.equals(e.getName()))
-                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("java:/jboss/datasources/kie"));
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).startsWith("java:/jboss/datasources/"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.KIE_DRIVER.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("mysql"));
@@ -1023,7 +1023,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("org.hibernate.dialect.MySQL5Dialect"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DS.equals(e.getName()))
-                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("java:/jboss/datasources/kie"));
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).startsWith("java:/jboss/datasources/"));
     }
 
     @Test
@@ -1046,7 +1046,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("custom-db"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.KIE_JNDI.equals(e.getName()))
-                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("java:/jboss/datasources/kie"));
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).startsWith("java:/jboss/datasources/"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.KIE_DRIVER.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("postgresql"));
@@ -1076,6 +1076,6 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("org.hibernate.dialect.PostgreSQLDialect"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DS.equals(e.getName()))
-                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("java:/jboss/datasources/kie"));
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).startsWith("java:/jboss/datasources/"));
     }
 }

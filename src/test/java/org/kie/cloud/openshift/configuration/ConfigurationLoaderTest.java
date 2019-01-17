@@ -65,4 +65,10 @@ public class ConfigurationLoaderTest extends AbstractCloudTest {
         String postgreSqlImageStreamTag = ConfigurationLoader.getPostgreSqlImageStreamTag();
         assertThat(postgreSqlImageStreamTag).isEqualTo("9.6");
     }
+
+    @Test
+    public void testGetKieServerDatasourceJndi() {
+        String kieServerDatasourceJndi = ConfigurationLoader.getKieServerDatasourceJndi();
+        assertThat(kieServerDatasourceJndi).startsWith("java:/jboss/datasources/");
+    }
 }

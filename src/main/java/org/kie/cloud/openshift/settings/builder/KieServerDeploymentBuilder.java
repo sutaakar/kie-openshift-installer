@@ -515,10 +515,10 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
 
     public KieServerDeploymentBuilder connectToMySqlDatabase(Deployment databaseDeployment) {
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DIALECT, "org.hibernate.dialect.MySQL5Dialect");
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DS, "java:/jboss/datasources/kie");
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DS, ConfigurationLoader.getKieServerDatasourceJndi());
         addOrReplaceEnvVar(OpenShiftImageConstants.DATASOURCES, OpenShiftImageConstants.DATASOURCES_KIE);
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_DATABASE, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_DATABASE));
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_JNDI, "java:/jboss/datasources/kie");
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_JNDI, ConfigurationLoader.getKieServerDatasourceJndi());
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_DRIVER, "mysql");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_JTA, "true");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_USERNAME, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_USER));
@@ -534,10 +534,10 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
 
     public KieServerDeploymentBuilder connectToPostgreSqlDatabase(Deployment databaseDeployment) {
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DS, "java:/jboss/datasources/kie");
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DS, ConfigurationLoader.getKieServerDatasourceJndi());
         addOrReplaceEnvVar(OpenShiftImageConstants.DATASOURCES, OpenShiftImageConstants.DATASOURCES_KIE);
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_DATABASE, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.POSTGRESQL_DATABASE));
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_JNDI, "java:/jboss/datasources/kie");
+        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_JNDI, ConfigurationLoader.getKieServerDatasourceJndi());
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_DRIVER, "postgresql");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_JTA, "true");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_USERNAME, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.POSTGRESQL_USER));
