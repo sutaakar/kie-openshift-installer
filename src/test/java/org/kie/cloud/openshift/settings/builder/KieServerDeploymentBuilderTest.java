@@ -965,6 +965,14 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
                        .build();
     }
 
+    @Test(expected = RuntimeException.class)
+    public void testBuildKieServerDeploymentWithoutPrefixedMavenRepoServiceOrUrl() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        settingsBuilder.withMavenRepo()
+                       .endMavenRepo()
+                       .build();
+    }
+
     @Test
     public void testBuildKieServerDeploymentWithMySqlDatabase() {
         MySqlDeploymentBuilder mySqlSettingsBuilder = new MySqlDeploymentBuilder();

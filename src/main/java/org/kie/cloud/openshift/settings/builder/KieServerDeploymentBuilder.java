@@ -505,6 +505,9 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
             if (repoUrl.isPresent() && repoService.isPresent()) {
                 throw new RuntimeException("Maven repo URL and Maven repo service cannot be defined in the same time.");
             }
+            if (!repoUrl.isPresent() && !repoService.isPresent()) {
+                throw new RuntimeException("Maven repo URL or Maven repo service must be defined.");
+            }
 
             return KieServerDeploymentBuilder.this;
         }
