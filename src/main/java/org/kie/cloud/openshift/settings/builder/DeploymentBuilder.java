@@ -23,12 +23,12 @@ import org.kie.cloud.openshift.deployment.Deployment;
  * If any environment variable isn't configured by SettingsBuilder, then default
  * value from application template is used.
  */
-public interface DeploymentBuilder {
+public interface DeploymentBuilder <T extends Deployment> {
 
     /**
      * Return built cloud deployment.
      *
      * @return Returns configured for deployment.
      */
-    Deployment build();
+    T build();
 }

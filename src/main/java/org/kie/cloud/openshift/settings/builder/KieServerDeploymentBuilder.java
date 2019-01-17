@@ -55,14 +55,14 @@ import org.kie.cloud.openshift.util.NameGenerator;
  * If any environment variable isn't configured by SettingsBuilder, then default
  * value from application template is used.
  */
-public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieServerDeploymentBuilder> {
+public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieServerDeploymentBuilder,Deployment> {
 
     public KieServerDeploymentBuilder() {
         this(NameGenerator.generateDeploymentName("kieserver"));
     }
 
     public KieServerDeploymentBuilder(String deploymentName) {
-        super(deploymentName);
+        super(new Deployment(deploymentName));
     }
 
     @Override

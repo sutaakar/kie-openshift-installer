@@ -28,6 +28,7 @@ import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.ServicePortBuilder;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
 import org.kie.cloud.openshift.configuration.ConfigurationLoader;
+import org.kie.cloud.openshift.deployment.Deployment;
 import org.kie.cloud.openshift.util.NameGenerator;
 
 /**
@@ -36,14 +37,14 @@ import org.kie.cloud.openshift.util.NameGenerator;
  * If any environment variable isn't configured by SettingsBuilder, then default
  * value from application template is used.
  */
-public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder<MySqlDeploymentBuilder> {
+public class MySqlDeploymentBuilder extends AbstractDeploymentBuilder<MySqlDeploymentBuilder, Deployment> {
 
     public MySqlDeploymentBuilder() {
         this(NameGenerator.generateDeploymentName("mysql"));
     }
 
     public MySqlDeploymentBuilder(String deploymentName) {
-        super(deploymentName);
+        super(new Deployment(deploymentName));
     }
 
     @Override

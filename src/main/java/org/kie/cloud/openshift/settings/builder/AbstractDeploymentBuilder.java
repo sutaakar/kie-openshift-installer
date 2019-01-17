@@ -24,12 +24,12 @@ import io.fabric8.openshift.api.model.Parameter;
 import io.fabric8.openshift.api.model.ParameterBuilder;
 import org.kie.cloud.openshift.deployment.Deployment;
 
-public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> implements DeploymentBuilder {
+public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder<U>, U extends Deployment> implements DeploymentBuilder<U> {
 
-    private Deployment deployment;
+    private U deployment;
 
-    protected AbstractDeploymentBuilder(String deploymentName) {
-        deployment = new Deployment(deploymentName);
+    protected AbstractDeploymentBuilder(U deployment) {
+        this.deployment = deployment;
         configureDeploymentConfig();
         configureService();
         configureAdditionalObjects();
@@ -37,7 +37,7 @@ public abstract class AbstractDeploymentBuilder<T extends DeploymentBuilder> imp
     }
 
     @Override
-    public Deployment build() {
+    public U build() {
         configureLivenessProbe();
         configureReadinessProbe();
         return deployment;
