@@ -12,6 +12,7 @@ import io.fabric8.openshift.api.model.RoleBinding;
 import org.junit.Test;
 import org.kie.cloud.openshift.AbstractCloudTest;
 import org.kie.cloud.openshift.OpenShiftImageConstants;
+import org.kie.cloud.openshift.configuration.ConfigurationLoader;
 import org.kie.cloud.openshift.deployment.Deployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -975,6 +976,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildKieServerDeploymentWithMySqlDatabase() {
+        String datasourcePrefix = ConfigurationLoader.getKieServerDatasourcePrefix();
         MySqlDeploymentBuilder mySqlSettingsBuilder = new MySqlDeploymentBuilder();
         Deployment builtMySqlDeployment = mySqlSettingsBuilder.withDatabaseName("custom-db")
                                                               .withDatabaseUser("mySqlName", "mySqlPassword")
@@ -987,30 +989,30 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtKieServerDeployment).isNotNull();
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.DATASOURCES.equals(e.getName()))
-                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo(OpenShiftImageConstants.DATASOURCES_KIE));
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isNotEmpty());
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                        .filteredOn(e -> OpenShiftImageConstants.KIE_DATABASE.equals(e.getName()))
+                        .filteredOn(e -> (datasourcePrefix + "_" + OpenShiftImageConstants.DATABASE).equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("custom-db"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                        .filteredOn(e -> OpenShiftImageConstants.KIE_JNDI.equals(e.getName()))
+                        .filteredOn(e -> (datasourcePrefix + "_" + OpenShiftImageConstants.JNDI).equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).startsWith("java:/jboss/datasources/"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                        .filteredOn(e -> OpenShiftImageConstants.KIE_DRIVER.equals(e.getName()))
+                        .filteredOn(e -> (datasourcePrefix + "_" + OpenShiftImageConstants.DRIVER).equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("mysql"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                        .filteredOn(e -> OpenShiftImageConstants.KIE_JTA.equals(e.getName()))
+                        .filteredOn(e -> (datasourcePrefix + "_" + OpenShiftImageConstants.JTA).equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("true"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                        .filteredOn(e -> OpenShiftImageConstants.KIE_USERNAME.equals(e.getName()))
+                        .filteredOn(e -> (datasourcePrefix + "_" + OpenShiftImageConstants.USERNAME).equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("mySqlName"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                        .filteredOn(e -> OpenShiftImageConstants.KIE_PASSWORD.equals(e.getName()))
+                        .filteredOn(e -> (datasourcePrefix + "_" + OpenShiftImageConstants.PASSWORD).equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("mySqlPassword"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                        .filteredOn(e -> OpenShiftImageConstants.KIE_SERVICE_HOST.equals(e.getName()))
+                        .filteredOn(e -> (datasourcePrefix + "_" + OpenShiftImageConstants.SERVICE_HOST).equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo(builtMySqlDeployment.getDeploymentName()));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                        .filteredOn(e -> OpenShiftImageConstants.KIE_SERVICE_PORT.equals(e.getName()))
+                        .filteredOn(e -> (datasourcePrefix + "_" + OpenShiftImageConstants.SERVICE_PORT).equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("3306"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE.equals(e.getName()))
@@ -1028,6 +1030,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
 
     @Test
     public void testBuildKieServerDeploymentWithPostgreSqlDatabase() {
+        String datasourcePrefix = ConfigurationLoader.getKieServerDatasourcePrefix();
         PostgreSqlDeploymentBuilder postgreSqlSettingsBuilder = new PostgreSqlDeploymentBuilder();
         Deployment builtPostgreSqlDeployment = postgreSqlSettingsBuilder.withDatabaseName("custom-db")
                                                                         .withDatabaseUser("postgreSqlName", "postgreSqlPassword")
@@ -1040,30 +1043,30 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtKieServerDeployment).isNotNull();
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.DATASOURCES.equals(e.getName()))
-                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo(OpenShiftImageConstants.DATASOURCES_KIE));
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isNotEmpty());
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                        .filteredOn(e -> OpenShiftImageConstants.KIE_DATABASE.equals(e.getName()))
+                        .filteredOn(e -> (datasourcePrefix + "_" + OpenShiftImageConstants.DATABASE).equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("custom-db"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                        .filteredOn(e -> OpenShiftImageConstants.KIE_JNDI.equals(e.getName()))
+                        .filteredOn(e -> (datasourcePrefix + "_" + OpenShiftImageConstants.JNDI).equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).startsWith("java:/jboss/datasources/"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                        .filteredOn(e -> OpenShiftImageConstants.KIE_DRIVER.equals(e.getName()))
+                        .filteredOn(e -> (datasourcePrefix + "_" + OpenShiftImageConstants.DRIVER).equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("postgresql"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                        .filteredOn(e -> OpenShiftImageConstants.KIE_JTA.equals(e.getName()))
+                        .filteredOn(e -> (datasourcePrefix + "_" + OpenShiftImageConstants.JTA).equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("true"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                        .filteredOn(e -> OpenShiftImageConstants.KIE_USERNAME.equals(e.getName()))
+                        .filteredOn(e -> (datasourcePrefix + "_" + OpenShiftImageConstants.USERNAME).equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("postgreSqlName"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                        .filteredOn(e -> OpenShiftImageConstants.KIE_PASSWORD.equals(e.getName()))
+                        .filteredOn(e -> (datasourcePrefix + "_" + OpenShiftImageConstants.PASSWORD).equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("postgreSqlPassword"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                        .filteredOn(e -> OpenShiftImageConstants.KIE_SERVICE_HOST.equals(e.getName()))
+                        .filteredOn(e -> (datasourcePrefix + "_" + OpenShiftImageConstants.SERVICE_HOST).equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo(builtPostgreSqlDeployment.getDeploymentName()));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
-                        .filteredOn(e -> OpenShiftImageConstants.KIE_SERVICE_PORT.equals(e.getName()))
+                        .filteredOn(e -> (datasourcePrefix + "_" + OpenShiftImageConstants.SERVICE_PORT).equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("5432"));
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE.equals(e.getName()))

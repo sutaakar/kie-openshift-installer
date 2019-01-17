@@ -128,17 +128,16 @@ public class OpenShiftImageConstants {
     public static final String OPENSHIFT_DNS_PING_SERVICE_PORT = "OPENSHIFT_DNS_PING_SERVICE_PORT";
 
     public static final String DATASOURCES = "DATASOURCES";
-    public static final String DATASOURCES_KIE = "KIE";
-    public static final String KIE_DATABASE = "KIE_DATABASE";
-    public static final String KIE_JNDI = "KIE_JNDI";
-    public static final String KIE_DRIVER = "KIE_DRIVER";
-    public static final String KIE_JTA = "KIE_JTA";
+    public static final String DATABASE = "DATABASE";
+    public static final String JNDI = "JNDI";
+    public static final String DRIVER = "DRIVER";
+    public static final String JTA = "JTA";
     // TODO: delete this?
     public static final String KIE_TX_ISOLATION = "KIE_TX_ISOLATION";
-    public static final String KIE_USERNAME = "KIE_USERNAME";
-    public static final String KIE_PASSWORD = "KIE_PASSWORD";
-    public static final String KIE_SERVICE_HOST = "KIE_SERVICE_HOST";
-    public static final String KIE_SERVICE_PORT = "KIE_SERVICE_PORT";
+    public static final String USERNAME = "USERNAME";
+    public static final String PASSWORD = "PASSWORD";
+    public static final String SERVICE_HOST = "SERVICE_HOST";
+    public static final String SERVICE_PORT = "SERVICE_PORT";
     public static final String TIMER_SERVICE_DATA_STORE = "TIMER_SERVICE_DATA_STORE";
     public static final String TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL = "TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL";
 }

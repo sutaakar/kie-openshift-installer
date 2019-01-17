@@ -71,4 +71,10 @@ public class ConfigurationLoaderTest extends AbstractCloudTest {
         String kieServerDatasourceJndi = ConfigurationLoader.getKieServerDatasourceJndi();
         assertThat(kieServerDatasourceJndi).startsWith("java:/jboss/datasources/");
     }
+
+    @Test
+    public void testGetKieServerDatasourcePrefix() {
+        String kieServerDatasourcePrefix = ConfigurationLoader.getKieServerDatasourcePrefix();
+        assertThat(kieServerDatasourcePrefix).isNotEmpty();
+    }
 }

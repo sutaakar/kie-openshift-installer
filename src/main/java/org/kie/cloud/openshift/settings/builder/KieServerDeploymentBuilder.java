@@ -514,18 +514,19 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
     }
 
     public KieServerDeploymentBuilder connectToMySqlDatabase(Deployment databaseDeployment) {
+        String datasourcePrefix = ConfigurationLoader.getKieServerDatasourcePrefix();
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DIALECT, "org.hibernate.dialect.MySQL5Dialect");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DS, ConfigurationLoader.getKieServerDatasourceJndi());
-        addOrReplaceEnvVar(OpenShiftImageConstants.DATASOURCES, OpenShiftImageConstants.DATASOURCES_KIE);
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_DATABASE, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_DATABASE));
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_JNDI, ConfigurationLoader.getKieServerDatasourceJndi());
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_DRIVER, "mysql");
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_JTA, "true");
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_USERNAME, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_USER));
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_PASSWORD, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_PASSWORD));
+        addOrReplaceEnvVar(OpenShiftImageConstants.DATASOURCES, datasourcePrefix);
+        addOrReplaceEnvVar(datasourcePrefix + "_" + OpenShiftImageConstants.DATABASE, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_DATABASE));
+        addOrReplaceEnvVar(datasourcePrefix + "_" + OpenShiftImageConstants.JNDI, ConfigurationLoader.getKieServerDatasourceJndi());
+        addOrReplaceEnvVar(datasourcePrefix + "_" + OpenShiftImageConstants.DRIVER, "mysql");
+        addOrReplaceEnvVar(datasourcePrefix + "_" + OpenShiftImageConstants.JTA, "true");
+        addOrReplaceEnvVar(datasourcePrefix + "_" + OpenShiftImageConstants.USERNAME, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_USER));
+        addOrReplaceEnvVar(datasourcePrefix + "_" + OpenShiftImageConstants.PASSWORD, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.MYSQL_PASSWORD));
         // Set to first service
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVICE_HOST, databaseDeployment.getServices().get(0).getMetadata().getName());
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVICE_PORT, "3306");
+        addOrReplaceEnvVar(datasourcePrefix + "_" + OpenShiftImageConstants.SERVICE_HOST, databaseDeployment.getServices().get(0).getMetadata().getName());
+        addOrReplaceEnvVar(datasourcePrefix + "_" + OpenShiftImageConstants.SERVICE_PORT, "3306");
         // Same as service host
         addOrReplaceEnvVar(OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE, databaseDeployment.getServices().get(0).getMetadata().getName());
         addOrReplaceEnvVar(OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL, "30000");
@@ -533,18 +534,19 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
     }
 
     public KieServerDeploymentBuilder connectToPostgreSqlDatabase(Deployment databaseDeployment) {
+        String datasourcePrefix = ConfigurationLoader.getKieServerDatasourcePrefix();
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_PERSISTENCE_DS, ConfigurationLoader.getKieServerDatasourceJndi());
-        addOrReplaceEnvVar(OpenShiftImageConstants.DATASOURCES, OpenShiftImageConstants.DATASOURCES_KIE);
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_DATABASE, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.POSTGRESQL_DATABASE));
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_JNDI, ConfigurationLoader.getKieServerDatasourceJndi());
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_DRIVER, "postgresql");
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_JTA, "true");
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_USERNAME, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.POSTGRESQL_USER));
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_PASSWORD, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.POSTGRESQL_PASSWORD));
+        addOrReplaceEnvVar(OpenShiftImageConstants.DATASOURCES, datasourcePrefix);
+        addOrReplaceEnvVar(datasourcePrefix + "_" + OpenShiftImageConstants.DATABASE, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.POSTGRESQL_DATABASE));
+        addOrReplaceEnvVar(datasourcePrefix + "_" + OpenShiftImageConstants.JNDI, ConfigurationLoader.getKieServerDatasourceJndi());
+        addOrReplaceEnvVar(datasourcePrefix + "_" + OpenShiftImageConstants.DRIVER, "postgresql");
+        addOrReplaceEnvVar(datasourcePrefix + "_" + OpenShiftImageConstants.JTA, "true");
+        addOrReplaceEnvVar(datasourcePrefix + "_" + OpenShiftImageConstants.USERNAME, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.POSTGRESQL_USER));
+        addOrReplaceEnvVar(datasourcePrefix + "_" + OpenShiftImageConstants.PASSWORD, databaseDeployment.getEnvironmentVariableValue(OpenShiftImageConstants.POSTGRESQL_PASSWORD));
         // Set to first service
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVICE_HOST, databaseDeployment.getServices().get(0).getMetadata().getName());
-        addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVICE_PORT, "5432");
+        addOrReplaceEnvVar(datasourcePrefix + "_" + OpenShiftImageConstants.SERVICE_HOST, databaseDeployment.getServices().get(0).getMetadata().getName());
+        addOrReplaceEnvVar(datasourcePrefix + "_" + OpenShiftImageConstants.SERVICE_PORT, "5432");
         // Same as service host
         addOrReplaceEnvVar(OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE, databaseDeployment.getServices().get(0).getMetadata().getName());
         addOrReplaceEnvVar(OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL, "30000");
