@@ -14,6 +14,7 @@
     <!-- Test properties -->
     <template.base.url>https://raw.githubusercontent.com/jboss-container-images/rhpam-7-openshift-image/master/templates</template.base.url>
     <template.kieserver-mysql.url>${template.base.url}/rhpam72-kieserver-mysql.yaml</template.kieserver-mysql.url>
+    <template.kieserver-postgresql.url>${template.base.url}/rhpam72-kieserver-postgresql.yaml</template.kieserver-postgresql.url>
   </properties>
 
   <dependencyManagement>
@@ -125,6 +126,7 @@
           </excludes>
           <systemProperties>
             <template.kieserver-mysql.url>${template.kieserver-mysql.url}</template.kieserver-mysql.url>
+            <template.kieserver-postgresql.url>${template.kieserver-postgresql.url}</template.kieserver-postgresql.url>
           </systemProperties>
         </configuration>
       </plugin>
@@ -153,6 +155,7 @@
           </includes>
           <systemProperties>
             <template.kieserver-mysql.url>${template.kieserver-mysql.url}</template.kieserver-mysql.url>
+            <template.kieserver-postgresql.url>${template.kieserver-postgresql.url}</template.kieserver-postgresql.url>
           </systemProperties>
         </configuration>
       </plugin>
