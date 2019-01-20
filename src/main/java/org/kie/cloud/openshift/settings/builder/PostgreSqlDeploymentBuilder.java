@@ -161,6 +161,17 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder<Postg
         return this;
     }
 
+    public PostgreSqlDeploymentBuilder withMaxPreparedTransactions(long maxPreparedTransactions) {
+        addOrReplaceEnvVar(OpenShiftImageConstants.POSTGRESQL_MAX_PREPARED_TRANSACTIONS, Long.toString(maxPreparedTransactions));
+        return this;
+    }
+
+    public PostgreSqlDeploymentBuilder withMaxPreparedTransactionsFromProperties() {
+        addOrReplaceProperty("PostgreSQL Database max prepared connections", "Allows the PostgreSQL to handle XA transactions.", OpenShiftImageConstants.POSTGRESQL_MAX_PREPARED_TRANSACTIONS, "100", true);
+        addOrReplaceEnvVar(OpenShiftImageConstants.POSTGRESQL_MAX_PREPARED_TRANSACTIONS, "${" + OpenShiftImageConstants.POSTGRESQL_MAX_PREPARED_TRANSACTIONS + "}");
+        return this;
+    }
+
     public PostgreSqlDeploymentBuilder makePersistentFromProperties() {
         addOrReplaceProperty("Database Volume Capacity", "Size of persistent storage for database volume.", OpenShiftImageConstants.DB_VOLUME_CAPACITY, "1Gi", true);
         makePersistent("${" + OpenShiftImageConstants.DB_VOLUME_CAPACITY + "}");

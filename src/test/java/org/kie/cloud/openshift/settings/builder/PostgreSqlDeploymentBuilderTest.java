@@ -275,6 +275,37 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildPostgreSqlDeploymentWithMaxPreparedTransactionsFromProperties() {
+        PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder();
+        Deployment builtPostgreSqlDeployment = settingsBuilder.withMaxPreparedTransactionsFromProperties()
+                                                              .build();
+
+        assertThat(builtPostgreSqlDeployment).isNotNull();
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.POSTGRESQL_MAX_PREPARED_TRANSACTIONS.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${POSTGRESQL_MAX_PREPARED_TRANSACTIONS}"));
+        assertThat(builtPostgreSqlDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.POSTGRESQL_MAX_PREPARED_TRANSACTIONS.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("PostgreSQL Database max prepared connections");
+                            assertThat(p.getValue()).isEqualTo("100");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.TRUE);
+                        });
+    }
+
+    @Test
+    public void testBuildPostgreSqlDeploymentWithMaxPreparedTransactions() {
+        PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder();
+        Deployment builtPostgreSqlDeployment = settingsBuilder.withMaxPreparedTransactions(10L)
+                                                              .build();
+
+        assertThat(builtPostgreSqlDeployment).isNotNull();
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.POSTGRESQL_MAX_PREPARED_TRANSACTIONS.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("10"));
+    }
+
+    @Test
     public void testBuildPostgreSqlDeploymentWithPersistence() {
         PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder();
         Deployment builtPostgreSqlDeployment = settingsBuilder.makePersistent()
