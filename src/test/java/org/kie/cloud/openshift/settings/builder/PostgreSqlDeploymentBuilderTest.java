@@ -53,7 +53,7 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
                         assertThat(e.getImageChangeParams().getContainerNames()).containsExactly(builtPostgreSqlDeployment.getDeploymentName());
                         assertThat(e.getImageChangeParams().getFrom().getKind()).isEqualTo("ImageStreamTag");
                         assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("openshift");
-                        assertThat(e.getImageChangeParams().getFrom().getName()).isEqualTo("postgresql:9.6");
+                        assertThat(e.getImageChangeParams().getFrom().getName()).isEqualTo("postgresql:10");
                     });
         assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getReplicas()).isEqualTo(1);
         assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getSelector()).containsEntry("deploymentConfig", builtPostgreSqlDeployment.getDeploymentName());

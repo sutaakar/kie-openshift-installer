@@ -170,7 +170,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
     public void testBuildMySqlDeploymentWithImageStreamTagFromProperties() {
         MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
         Deployment builtMySqlDeployment = settingsBuilder.withImageStreamTagFromProperties()
-                                                             .build();
+                                                         .build();
 
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTriggers())
                     .filteredOn(t -> t.getType().equals("ImageChange"))
@@ -190,7 +190,7 @@ public class MySqlDeploymentBuilderTest extends AbstractCloudTest{
     public void testBuildMySqlDeploymentWithCustomImageStreamTag() {
         MySqlDeploymentBuilder settingsBuilder = new MySqlDeploymentBuilder();
         Deployment builtMySqlDeployment = settingsBuilder.withImageStreamTag("123")
-                                                             .build();
+                                                         .build();
 
         assertThat(builtMySqlDeployment).isNotNull();
         assertThat(builtMySqlDeployment.getDeploymentConfig().getSpec().getTriggers())
