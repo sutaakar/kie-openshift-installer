@@ -199,6 +199,36 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildMySqlDeploymentWithPostgreSqlUserFromProperties() {
+        PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder();
+        Deployment builtPostgreSqlDeployment = settingsBuilder.withDatabaseUserFromProperties()
+                                                              .build();
+
+        assertThat(builtPostgreSqlDeployment).isNotNull();
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.POSTGRESQL_USER.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${KIE_SERVER_POSTGRESQL_USER}"));
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.POSTGRESQL_PASSWORD.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${KIE_SERVER_POSTGRESQL_PWD}"));
+        assertThat(builtPostgreSqlDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_POSTGRESQL_USER.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("KIE Server PostgreSQL Database User");
+                            assertThat(p.getValue()).isEqualTo("rhpam");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
+        assertThat(builtPostgreSqlDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_POSTGRESQL_PWD.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("KIE Server PostgreSQL Database Password");
+                            assertThat(p.getGenerate()).isEqualTo("expression");
+                            assertThat(p.getFrom()).isEqualTo("[a-zA-Z]{6}[0-9]{1}!");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
+    }
+
+    @Test
     public void testBuildPostgreSqlDeploymentWithPostgreSqlUser() {
         PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder();
         Deployment builtPostgreSqlDeployment = settingsBuilder.withDatabaseUser("postgreSqlName", "postgreSqlPassword")

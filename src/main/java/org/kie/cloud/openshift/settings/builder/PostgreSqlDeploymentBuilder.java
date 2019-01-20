@@ -143,6 +143,13 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder<Postg
         return this;
     }
 
+    public PostgreSqlDeploymentBuilder withDatabaseUserFromProperties() {
+        addOrReplaceProperty("KIE Server PostgreSQL Database User", "KIE server PostgreSQL database username", OpenShiftImageConstants.KIE_SERVER_POSTGRESQL_USER, "rhpam", false);
+        addOrReplaceProperty("KIE Server PostgreSQL Database Password", "KIE server PostgreSQL database password", OpenShiftImageConstants.KIE_SERVER_POSTGRESQL_PWD, "[a-zA-Z]{6}[0-9]{1}!", "expression", false);
+        withDatabaseUser("${" + OpenShiftImageConstants.KIE_SERVER_POSTGRESQL_USER + "}", "${" + OpenShiftImageConstants.KIE_SERVER_POSTGRESQL_PWD + "}");
+        return this;
+    }
+
     public PostgreSqlDeploymentBuilder withDatabaseName(String dbName) {
         addOrReplaceEnvVar(OpenShiftImageConstants.POSTGRESQL_DATABASE, dbName);
         return this;
