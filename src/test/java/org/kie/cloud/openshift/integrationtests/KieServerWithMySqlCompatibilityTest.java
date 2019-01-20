@@ -30,7 +30,7 @@ import org.kie.cloud.openshift.scenario.builder.ScenarioBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CompatibilityTest extends AbstractCloudTest{
+public class KieServerWithMySqlCompatibilityTest extends AbstractCloudTest{
 
     private static final String KIE_SERVER_TEMPLATE_URL = System.getProperty("template.kieserver-mysql.url");
 
