@@ -10,6 +10,10 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- Test properties -->
+    <template.base.url>https://raw.githubusercontent.com/jboss-container-images/rhpam-7-openshift-image/master/templates</template.base.url>
+    <template.kieserver-mysql.url>${template.base.url}/rhpam72-kieserver-mysql.yaml</template.kieserver-mysql.url>
   </properties>
 
   <dependencyManagement>
@@ -119,6 +123,9 @@
           <excludes>
             <exclude>**/*IntegrationTest.java</exclude>
           </excludes>
+          <systemProperties>
+            <template.kieserver-mysql.url>${template.kieserver-mysql.url}</template.kieserver-mysql.url>
+          </systemProperties>
         </configuration>
       </plugin>
       <plugin>
@@ -144,6 +151,9 @@
           <includes>
             <include>**/*IntegrationTest.java</include>
           </includes>
+          <systemProperties>
+            <template.kieserver-mysql.url>${template.kieserver-mysql.url}</template.kieserver-mysql.url>
+          </systemProperties>
         </configuration>
       </plugin>
     </plugins>
