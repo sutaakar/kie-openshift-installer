@@ -1,5 +1,6 @@
 package org.kie.cloud.openshift.settings.builder;
 
+import java.time.Duration;
 import java.util.List;
 
 import io.fabric8.kubernetes.api.model.EnvVar;
@@ -777,6 +778,35 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
         assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
                         .filteredOn(e -> OpenShiftImageConstants.DROOLS_SERVER_FILTER_CLASSES.equals(e.getName()))
                         .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("false"));
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithTimerServiceDataStoreRefreshIntervalFromProperties() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withTimerServiceDataStoreRefreshIntervalFromProperties()
+                                                             .build();
+
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("${TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL}"));
+        assertThat(builtKieServerDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("Timer service data store refresh interval (in milliseconds)");
+                            assertThat(p.getValue()).isEqualTo("30000");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                        });
+    }
+
+    @Test
+    public void testBuildKieServerDeploymentWithTimerServiceDataStoreRefreshInterval() {
+        KieServerDeploymentBuilder settingsBuilder = new KieServerDeploymentBuilder();
+        Deployment builtKieServerDeployment = settingsBuilder.withTimerServiceDataStoreRefreshInterval(Duration.ofSeconds(10))
+                                                             .build();
+
+        assertThat(builtKieServerDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getEnv())
+                        .filteredOn(e -> OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL.equals(e.getName()))
+                        .hasOnlyOneElementSatisfying(e -> assertThat(e.getValue()).isEqualTo("10000"));
     }
 
     @Test

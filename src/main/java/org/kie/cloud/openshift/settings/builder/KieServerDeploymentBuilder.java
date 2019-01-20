@@ -15,6 +15,7 @@
  */
 package org.kie.cloud.openshift.settings.builder;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -461,6 +462,17 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
         return this;
     }
 
+    public KieServerDeploymentBuilder withTimerServiceDataStoreRefreshIntervalFromProperties() {
+        addOrReplaceProperty("Timer service data store refresh interval (in milliseconds)", "Sets refresh-interval for the EJB timer database data-store service.", OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL, "30000", false);
+        addOrReplaceEnvVar(OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL, "${" + OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL + "}");
+        return this;
+    }
+
+    public KieServerDeploymentBuilder withTimerServiceDataStoreRefreshInterval(Duration timerServiceDataStoreRefreshInterval) {
+        addOrReplaceEnvVar(OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL, Long.toString(timerServiceDataStoreRefreshInterval.toMillis()));
+        return this;
+    }
+
     public MavenRepoBuilder withMavenRepo() {
         return withMavenRepo(NameGenerator.generateRandomNameUpperCase());
     }
@@ -531,6 +543,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
         addOrReplaceEnvVar(datasourcePrefix + "_" + OpenShiftImageConstants.SERVICE_PORT, "3306");
         // Same as service host
         addOrReplaceEnvVar(OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE, mySqlDeployment.getServices().get(0).getMetadata().getName());
+        // TODO override if exists?
         addOrReplaceEnvVar(OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL, "30000");
         return this;
     }
@@ -551,6 +564,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
         addOrReplaceEnvVar(datasourcePrefix + "_" + OpenShiftImageConstants.SERVICE_PORT, "5432");
         // Same as service host
         addOrReplaceEnvVar(OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE, postgreSqlDeployment.getServices().get(0).getMetadata().getName());
+        // TODO override if exists?
         addOrReplaceEnvVar(OpenShiftImageConstants.TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL, "30000");
         return this;
     }
