@@ -148,6 +148,12 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder<Postg
         return this;
     }
 
+    public PostgreSqlDeploymentBuilder withDatabaseNameFromProperties() {
+        addOrReplaceProperty("KIE Server PostgreSQL Database Name", "KIE server PostgreSQL database name", OpenShiftImageConstants.KIE_SERVER_POSTGRESQL_DB, "rhpam7", false);
+        withDatabaseName("${" + OpenShiftImageConstants.KIE_SERVER_POSTGRESQL_DB + "}");
+        return this;
+    }
+
     public PostgreSqlDeploymentBuilder makePersistentFromProperties() {
         addOrReplaceProperty("Database Volume Capacity", "Size of persistent storage for database volume.", OpenShiftImageConstants.DB_VOLUME_CAPACITY, "1Gi", true);
         makePersistent("${" + OpenShiftImageConstants.DB_VOLUME_CAPACITY + "}");
