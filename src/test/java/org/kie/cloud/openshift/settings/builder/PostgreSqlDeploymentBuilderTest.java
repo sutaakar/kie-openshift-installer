@@ -229,7 +229,7 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
     public void testBuildPostgreSqlDeploymentWithPersistence() {
         PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder();
         Deployment builtPostgreSqlDeployment = settingsBuilder.makePersistent()
-                                                         .build();
+                                                              .build();
 
         List<VolumeMount> volumeMounts = builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getVolumeMounts();
         List<Volume> volumes = builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getVolumes();
@@ -248,6 +248,67 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
                             assertThat(p.getMetadata().getName()).isEqualTo(volumes.get(0).getPersistentVolumeClaim().getClaimName());
                             assertThat(p.getSpec().getAccessModes()).containsOnlyOnce("ReadWriteOnce");
                             assertThat(p.getSpec().getResources().getRequests().get("storage")).isEqualTo(new Quantity("1Gi"));
+                        });
+    }
+
+    @Test
+    public void testBuildPostgreSqlDeploymentWithCustomPersistence() {
+        PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder();
+        Deployment builtPostgreSqlDeployment = settingsBuilder.makePersistent("64Mi")
+                                                              .build();
+
+        List<VolumeMount> volumeMounts = builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getVolumeMounts();
+        List<Volume> volumes = builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getVolumes();
+        assertThat(volumeMounts)
+                        .hasOnlyOneElementSatisfying(m -> {
+                            assertThat(m.getName()).isEqualTo(builtPostgreSqlDeployment.getDeploymentName() + "-pvol");
+                            assertThat(m.getMountPath()).isEqualTo("/var/lib/pgsql/data");
+                        });
+        assertThat(volumes)
+                        .hasOnlyOneElementSatisfying(v -> {
+                            assertThat(v.getName()).isEqualTo(volumeMounts.get(0).getName());
+                            assertThat(v.getPersistentVolumeClaim().getClaimName()).isEqualTo(builtPostgreSqlDeployment.getDeploymentName() + "-claim");
+                        });
+        assertThat(builtPostgreSqlDeployment.getPersistentVolumeClaims())
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getMetadata().getName()).isEqualTo(volumes.get(0).getPersistentVolumeClaim().getClaimName());
+                            assertThat(p.getMetadata().getLabels()).containsEntry("service", builtPostgreSqlDeployment.getDeploymentName());
+                            assertThat(p.getSpec().getAccessModes()).containsOnlyOnce("ReadWriteOnce");
+                            assertThat(p.getSpec().getResources().getRequests().get("storage")).isEqualTo(new Quantity("64Mi"));
+                        });
+    }
+
+    @Test
+    public void testBuildPostgreSqlDeploymentWithPersistenceFromProperties() {
+        PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder();
+        Deployment builtPostgreSqlDeployment = settingsBuilder.makePersistentFromProperties()
+                                                              .build();
+
+        List<VolumeMount> volumeMounts = builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getContainers().get(0).getVolumeMounts();
+        List<Volume> volumes = builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTemplate().getSpec().getVolumes();
+        assertThat(volumeMounts)
+                        .hasOnlyOneElementSatisfying(m -> {
+                            assertThat(m.getName()).isEqualTo(builtPostgreSqlDeployment.getDeploymentName() + "-pvol");
+                            assertThat(m.getMountPath()).isEqualTo("/var/lib/pgsql/data");
+                        });
+        assertThat(volumes)
+                        .hasOnlyOneElementSatisfying(v -> {
+                            assertThat(v.getName()).isEqualTo(volumeMounts.get(0).getName());
+                            assertThat(v.getPersistentVolumeClaim().getClaimName()).isEqualTo(builtPostgreSqlDeployment.getDeploymentName() + "-claim");
+                        });
+        assertThat(builtPostgreSqlDeployment.getPersistentVolumeClaims())
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getMetadata().getName()).isEqualTo(volumes.get(0).getPersistentVolumeClaim().getClaimName());
+                            assertThat(p.getMetadata().getLabels()).containsEntry("service", builtPostgreSqlDeployment.getDeploymentName());
+                            assertThat(p.getSpec().getAccessModes()).containsOnlyOnce("ReadWriteOnce");
+                            assertThat(p.getSpec().getResources().getRequests().get("storage")).isEqualTo(new Quantity("${DB_VOLUME_CAPACITY}"));
+                        });
+        assertThat(builtPostgreSqlDeployment.getParameters())
+                        .filteredOn(p -> OpenShiftImageConstants.DB_VOLUME_CAPACITY.equals(p.getName()))
+                        .hasOnlyOneElementSatisfying(p -> {
+                            assertThat(p.getDisplayName()).isEqualTo("Database Volume Capacity");
+                            assertThat(p.getValue()).isEqualTo("1Gi");
+                            assertThat(p.getRequired()).isEqualTo(Boolean.TRUE);
                         });
     }
 }

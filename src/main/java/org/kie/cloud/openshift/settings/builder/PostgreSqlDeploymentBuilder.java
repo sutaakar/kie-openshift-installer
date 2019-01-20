@@ -148,8 +148,19 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder<Postg
         return this;
     }
 
+    public PostgreSqlDeploymentBuilder makePersistentFromProperties() {
+        addOrReplaceProperty("Database Volume Capacity", "Size of persistent storage for database volume.", OpenShiftImageConstants.DB_VOLUME_CAPACITY, "1Gi", true);
+        makePersistent("${" + OpenShiftImageConstants.DB_VOLUME_CAPACITY + "}");
+        return this;
+    }
+
     public PostgreSqlDeploymentBuilder makePersistent() {
-        addPersistence(getDeployment().getDeploymentName(), "/var/lib/pgsql/data", "ReadWriteOnce", "1Gi");
+        makePersistent("1Gi");
+        return this;
+    }
+
+    public PostgreSqlDeploymentBuilder makePersistent(String persistentVolumeStorageSize) {
+        addPersistence(getDeployment().getDeploymentName(), "/var/lib/pgsql/data", "ReadWriteOnce", persistentVolumeStorageSize);
         return this;
     }
 }
