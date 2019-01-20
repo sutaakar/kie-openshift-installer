@@ -80,6 +80,9 @@ public class OpenShiftImageConstants {
     public static final String MYSQL_IMAGE_STREAM_NAMESPACE = "MYSQL_IMAGE_STREAM_NAMESPACE";
     public static final String MYSQL_IMAGE_STREAM_TAG = "MYSQL_IMAGE_STREAM_TAG";
 
+    public static final String POSTGRESQL_IMAGE_STREAM_NAMESPACE = "POSTGRESQL_IMAGE_STREAM_NAMESPACE";
+    public static final String POSTGRESQL_IMAGE_STREAM_TAG = "POSTGRESQL_IMAGE_STREAM_TAG";
+
     public static final String DBE_SERVICE_HOST = "DBE_SERVICE_HOST";
     public static final String DBE_SERVICE_PORT = "DBE_SERVICE_PORT";
     public static final String DBE_DRIVER = "DBE_DRIVER";

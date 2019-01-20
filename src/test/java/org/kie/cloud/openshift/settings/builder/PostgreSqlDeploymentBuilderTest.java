@@ -131,6 +131,74 @@ public class PostgreSqlDeploymentBuilderTest extends AbstractCloudTest{
     }
 
     @Test
+    public void testBuildPostgreSqlDeploymentWithImageStreamNamespaceFromProperties() {
+        PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder();
+        Deployment builtPostgreSqlDeployment = settingsBuilder.withImageStreamNamespaceFromProperties()
+                                                              .build();
+
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ImageChange"))
+                    .hasOnlyOneElementSatisfying(e -> {
+                        assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("${POSTGRESQL_IMAGE_STREAM_NAMESPACE}");
+                    });
+        assertThat(builtPostgreSqlDeployment.getParameters())
+                    .filteredOn(p -> OpenShiftImageConstants.POSTGRESQL_IMAGE_STREAM_NAMESPACE.equals(p.getName()))
+                    .hasOnlyOneElementSatisfying(p -> {
+                        assertThat(p.getDisplayName()).isEqualTo("PostgreSQL ImageStream Namespace");
+                        assertThat(p.getValue()).isEqualTo("openshift");
+                        assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                    });
+    }
+
+    @Test
+    public void testBuildPostgreSqlDeploymentWithCustomImageStreamNamespace() {
+        PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder();
+        Deployment builtPostgreSqlDeployment = settingsBuilder.withImageStreamNamespace("custom-namespace")
+                                                              .build();
+
+        assertThat(builtPostgreSqlDeployment).isNotNull();
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ImageChange"))
+                    .hasOnlyOneElementSatisfying(e -> {
+                        assertThat(e.getImageChangeParams().getFrom().getNamespace()).isEqualTo("custom-namespace");
+                    });
+    }
+
+    @Test
+    public void testBuildPostgreSqlDeploymentWithImageStreamTagFromProperties() {
+        PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder();
+        Deployment builtPostgreSqlDeployment = settingsBuilder.withImageStreamTagFromProperties()
+                                                              .build();
+
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ImageChange"))
+                    .hasOnlyOneElementSatisfying(e -> {
+                        assertThat(e.getImageChangeParams().getFrom().getName()).endsWith(":${POSTGRESQL_IMAGE_STREAM_TAG}");
+                    });
+        assertThat(builtPostgreSqlDeployment.getParameters())
+                    .filteredOn(p -> OpenShiftImageConstants.POSTGRESQL_IMAGE_STREAM_TAG.equals(p.getName()))
+                    .hasOnlyOneElementSatisfying(p -> {
+                        assertThat(p.getDisplayName()).isEqualTo("PostgreSQL ImageStream Tag");
+                        assertThat(p.getValue()).isEqualTo("10");
+                        assertThat(p.getRequired()).isEqualTo(Boolean.FALSE);
+                    });
+    }
+
+    @Test
+    public void testBuildPostgreSqlDeploymentWithCustomImageStreamTag() {
+        PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder();
+        Deployment builtPostgreSqlDeployment = settingsBuilder.withImageStreamTag("123")
+                                                              .build();
+
+        assertThat(builtPostgreSqlDeployment).isNotNull();
+        assertThat(builtPostgreSqlDeployment.getDeploymentConfig().getSpec().getTriggers())
+                    .filteredOn(t -> t.getType().equals("ImageChange"))
+                    .hasOnlyOneElementSatisfying(e -> {
+                        assertThat(e.getImageChangeParams().getFrom().getName()).endsWith(":123");
+                    });
+    }
+
+    @Test
     public void testBuildPostgreSqlDeploymentWithPostgreSqlUser() {
         PostgreSqlDeploymentBuilder settingsBuilder = new PostgreSqlDeploymentBuilder();
         Deployment builtPostgreSqlDeployment = settingsBuilder.withDatabaseUser("postgreSqlName", "postgreSqlPassword")

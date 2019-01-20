@@ -119,6 +119,24 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder<Postg
         container.setReadinessProbe(readinessProbe);
     }
 
+    public PostgreSqlDeploymentBuilder withImageStreamNamespaceFromProperties() {
+        addOrReplaceProperty("PostgreSQL ImageStream Namespace", "Namespace in which the ImageStream for the PostgreSQL image is" +
+                " installed. The ImageStream is already installed in the openshift namespace." +
+                " You should only need to modify this if you've installed the ImageStream in a" +
+                " different namespace/project. Default is \"openshift\".", OpenShiftImageConstants.POSTGRESQL_IMAGE_STREAM_NAMESPACE, getDefaultImageStreamNamespace(), false);
+
+        withImageStreamNamespace("${" + OpenShiftImageConstants.POSTGRESQL_IMAGE_STREAM_NAMESPACE + "}");
+        return this;
+    }
+
+    public PostgreSqlDeploymentBuilder withImageStreamTagFromProperties() {
+        String defaultImageStreamTag = getDefaultImageStreamTag();
+        addOrReplaceProperty("PostgreSQL ImageStream Tag", "The PostgreSQL image version, which is intended to correspond to the PostgreSQL version. Default is \"" + defaultImageStreamTag + "\".", OpenShiftImageConstants.POSTGRESQL_IMAGE_STREAM_TAG, defaultImageStreamTag, false);
+
+        withImageStreamTag("${" + OpenShiftImageConstants.POSTGRESQL_IMAGE_STREAM_TAG + "}");
+        return this;
+    }
+
     public PostgreSqlDeploymentBuilder withDatabaseUser(String postgreSqlUser, String postgreSqlPwd) {
         addOrReplaceEnvVar(OpenShiftImageConstants.POSTGRESQL_USER, postgreSqlUser);
         addOrReplaceEnvVar(OpenShiftImageConstants.POSTGRESQL_PASSWORD, postgreSqlPwd);
