@@ -122,7 +122,7 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder<Postg
     public PostgreSqlDeploymentBuilder withImageStreamNamespaceFromProperties() {
         addOrReplaceProperty("PostgreSQL ImageStream Namespace", "Namespace in which the ImageStream for the PostgreSQL image is" +
                 " installed. The ImageStream is already installed in the openshift namespace." +
-                " You should only need to modify this if you've installed the ImageStream in a" +
+                " You should only need to modify this if you installed the ImageStream in a" +
                 " different namespace/project. Default is \"openshift\".", OpenShiftImageConstants.POSTGRESQL_IMAGE_STREAM_NAMESPACE, getDefaultImageStreamNamespace(), false);
 
         withImageStreamNamespace("${" + OpenShiftImageConstants.POSTGRESQL_IMAGE_STREAM_NAMESPACE + "}");
@@ -173,7 +173,7 @@ public class PostgreSqlDeploymentBuilder extends AbstractDeploymentBuilder<Postg
     }
 
     public PostgreSqlDeploymentBuilder makePersistentFromProperties() {
-        addOrReplaceProperty("Database Volume Capacity", "Size of persistent storage for database volume.", OpenShiftImageConstants.DB_VOLUME_CAPACITY, "1Gi", true);
+        addOrReplaceProperty("Database Volume Capacity", "Size of persistent storage for the database volume.", OpenShiftImageConstants.DB_VOLUME_CAPACITY, "1Gi", true);
         makePersistent("${" + OpenShiftImageConstants.DB_VOLUME_CAPACITY + "}");
         return this;
     }

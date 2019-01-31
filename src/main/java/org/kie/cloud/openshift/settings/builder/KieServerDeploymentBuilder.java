@@ -207,7 +207,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
     public KieServerDeploymentBuilder withImageStreamNamespaceFromProperties() {
         addOrReplaceProperty("ImageStream Namespace", "Namespace in which the ImageStreams for Red Hat Middleware images are" +
                 " installed. These ImageStreams are normally installed in the openshift namespace." +
-                " You should only need to modify this if you've installed the ImageStreams in a" +
+                " You should only need to modify this if you installed the ImageStreams in a" +
                 " different namespace/project.", OpenShiftImageConstants.IMAGE_STREAM_NAMESPACE, getDefaultImageStreamNamespace(), true);
 
         withImageStreamNamespace("${" + OpenShiftImageConstants.IMAGE_STREAM_NAMESPACE + "}");
@@ -265,7 +265,7 @@ public class KieServerDeploymentBuilder extends AbstractDeploymentBuilder<KieSer
         // TODO: Bug - missing value
         addOrReplaceProperty("KIE Server Controller Password", "KIE server controller password (Sets the org.kie.server.controller.pwd system property)", OpenShiftImageConstants.KIE_SERVER_CONTROLLER_PWD, false);
         addOrReplaceProperty("KIE Server Controller Token", "KIE server controller token for bearer authentication (Sets the org.kie.server.controller.token system property)", OpenShiftImageConstants.KIE_SERVER_CONTROLLER_TOKEN, false);
-        addOrReplaceProperty("KIE Server Controller Service", "The service name for the optional business central monitor, where it can be reached to allow service lookup, and registered with to allow monitoring console functionality (If set, will be used to discover host and port)", OpenShiftImageConstants.KIE_SERVER_CONTROLLER_SERVICE, false);
+        addOrReplaceProperty("KIE Server Controller Service", "The service name for the optional Business Central Monitoring. The application uses this service name to register with the monitoring console. (If set, will be used to discover host and port)", OpenShiftImageConstants.KIE_SERVER_CONTROLLER_SERVICE, false);
         addOrReplacePropertyWithExample("KIE Server Controller host", "KIE server controller host (Used to set the org.kie.server.controller system property)", OpenShiftImageConstants.KIE_SERVER_CONTROLLER_HOST, "my-app-controller-ocpuser.os.example.com", false);
         addOrReplacePropertyWithExample("KIE Server Controller port", "KIE server controller port (Used to set the org.kie.server.controller system property)", OpenShiftImageConstants.KIE_SERVER_CONTROLLER_PORT, "8080", false);
         addOrReplaceEnvVar(OpenShiftImageConstants.KIE_SERVER_CONTROLLER_USER, "${" + OpenShiftImageConstants.KIE_SERVER_CONTROLLER_USER + "}");

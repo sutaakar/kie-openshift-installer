@@ -533,7 +533,7 @@ public class KieServerDeploymentBuilderTest extends AbstractCloudTest{
                     .filteredOn(p -> OpenShiftImageConstants.KIE_SERVER_IMAGE_STREAM_NAME.equals(p.getName()))
                     .hasOnlyOneElementSatisfying(p -> {
                         assertThat(p.getDisplayName()).isEqualTo("KIE Server ImageStream Name");
-                        assertThat(p.getValue()).isEqualTo("rhpam72-kieserver-openshift");
+                        assertThat(p.getValue()).isEqualTo("rhpam73-kieserver-openshift");
                         assertThat(p.getRequired()).isEqualTo(Boolean.TRUE);
                     });
     }
